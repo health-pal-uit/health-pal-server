@@ -1,9 +1,45 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { UsersModule } from './users/users.module';
+import { ExpertsModule } from './experts/experts.module';
+import { ExpertsRolesModule } from './experts_roles/experts_roles.module';
+import { ExpertsRatingsModule } from './experts_ratings/experts_ratings.module';
+import { BookingsModule } from './bookings/bookings.module';
+import { PremiumPackagesModule } from './premium_packages/premium_packages.module';
+import { PayRecordsModule } from './pay_records/pay_records.module';
+import { MonthlyPaymentsModule } from './monthly_payments/monthly_payments.module';
+import { ConsultationsModule } from './consultations/consultations.module';
+import { ChatSessionsModule } from './chat_sessions/chat_sessions.module';
+import { ChatParticipantsModule } from './chat_participants/chat_participants.module';
+import { ChatMessagesModule } from './chat_messages/chat_messages.module';
+import { FitnessGoalsModule } from './fitness_goals/fitness_goals.module';
+import { FitnessProfilesModule } from './fitness_profiles/fitness_profiles.module';
+import { DietTypesModule } from './diet_types/diet_types.module';
+import { IngredientsModule } from './ingredients/ingredients.module';
+import { MealsModule } from './meals/meals.module';
+import { IngreMealsModule } from './ingre_meals/ingre_meals.module';
+import { DailyLogsModule } from './daily_logs/daily_logs.module';
+import { DailyIngresModule } from './daily_ingres/daily_ingres.module';
+import { DailyMealsModule } from './daily_meals/daily_meals.module';
+import { ActivitiesModule } from './activities/activities.module';
+import { ActivityRecordsModule } from './activity_records/activity_records.module';
+import { ChallengesModule } from './challenges/challenges.module';
+import { MedalsModule } from './medals/medals.module';
+import { ChallengesMedalsModule } from './challenges_medals/challenges_medals.module';
+import { ChallengesUsersModule } from './challenges_users/challenges_users.module';
+import { MedalsUsersModule } from './medals_users/medals_users.module';
+import { PostsModule } from './posts/posts.module';
+import { PostsMediasModule } from './posts_medias/posts_medias.module';
+import { CommentsModule } from './comments/comments.module';
+import { LikesModule } from './likes/likes.module';
+import { NotificationsModule } from './notifications/notifications.module';
+import { DevicesModule } from './devices/devices.module';
+import { FavMealsModule } from './fav_meals/fav_meals.module';
+import { FavIngresModule } from './fav_ingres/fav_ingres.module';
 
 @Module({
-  imports: [],
+  imports: [UsersModule, ExpertsModule, ExpertsRolesModule, ExpertsRatingsModule, BookingsModule, PremiumPackagesModule, PayRecordsModule, MonthlyPaymentsModule, ConsultationsModule, ChatSessionsModule, ChatParticipantsModule, ChatMessagesModule, FitnessGoalsModule, FitnessProfilesModule, DietTypesModule, IngredientsModule, MealsModule, IngreMealsModule, DailyLogsModule, DailyIngresModule, DailyMealsModule, ActivitiesModule, ActivityRecordsModule, ChallengesModule, MedalsModule, ChallengesMedalsModule, ChallengesUsersModule, MedalsUsersModule, PostsModule, PostsMediasModule, CommentsModule, LikesModule, NotificationsModule, DevicesModule, FavMealsModule, FavIngresModule],
   controllers: [AppController],
   providers: [AppService],
 })
