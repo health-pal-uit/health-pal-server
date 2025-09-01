@@ -38,7 +38,7 @@ import { DevicesModule } from './devices/devices.module';
 import { FavMealsModule } from './fav_meals/fav_meals.module';
 import { FavIngresModule } from './fav_ingres/fav_ingres.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { typeOrmConfig } from './database/data-sources';
+import { typeOrmConfig } from '../database/data-sources';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
