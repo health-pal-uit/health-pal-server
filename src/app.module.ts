@@ -37,9 +37,17 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { DevicesModule } from './devices/devices.module';
 import { FavMealsModule } from './fav_meals/fav_meals.module';
 import { FavIngresModule } from './fav_ingres/fav_ingres.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { typeOrmConfig } from '../database/data-sources';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [UsersModule, ExpertsModule, ExpertsRolesModule, ExpertsRatingsModule, BookingsModule, PremiumPackagesModule, PayRecordsModule, MonthlyPaymentsModule, ConsultationsModule, ChatSessionsModule, ChatParticipantsModule, ChatMessagesModule, FitnessGoalsModule, FitnessProfilesModule, DietTypesModule, IngredientsModule, MealsModule, IngreMealsModule, DailyLogsModule, DailyIngresModule, DailyMealsModule, ActivitiesModule, ActivityRecordsModule, ChallengesModule, MedalsModule, ChallengesMedalsModule, ChallengesUsersModule, MedalsUsersModule, PostsModule, PostsMediasModule, CommentsModule, LikesModule, NotificationsModule, DevicesModule, FavMealsModule, FavIngresModule],
+  imports: [ ConfigModule.forRoot({
+    isGlobal: true,
+    envFilePath: '.env', // Load environment variables from .env file
+  }),
+    TypeOrmModule.forRootAsync(typeOrmConfig),
+    UsersModule, ExpertsModule, ExpertsRolesModule, ExpertsRatingsModule, BookingsModule, PremiumPackagesModule, PayRecordsModule, MonthlyPaymentsModule, ConsultationsModule, ChatSessionsModule, ChatParticipantsModule, ChatMessagesModule, FitnessGoalsModule, FitnessProfilesModule, DietTypesModule, IngredientsModule, MealsModule, IngreMealsModule, DailyLogsModule, DailyIngresModule, DailyMealsModule, ActivitiesModule, ActivityRecordsModule, ChallengesModule, MedalsModule, ChallengesMedalsModule, ChallengesUsersModule, MedalsUsersModule, PostsModule, PostsMediasModule, CommentsModule, LikesModule, NotificationsModule, DevicesModule, FavMealsModule, FavIngresModule],
   controllers: [AppController],
   providers: [AppService],
 })
