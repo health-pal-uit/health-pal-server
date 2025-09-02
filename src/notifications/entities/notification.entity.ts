@@ -1,5 +1,6 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/users/entities/user.entity";
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @ApiSchema({name: Notification.name, description: 'Notification entity'})
 @Entity('notifications')
@@ -21,6 +22,15 @@ export class Notification {
     is_read: boolean;
 
     @ApiProperty({example: '2023-01-01T00:00:00Z', description: 'Creation date of the notification'})
-    @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})
+    @CreateDateColumn({ type: 'timestamptz' })
     created_at: Date;
+
+    // relations => 1
+    @ManyToOne(() => User, (user) => user.notifications, {
+    eager: false,               
+    onDelete: 'CASCADE',         // delete notifications when user is deleted
+    })
+    @JoinColumn({name: 'user_id'})
+    @Index('idx_notifications_user')
+    user: User;
 }

@@ -1,5 +1,11 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Check, Column, Entity, PrimaryColumn } from "typeorm";
+import { Booking } from "src/bookings/entities/booking.entity";
+import { ExpertsRating } from "src/experts_ratings/entities/experts_rating.entity";
+import { ExpertsRole } from "src/experts_roles/entities/experts_role.entity";
+import { PayRecord } from "src/pay_records/entities/pay_record.entity";
+import { PremiumPackage } from "src/premium_packages/entities/premium_package.entity";
+import { User } from "src/users/entities/user.entity";
+import { Check, Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryColumn } from "typeorm";
 
 export enum AccStatus {
     PENDING = 'pending',
@@ -12,7 +18,7 @@ export enum AccStatus {
 @Entity('experts')
 export class Expert {
     @ApiProperty()
-    @PrimaryColumn()
+    @PrimaryColumn('uuid')
     user_id: string;
 
     @ApiProperty()
@@ -24,7 +30,7 @@ export class Expert {
     license_url: string; // @IsUrl() in dto
 
     @ApiProperty()
-    @Column({ name: 'citizenId', type: 'char', length: 12, unique: true })
+    @Column({ type: 'char', length: 12, unique: true })
     identity_id!: string;
 
     @ApiProperty()
@@ -42,4 +48,37 @@ export class Expert {
     @ApiProperty()
     @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
     joined_at: Date;
+
+    // relations => 3
+
+    @OneToOne(() => User, { eager: true, onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'user_id' })
+    user: User;
+
+    @ManyToOne(() => PremiumPackage, (pkg) => pkg.experts, {
+    eager: true,
+    nullable: false,
+    onDelete: 'RESTRICT', // or 'SET NULL'
+    })
+    @JoinColumn({ name: 'booking_fee_tier_id' })
+    booking_fee_tier: PremiumPackage;
+
+    @ManyToOne(() => ExpertsRole, (role) => role.experts, {
+    eager: true,
+    nullable: false,
+    onDelete: 'RESTRICT', // or 'SET NULL'
+    })
+    @JoinColumn({ name: 'role_id' })
+    role: ExpertsRole;
+
+    // reflects
+
+    @OneToMany(() => ExpertsRating, (rating) => rating.expert)
+    expert_ratings: ExpertsRating[];
+
+    @OneToMany(() => Booking, (booking) => booking.expert)
+    bookings: Booking[];
+
+    @OneToMany(() => PayRecord, (pay_record) => pay_record.expert)
+    pay_records: PayRecord[];
 }

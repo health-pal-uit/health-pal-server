@@ -1,5 +1,7 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { ActivityRecord } from "src/activity_records/entities/activity_record.entity";
+import { User } from "src/users/entities/user.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum FitnessGoalType {
     CUT = 'cut',
@@ -47,4 +49,14 @@ export class FitnessGoal {
     @ApiProperty()
     @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})
     created_at: Date;
+
+    // relations => 1
+    @ManyToOne(() => User, (user) => user.fitness_goals, {onDelete: 'CASCADE'})
+    @JoinColumn({ name: 'user_id' })
+    user: User;
+
+    // reflects
+
+    @OneToMany(() => ActivityRecord, (activityRecord) => activityRecord.goal)
+    activity_records: ActivityRecord[] | null;
 }

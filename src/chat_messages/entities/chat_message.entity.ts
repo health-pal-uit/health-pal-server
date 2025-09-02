@@ -1,5 +1,7 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { ChatSession } from "src/chat_sessions/entities/chat_session.entity";
+import { User } from "src/users/entities/user.entity";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum MessageType {
     TEXT = 'text',
@@ -27,6 +29,17 @@ export class ChatMessage {
     media_url?: string;
 
     @ApiProperty()
-    @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})
+    @CreateDateColumn({ type: 'timestamptz' })
     created_at: Date;
+
+    // relations => 2
+    @ManyToOne(() => ChatSession, (chat_session) => chat_session.messages)
+    @JoinColumn({name: 'chat_session_id'})
+    chat_session: ChatSession;
+
+    @ManyToOne(() => User, (user) => user.chat_messages, {onDelete: 'CASCADE'})
+    @JoinColumn({name: 'sender_id', referencedColumnName: 'id'})
+    user: User;
+
+    // reflects
 }

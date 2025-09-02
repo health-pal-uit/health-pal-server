@@ -1,5 +1,6 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { FitnessProfile } from "src/fitness_profiles/entities/fitness_profile.entity";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum DietTypeName {
     KETO = 'keto',
@@ -14,7 +15,7 @@ export enum DietTypeName {
 export class DietType {
     @ApiProperty({example: 'uuid', description: 'Unique identifier'})
     @PrimaryGeneratedColumn('uuid')
-    id: number;
+    id: string;
 
     @ApiProperty({enum: DietTypeName, description: 'Name of the diet type'})
     @Column({type: 'enum', enum: DietTypeName, unique: true})
@@ -33,6 +34,13 @@ export class DietType {
     carbs_percentages: number;
 
     @ApiProperty({example: '2022-01-01T00:00:00.000Z', description: 'Creation date of the diet type'})
-    @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})
+    @CreateDateColumn({ type: 'timestamptz' })
     created_at: Date;
+
+    // relations
+
+    // reflects
+    @ApiProperty({type: () => [FitnessProfile], description: 'List of fitness profiles associated with this diet type'})
+    @OneToMany(() => FitnessProfile, fitness_profile => fitness_profile.diet_type)
+    fitness_profiles: FitnessProfile[];
 }

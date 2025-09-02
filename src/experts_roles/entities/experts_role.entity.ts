@@ -1,5 +1,6 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Expert } from "src/experts/entities/expert.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum Tier{
     BACHELOR = 'bachelor',
@@ -30,4 +31,12 @@ export class ExpertsRole {
     @ApiProperty()
     @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})
     created_at: Date;
+
+    // relations
+
+
+    // reflects
+    
+    @OneToMany(() => Expert, (expert) => expert.role)
+    experts: Expert[];
 }

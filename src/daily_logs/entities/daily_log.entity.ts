@@ -1,7 +1,14 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { ActivityRecord } from "src/activity_records/entities/activity_record.entity";
+import { DailyIngre } from "src/daily_ingres/entities/daily_ingre.entity";
+import { DailyMeal } from "src/daily_meals/entities/daily_meal.entity";
+import { User } from "src/users/entities/user.entity";
+import { Check, Column, Entity, Index, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 
 @ApiSchema({name: DailyLog.name, description: 'DailyLog entity'})
+@Check(`total_kcal >= 0 AND total_protein_gr >= 0 AND total_fat_gr >= 0 AND total_carbs_gr >= 0 AND total_fiber_gr >= 0 AND water_drank_l >= 0`)
+@Unique('UQ_daily_logs_user_date', ['user', 'date'])
+@Index('idx_daily_logs_user_date', ['user', 'date'])
 @Entity('daily_logs')
 export class DailyLog {
     @ApiProperty({description: 'Unique identifier for the daily log'})
@@ -37,6 +44,21 @@ export class DailyLog {
     water_drank_l: number;
 
     @ApiProperty({description: 'Date when the daily log was last updated'})
-    @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})
+    @UpdateDateColumn({ type: 'timestamptz' })
     updated_at: Date;
+
+    // relations => 1
+    @ManyToOne(() => User, (user) => user.daily_logs, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'user_id' })
+    user: User;
+
+    // reflects
+    @OneToMany(() => DailyIngre, (dailyIngre) => dailyIngre.daily_log)
+    daily_ingres: DailyIngre[];
+
+    @OneToMany(() => DailyMeal, (dailyMeal) => dailyMeal.daily_log)
+    daily_meals: DailyMeal[];
+
+    @OneToMany(() => ActivityRecord, (activityRecord) => activityRecord.daily_log)
+    activity_records: ActivityRecord[] | null;
 }

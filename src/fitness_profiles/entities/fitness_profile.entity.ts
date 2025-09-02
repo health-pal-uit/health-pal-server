@@ -1,5 +1,7 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { DietType } from "src/diet_types/entities/diet_type.entity";
+import { User } from "src/users/entities/user.entity";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 export enum ActivityLevel {
     SEDENTARY = 'sedentary',
@@ -62,10 +64,23 @@ export class FitnessProfile {
     bmi: number;
 
     @ApiProperty()
-    @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})
+    @UpdateDateColumn({ type: 'timestamptz' })
+    updated_at: Date;
+
+    @ApiProperty()
+    @CreateDateColumn({ type: 'timestamptz' })
     created_at: Date;
 
     @ApiProperty()
     @Column({type: 'float'})
     tdee_kcal: number;
+
+    // relations => 2
+    @OneToOne(() => User, user => user.fitness_profile, {onDelete: 'CASCADE'})
+    @JoinColumn({name: 'user_id'})
+    user: User;
+
+    @ManyToOne(() => DietType, diet_type => diet_type.fitness_profiles, {onDelete: 'SET NULL'})
+    @JoinColumn({name: 'diet_type_id'})
+    diet_type: DietType;
 }

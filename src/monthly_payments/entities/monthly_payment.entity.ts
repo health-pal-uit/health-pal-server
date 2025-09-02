@@ -1,5 +1,6 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Money, PayRecord } from "src/pay_records/entities/pay_record.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum MonthlyPaymentStatus {
     PROCESSED = 'processed',
@@ -18,7 +19,7 @@ export class MonthlyPayment {
     process_date: Date;
 
     @ApiProperty()
-    @Column({type: 'numeric'})
+    @Column({type: 'numeric', precision: 12, scale: 2, transformer: Money})
     total_pay_amount: number;
 
     @ApiProperty({ enum: MonthlyPaymentStatus })
@@ -28,4 +29,11 @@ export class MonthlyPayment {
     @ApiProperty()
     @Column({type: 'timestamptz'})
     processed_at: Date;
+
+    // relations
+
+    // reflects
+
+    @OneToMany(() => PayRecord, (pay_record) => pay_record.monthly_payment)
+    pay_records: PayRecord[];
 }

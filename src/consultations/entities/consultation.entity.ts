@@ -1,5 +1,8 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Booking } from "src/bookings/entities/booking.entity";
+import { ChatSession } from "src/chat_sessions/entities/chat_session.entity";
+import { ExpertsRating } from "src/experts_ratings/entities/experts_rating.entity";
+import { Column, CreateDateColumn, Entity, JoinColumn, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum ConsultationStatus {
     FINISHED = 'finished',
@@ -39,6 +42,18 @@ export class Consultation {
     payment_status: boolean;
 
     @ApiProperty()
-    @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})
+    @CreateDateColumn({ type: 'timestamptz' })
     created_at: Date;
+
+    // relations => 2
+    @OneToOne(() => Booking, (booking) => booking.consultation, {eager: true, onDelete: 'SET NULL'})
+    @JoinColumn({name: 'booking_id'})
+    booking: Booking;
+
+    @OneToOne(() => ChatSession, (chat_session) => chat_session.consultation, {eager: true, onDelete: 'SET NULL'})
+    chat_session: ChatSession;
+
+    // reflects
+    @OneToOne(() => ExpertsRating, (experts_rating) => experts_rating.consultation)
+    experts_rating: ExpertsRating;
 }

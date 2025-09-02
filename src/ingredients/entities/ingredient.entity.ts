@@ -1,16 +1,14 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { DailyIngre } from "src/daily_ingres/entities/daily_ingre.entity";
+import { FavIngre } from "src/fav_ingres/entities/fav_ingre.entity";
+import { IngreMeal } from "src/ingre_meals/entities/ingre_meal.entity";
+import { Check, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { FoodType } from "../food-type.enum";
 
-export enum FoodType {
-    MEAT = 'meat',
-    VEGETABLE = 'vegetable',
-    FRUIT = 'fruit',
-    GRAIN = 'grain',
-    DAIRY = 'dairy',
-    VEGAN = 'vegan', // more 2 come
-}
+
 
 @ApiSchema({name: Ingredient.name, description: 'Ingredient entity'})
+@Check(`kcal_per_100g >= 0 AND protein_per_100g >= 0 AND fat_per_100g >= 0 AND carbs_per_100g >= 0 AND fiber_per_100g >= 0`)
 @Entity('ingredients')
 export class Ingredient {
     @ApiProperty({example: 'uuid', description: 'Unique identifier'})
@@ -54,7 +52,23 @@ export class Ingredient {
     is_verified: boolean;
 
     @ApiProperty({example: 'https://example.com/image.jpg', description: 'Image URL of the ingredient'})
-    @Column({type: 'varchar', nullable: true})
+    @Column({type: 'text', nullable: true})
     image_url?: string | null;
+
+    @ApiProperty({example: '2023-01-01T00:00:00Z', description: 'Creation date of the ingredient'})
+    @CreateDateColumn({type: 'timestamptz'})
+    created_at: Date;
+
+    // relations => 0
+
+    // reflects
+    @OneToMany(() => IngreMeal, (ingreMeal) => ingreMeal.ingredient)
+    ingre_meals: IngreMeal[];
+
+    @OneToMany(() => DailyIngre, (dailyIngre) => dailyIngre.ingredient)
+    daily_ingres: DailyIngre[];
+
+    @OneToMany(() => FavIngre, (favIngre) => favIngre.ingredient)
+    fav_ingres: FavIngre[];
 
 }

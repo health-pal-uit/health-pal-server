@@ -1,5 +1,9 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Activity } from "src/activities/entities/activity.entity";
+import { Challenge } from "src/challenges/entities/challenge.entity";
+import { DailyLog } from "src/daily_logs/entities/daily_log.entity";
+import { FitnessGoal } from "src/fitness_goals/entities/fitness_goal.entity";
+import { Check, Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum RecordType {
     DAILY = 'daily',
@@ -8,6 +12,20 @@ export enum RecordType {
 }
 
 @ApiSchema({name: ActivityRecord.name, description: 'ActivityRecord entity'})
+@Check(`reps IS NULL OR reps > 0`)
+@Check(`hours IS NULL OR hours > 0`)
+@Check(`kcal_burned IS NULL OR kcal_burned >= 0`)
+@Check(`rhr IS NULL OR rhr >= 0`)
+@Check(`ahr IS NULL OR ahr >= 0`)
+@Check(`intensity_level IS NULL OR (intensity_level BETWEEN 1 AND 5)`)
+@Check(`num_nonnulls(daily_log_id, challenge_id, goal_id) = 1`)
+@Check(`
+  (type = 'daily'     AND daily_log_id  IS NOT NULL) OR
+  (type = 'challenge' AND challenge_id  IS NOT NULL) OR
+  (type = 'goal'      AND goal_id       IS NOT NULL)
+`)
+@Index('idx_ar_activity', ['activity'])
+@Index('idx_ar_created', ['created_at'])
 @Entity('activity_records')
 export class ActivityRecord {
     @ApiProperty({example: 'uuid', description: 'Unique identifier'})
@@ -43,7 +61,24 @@ export class ActivityRecord {
     intensity_level: number;
 
     @ApiProperty({example: '2023-01-01', description: 'Creation date'})
-    @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})
+    @CreateDateColumn({ type: 'timestamptz' })
     created_at: Date;
 
+    // relations => 2
+
+    @ManyToOne(() => DailyLog, (dailyLog) => dailyLog.activity_records, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'daily_log_id' })
+    daily_log: DailyLog | null;
+
+    @ManyToOne(() => Challenge, (challenge) => challenge.activity_records, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'challenge_id' })
+    challenge: Challenge | null;
+
+    @ManyToOne(() => FitnessGoal, (fitnessGoal) => fitnessGoal.activity_records, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'goal_id' })
+    goal: FitnessGoal | null;
+
+    @ManyToOne(() => Activity, (activity) => activity.activity_records, { onDelete: 'CASCADE' })
+    @JoinColumn({ name: 'activity_id' })
+    activity: Activity
 }

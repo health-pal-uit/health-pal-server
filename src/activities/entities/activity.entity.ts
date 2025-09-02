@@ -1,5 +1,6 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Column, Entity } from "typeorm";
+import { ActivityRecord } from "src/activity_records/entities/activity_record.entity";
+import { Check, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 export enum ActivityType {
     CARDIO = 'cardio',
@@ -9,14 +10,17 @@ export enum ActivityType {
 }
 
 @ApiSchema({name: Activity.name, description: 'Activity entity'})
+@Check(`met_value >= 0`)
+@Check(`kcal_per_rep >= 0`)
+@Check(`kcal_per_hour >= 0`)
 @Entity('activities')
 export class Activity {
     @ApiProperty({example: 'uuid', description: 'Unique identifier'})
-    @Column({type: 'uuid'})
+    @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @ApiProperty({example: 'Running', description: 'Name of the activity'})
-    @Column({type: 'varchar'})
+    @Column({ type: 'varchar', length: 255, unique: true })
     name: string;
 
     @ApiProperty({example: 8, description: 'Metabolic equivalent of task (MET) value'})
@@ -44,6 +48,13 @@ export class Activity {
     categories: ActivityType[];
 
     @ApiProperty({example: '2023-01-01T00:00:00Z', description: 'Creation date of the activity'})
-    @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})
+    @CreateDateColumn({ type: 'timestamptz' })
     created_at: Date;
+
+    // relations => 0
+
+    // reflects
+
+    @OneToMany(() => ActivityRecord, (activityRecord) => activityRecord.activity)
+    activity_records: ActivityRecord[];
 }

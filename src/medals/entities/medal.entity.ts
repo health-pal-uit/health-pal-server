@@ -1,5 +1,7 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { ChallengesMedal } from "src/challenges_medals/entities/challenges_medal.entity";
+import { MedalsUser } from "src/medals_users/entities/medals_user.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn, Unique } from "typeorm";
 
 export enum MedalTier {
     BRONZE = 'bronze',
@@ -34,4 +36,13 @@ export class Medal {
     @Column('timestamptz', {default: () => 'CURRENT_TIMESTAMP'})
     @ApiProperty({example: new Date(), description: 'Creation date of the medal'})
     created_at: Date;
+
+    // relations => 0
+
+    // reflects
+    @OneToMany(() => ChallengesMedal, (challengesMedal) => challengesMedal.medal)
+    challenges_medals: ChallengesMedal[];
+
+    @OneToMany(() => MedalsUser, (medalsUser) => medalsUser.medal)
+    medals_users: MedalsUser[];
 }

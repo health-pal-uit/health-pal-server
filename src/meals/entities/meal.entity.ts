@@ -1,9 +1,13 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { FoodType } from "src/ingredients/entities/ingredient.entity";
-import { Check, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { DailyMeal } from "src/daily_meals/entities/daily_meal.entity";
+import { FavMeal } from "src/fav_meals/entities/fav_meal.entity";
+import { IngreMeal } from "src/ingre_meals/entities/ingre_meal.entity";
+import { Check, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { FoodType } from "src/ingredients/food-type.enum";
 
-@Check(`"rating" >= 0 AND "rating" <= 5`)
 @ApiSchema({name: Meal.name, description: 'Meal entity'})
+@Check(`rating >= 0 AND rating <= 5`)
+@Check(`kcal_per_100g >= 0 AND protein_per_100g >= 0 AND fat_per_100g >= 0 AND carbs_per_100g >= 0 AND fiber_per_100g >= 0`)
 @Entity('meals')
 export class Meal {
     @ApiProperty({example: 'uuid', description: 'Unique identifier'})
@@ -35,7 +39,7 @@ export class Meal {
     fiber_per_100g: number;
 
     @ApiProperty({example: 4.5, description: 'Rating of the meal'})
-    @Column({type: 'float'})
+    @Column({type: 'float', default: 0 })
     rating: number;
 
     @ApiProperty({example: [FoodType.MEAT], description: 'Tags for the meal'})
@@ -47,7 +51,7 @@ export class Meal {
     notes: string;
 
     @ApiProperty({example: '2023-01-01T00:00:00.000Z', description: 'Creation date of the meal'})
-    @Column({type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP'})
+    @CreateDateColumn({type: 'timestamptz'})
     created_at: Date;
 
     @ApiProperty({example: true, description: 'Indicates if the meal is verified'})
@@ -55,6 +59,19 @@ export class Meal {
     is_verified: boolean;
 
     @ApiProperty({example: 'https://example.com/image.jpg', description: 'Image URL of the meal'})
-    @Column({type: 'varchar', nullable: true})
+    @Column({type: 'text', nullable: true})
     image_url?: string | null;
+
+    // relations => 0
+
+    // reflects
+    @OneToMany(() => IngreMeal, (ingreMeal) => ingreMeal.meal)
+    ingre_meals: IngreMeal[];
+
+    @OneToMany(() => DailyMeal, (dailyMeal) => dailyMeal.meal)
+    daily_meals: DailyMeal[];
+
+    @OneToMany(() => FavMeal, (favMeal) => favMeal.meal)
+    fav_meals: FavMeal[];
+
 }
