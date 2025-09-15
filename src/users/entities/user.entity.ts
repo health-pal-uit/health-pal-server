@@ -18,11 +18,7 @@ import { Notification } from "src/notifications/entities/notification.entity";
 import { Device } from "src/devices/entities/device.entity";
 import { FavIngre } from "src/fav_ingres/entities/fav_ingre.entity";
 import { FavMeal } from "src/fav_meals/entities/fav_meal.entity";
-
-export enum UserRole {
-    USER = 'user',
-    ADMIN = 'admin',
-}
+import { Role } from "src/roles/entities/role.entity";
 
 @ApiSchema({name: User.name, description: 'User entity'})
 @Entity('users')
@@ -60,10 +56,6 @@ export class User {
     @Column({type: 'date', nullable: true})
     birth_date: Date;
 
-    @ApiProperty()
-    @Column({ type: 'enum', enum: UserRole })
-    role: UserRole;
-
     @ApiProperty({ type: String, nullable: true, description: 'Avatar URL' })
     @Column({type: 'text', nullable: true})
     avatar_url?: string;
@@ -77,6 +69,9 @@ export class User {
     deactivated_at?: Date;
 
     // relations
+
+    @OneToMany(() => Role , (role) => role.user)
+    roles: Role[];
 
     // reflects
 
