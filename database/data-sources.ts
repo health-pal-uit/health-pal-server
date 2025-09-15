@@ -35,6 +35,7 @@ import { PayRecord } from "src/pay_records/entities/pay_record.entity";
 import { Post } from "src/posts/entities/post.entity";
 import { PostsMedia } from "src/posts_medias/entities/posts_media.entity";
 import { PremiumPackage } from "src/premium_packages/entities/premium_package.entity";
+import { Role } from "src/roles/entities/role.entity";
 import { User } from "src/users/entities/user.entity";
 import { DataSource, DataSourceOptions } from "typeorm";
 
@@ -48,7 +49,7 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
         username: configService.get("DB_USERNAME"),
         password: configService.get("DB_PASSWORD"),
         database: configService.get("DB_DATABASE"),
-        entities: [Activity, ActivityRecord, Booking, Challenge, ChallengesMedal, ChallengesUser, ChatMessage, ChatParticipant, ChatSession, Comment, Consultation, DailyIngre, DailyLog, DailyMeal, Device, DietType, Expert, ExpertsRating, ExpertsRole, FavIngre, FavMeal, FitnessGoal, FitnessProfile, IngreMeal, Ingredient, Like, Meal, Medal, MedalsUser, MonthlyPayment, Notification, PayRecord, Post, PostsMedia, PremiumPackage, User], // change later
+        entities: [Activity, ActivityRecord, Booking, Challenge, ChallengesMedal, ChallengesUser, ChatMessage, ChatParticipant, ChatSession, Comment, Consultation, DailyIngre, DailyLog, DailyMeal, Device, DietType, Expert, ExpertsRating, ExpertsRole, FavIngre, FavMeal, FitnessGoal, FitnessProfile, IngreMeal, Ingredient, Like, Meal, Medal, MedalsUser, MonthlyPayment, Notification, PayRecord, Post, PostsMedia, PremiumPackage, User, Role], // change later
         autoLoadEntities: true,
         migrations: [__dirname + '/../migrations/**/*{.ts,.js}'], // change later
         synchronize: true,
