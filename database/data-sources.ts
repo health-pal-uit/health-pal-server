@@ -2,7 +2,6 @@ import { ConfigModule, ConfigService } from "@nestjs/config";
 import { TypeOrmModuleAsyncOptions } from "@nestjs/typeorm";
 import { Activity } from "src/activities/entities/activity.entity";
 import { ActivityRecord } from "src/activity_records/entities/activity_record.entity";
-import { Booking } from "src/bookings/entities/booking.entity";
 import { Challenge } from "src/challenges/entities/challenge.entity";
 import { ChallengesMedal } from "src/challenges_medals/entities/challenges_medal.entity";
 import { ChallengesUser } from "src/challenges_users/entities/challenges_user.entity";
@@ -10,15 +9,11 @@ import { ChatMessage } from "src/chat_messages/entities/chat_message.entity";
 import { ChatParticipant } from "src/chat_participants/entities/chat_participant.entity";
 import { ChatSession } from "src/chat_sessions/entities/chat_session.entity";
 import { Comment } from "src/comments/entities/comment.entity";
-import { Consultation } from "src/consultations/entities/consultation.entity";
 import { DailyIngre } from "src/daily_ingres/entities/daily_ingre.entity";
 import { DailyLog } from "src/daily_logs/entities/daily_log.entity";
 import { DailyMeal } from "src/daily_meals/entities/daily_meal.entity";
 import { Device } from "src/devices/entities/device.entity";
 import { DietType } from "src/diet_types/entities/diet_type.entity";
-import { Expert } from "src/experts/entities/expert.entity";
-import { ExpertsRating } from "src/experts_ratings/entities/experts_rating.entity";
-import { ExpertsRole } from "src/experts_roles/entities/experts_role.entity";
 import { FavIngre } from "src/fav_ingres/entities/fav_ingre.entity";
 import { FavMeal } from "src/fav_meals/entities/fav_meal.entity";
 import { FitnessGoal } from "src/fitness_goals/entities/fitness_goal.entity";
@@ -29,9 +24,7 @@ import { Like } from "src/likes/entities/like.entity";
 import { Meal } from "src/meals/entities/meal.entity";
 import { Medal } from "src/medals/entities/medal.entity";
 import { MedalsUser } from "src/medals_users/entities/medals_user.entity";
-import { MonthlyPayment } from "src/monthly_payments/entities/monthly_payment.entity";
 import { Notification } from "src/notifications/entities/notification.entity";
-import { PayRecord } from "src/pay_records/entities/pay_record.entity";
 import { Post } from "src/posts/entities/post.entity";
 import { PostsMedia } from "src/posts_medias/entities/posts_media.entity";
 import { PremiumPackage } from "src/premium_packages/entities/premium_package.entity";
@@ -49,7 +42,7 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
         username: configService.get("DB_USERNAME"),
         password: configService.get("DB_PASSWORD"),
         database: configService.get("DB_DATABASE"),
-        entities: [Activity, ActivityRecord, Booking, Challenge, ChallengesMedal, ChallengesUser, ChatMessage, ChatParticipant, ChatSession, Comment, Consultation, DailyIngre, DailyLog, DailyMeal, Device, DietType, Expert, ExpertsRating, ExpertsRole, FavIngre, FavMeal, FitnessGoal, FitnessProfile, IngreMeal, Ingredient, Like, Meal, Medal, MedalsUser, MonthlyPayment, Notification, PayRecord, Post, PostsMedia, PremiumPackage, User, Role], // change later
+        entities: [Activity, ActivityRecord, Challenge, ChallengesMedal, ChallengesUser, ChatMessage, ChatParticipant, ChatSession, Comment, DailyIngre, DailyLog, DailyMeal, Device, DietType, FavIngre, FavMeal, FitnessGoal, FitnessProfile, IngreMeal, Ingredient, Like, Meal, Medal, MedalsUser,Notification, Post, PostsMedia, PremiumPackage, User, Role], // change later
         autoLoadEntities: true,
         migrations: [__dirname + '/../migrations/**/*{.ts,.js}'], // change later
         synchronize: true,

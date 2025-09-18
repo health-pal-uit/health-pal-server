@@ -2,14 +2,7 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
-import { ExpertsModule } from './experts/experts.module';
-import { ExpertsRolesModule } from './experts_roles/experts_roles.module';
-import { ExpertsRatingsModule } from './experts_ratings/experts_ratings.module';
-import { BookingsModule } from './bookings/bookings.module';
 import { PremiumPackagesModule } from './premium_packages/premium_packages.module';
-import { PayRecordsModule } from './pay_records/pay_records.module';
-import { MonthlyPaymentsModule } from './monthly_payments/monthly_payments.module';
-import { ConsultationsModule } from './consultations/consultations.module';
 import { ChatSessionsModule } from './chat_sessions/chat_sessions.module';
 import { ChatParticipantsModule } from './chat_participants/chat_participants.module';
 import { ChatMessagesModule } from './chat_messages/chat_messages.module';
@@ -48,7 +41,7 @@ import { RolesModule } from './roles/roles.module';
     envFilePath: '.env', // Load environment variables from .env file
   }),
     TypeOrmModule.forRootAsync(typeOrmConfig),
-    UsersModule, ExpertsModule, ExpertsRolesModule, ExpertsRatingsModule, BookingsModule, PremiumPackagesModule, PayRecordsModule, MonthlyPaymentsModule, ConsultationsModule, ChatSessionsModule, ChatParticipantsModule, ChatMessagesModule, FitnessGoalsModule, FitnessProfilesModule, DietTypesModule, IngredientsModule, MealsModule, IngreMealsModule, DailyLogsModule, DailyIngresModule, DailyMealsModule, ActivitiesModule, ActivityRecordsModule, ChallengesModule, MedalsModule, ChallengesMedalsModule, ChallengesUsersModule, MedalsUsersModule, PostsModule, PostsMediasModule, CommentsModule, LikesModule, NotificationsModule, DevicesModule, FavMealsModule, FavIngresModule, RolesModule],
+    UsersModule, PremiumPackagesModule, ChatSessionsModule, ChatParticipantsModule, ChatMessagesModule, FitnessGoalsModule, FitnessProfilesModule, DietTypesModule, IngredientsModule, MealsModule, IngreMealsModule, DailyLogsModule, DailyIngresModule, DailyMealsModule, ActivitiesModule, ActivityRecordsModule, ChallengesModule, MedalsModule, ChallengesMedalsModule, ChallengesUsersModule, MedalsUsersModule, PostsModule, PostsMediasModule, CommentsModule, LikesModule, NotificationsModule, DevicesModule, FavMealsModule, FavIngresModule, RolesModule],
   controllers: [AppController],
   providers: [AppService],
 })

@@ -1,9 +1,6 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
 import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Exclude } from "class-transformer";
-import { Expert } from "src/experts/entities/expert.entity";
-import { ExpertsRating } from "src/experts_ratings/entities/experts_rating.entity";
-import { Booking } from "src/bookings/entities/booking.entity";
 import { ChatParticipant } from "src/chat_participants/entities/chat_participant.entity";
 import { ChatMessage } from "src/chat_messages/entities/chat_message.entity";
 import { FitnessGoal } from "src/fitness_goals/entities/fitness_goal.entity";
@@ -78,15 +75,6 @@ export class User {
     premiumPackage: PremiumPackage;
 
     // reflects
-
-    @OneToOne(() => Expert, (expert) => expert.user)
-    expert: Expert;
-
-    @OneToMany(() => ExpertsRating, (rating) => rating.user)
-    expert_ratings: ExpertsRating[];
-
-    @OneToMany(() => Booking, (booking) => booking.user)
-    bookings: Booking[];
 
     @OneToMany(() => ChatParticipant, (chat_participant) => chat_participant.user)
     chat_participants: ChatParticipant[];
