@@ -1,5 +1,5 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Column, Entity, JoinTable, ManyToMany, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 import { Exclude } from "class-transformer";
 import { Expert } from "src/experts/entities/expert.entity";
 import { ExpertsRating } from "src/experts_ratings/entities/experts_rating.entity";
@@ -19,6 +19,7 @@ import { Device } from "src/devices/entities/device.entity";
 import { FavIngre } from "src/fav_ingres/entities/fav_ingre.entity";
 import { FavMeal } from "src/fav_meals/entities/fav_meal.entity";
 import { Role } from "src/roles/entities/role.entity";
+import { PremiumPackage } from "src/premium_packages/entities/premium_package.entity";
 
 @ApiSchema({name: User.name, description: 'User entity'})
 @Entity('users')
@@ -38,7 +39,7 @@ export class User {
 
     @ApiProperty()
     @Column({type: 'varchar', length: 255, unique: true})
-    email: string;
+    email!: string;
 
     @ApiProperty()
     @Column({type: 'varchar', length: 255, nullable: true})
@@ -72,6 +73,9 @@ export class User {
 
     @OneToMany(() => Role , (role) => role.user)
     roles: Role[];
+
+    @ManyToOne(() => PremiumPackage, (premiumPackage) => premiumPackage.users, { nullable: true })
+    premiumPackage: PremiumPackage;
 
     // reflects
 
