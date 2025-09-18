@@ -68,7 +68,7 @@ export class Expert {
     nullable: false,
     onDelete: 'RESTRICT', // or 'SET NULL'
     })
-    @JoinColumn({ name: 'role_id' })
+    @JoinColumn({ name: 'expert_role_id' })
     role: ExpertsRole;
 
     // reflects

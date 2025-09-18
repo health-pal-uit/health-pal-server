@@ -1,6 +1,7 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
 import { Expert } from "src/experts/entities/expert.entity";
 import { Money } from "src/pay_records/entities/pay_record.entity";
+import { User } from "src/users/entities/user.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 export enum PremiumPackageName {
@@ -39,4 +40,7 @@ export class PremiumPackage {
 
     @OneToMany(() => Expert, (expert) => expert.booking_fee_tier)
     experts: Expert[];
+
+    @OneToMany(() => User, (user) => user.premiumPackage)
+    users: User[];
 }
