@@ -1,7 +1,6 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
 import { ChatMessage } from "src/chat_messages/entities/chat_message.entity";
 import { ChatParticipant } from "src/chat_participants/entities/chat_participant.entity";
-import { Consultation } from "src/consultations/entities/consultation.entity";
 import { Check, Column, CreateDateColumn, Entity, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn } from "typeorm";
 
 export enum ChatSessionStatus {
@@ -10,7 +9,7 @@ export enum ChatSessionStatus {
 }
 
 @ApiSchema({name: ChatSession.name, description: 'Chat session entity'})
-@Check(`(status = 'chat' AND consultation_id IS NULL) OR (status = 'consult' AND consultation_id IS NOT NULL)`)
+//@Check(`(status = 'chat' AND consultation_id IS NULL) OR (status = 'consult' AND consultation_id IS NOT NULL)`)
 @Entity('chat_sessions')
 export class ChatSession {
     @ApiProperty()
@@ -36,10 +35,6 @@ export class ChatSession {
     // relations
 
     // reflects
-    @OneToOne(() => Consultation, (consultation) => consultation.chat_session)
-    @JoinColumn({name: 'consultation_id'})
-    consultation: Consultation;
-
     @OneToMany(() => ChatParticipant, (chat_participant) => chat_participant.chat_session)
     participants: ChatParticipant[];
 

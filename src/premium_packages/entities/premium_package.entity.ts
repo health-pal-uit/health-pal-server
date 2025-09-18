@@ -1,6 +1,4 @@
 import { ApiProperty, ApiSchema } from "@nestjs/swagger";
-import { Expert } from "src/experts/entities/expert.entity";
-import { Money } from "src/pay_records/entities/pay_record.entity";
 import { User } from "src/users/entities/user.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
@@ -9,6 +7,13 @@ export enum PremiumPackageName {
     LITE = 'lite',
     PRO = 'pro'
 }
+
+// hàm đưa và trả tiền ra vào db
+export const Money = {
+    to: (v?: number | null) => v,
+    from: (v?: string | null) => (v==null?null:Number(v))
+};
+
 
 @ApiSchema({name: PremiumPackage.name, description: 'PremiumPackage entity'})
 @Entity('premium_packages')
@@ -37,10 +42,6 @@ export class PremiumPackage {
 
 
     // reflects
-
-    @OneToMany(() => Expert, (expert) => expert.booking_fee_tier)
-    experts: Expert[];
-
     @OneToMany(() => User, (user) => user.premiumPackage)
     users: User[];
 }
