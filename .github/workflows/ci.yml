@@ -9,7 +9,7 @@ on:
 
 jobs:
   lint:
-    name: Lint
+    name: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
       - run: npm run lint
 
   prettier_check:
-    name: Prettier Check
+    name: prettier check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
