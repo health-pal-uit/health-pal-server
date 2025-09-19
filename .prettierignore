@@ -10,3 +10,7 @@ nest-cli.json
 test/jest-e2e.json
 tsconfig.json
 tsconfig.build.json
+
+commitlint.config.mjs
+eslint.config.mjs
+.prettierrc
