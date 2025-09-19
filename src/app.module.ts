@@ -36,12 +36,43 @@ import { ConfigModule } from '@nestjs/config';
 import { RolesModule } from './roles/roles.module';
 
 @Module({
-  imports: [ ConfigModule.forRoot({
-    isGlobal: true,
-    envFilePath: '.env', // Load environment variables from .env file
-  }),
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env', // Load environment variables from .env file
+    }),
     TypeOrmModule.forRootAsync(typeOrmConfig),
-    UsersModule, PremiumPackagesModule, ChatSessionsModule, ChatParticipantsModule, ChatMessagesModule, FitnessGoalsModule, FitnessProfilesModule, DietTypesModule, IngredientsModule, MealsModule, IngreMealsModule, DailyLogsModule, DailyIngresModule, DailyMealsModule, ActivitiesModule, ActivityRecordsModule, ChallengesModule, MedalsModule, ChallengesMedalsModule, ChallengesUsersModule, MedalsUsersModule, PostsModule, PostsMediasModule, CommentsModule, LikesModule, NotificationsModule, DevicesModule, FavMealsModule, FavIngresModule, RolesModule],
+    UsersModule,
+    PremiumPackagesModule,
+    ChatSessionsModule,
+    ChatParticipantsModule,
+    ChatMessagesModule,
+    FitnessGoalsModule,
+    FitnessProfilesModule,
+    DietTypesModule,
+    IngredientsModule,
+    MealsModule,
+    IngreMealsModule,
+    DailyLogsModule,
+    DailyIngresModule,
+    DailyMealsModule,
+    ActivitiesModule,
+    ActivityRecordsModule,
+    ChallengesModule,
+    MedalsModule,
+    ChallengesMedalsModule,
+    ChallengesUsersModule,
+    MedalsUsersModule,
+    PostsModule,
+    PostsMediasModule,
+    CommentsModule,
+    LikesModule,
+    NotificationsModule,
+    DevicesModule,
+    FavMealsModule,
+    FavIngresModule,
+    RolesModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
