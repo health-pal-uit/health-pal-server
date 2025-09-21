@@ -6,11 +6,13 @@ on:
 
 jobs:
   codeball_job:
+    if: ${{ false }} # disable the job for now
     runs-on: ubuntu-latest
     name: Codeball
     steps:
       - name: Codeball
         uses: sturdy-dev/codeball-action@v2
+        continue-on-error: true
         with:
           # For all configuration options see https://github.com/sturdy-dev/codeball-action/blob/v2/action.yml
           approvePullRequests: 'true'
