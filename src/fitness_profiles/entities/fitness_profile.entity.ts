@@ -11,19 +11,8 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
-export enum ActivityLevel {
-  SEDENTARY = 'sedentary',
-  LIGHTLY_ACTIVE = 'lightly_active',
-  MODERATELY = 'moderately',
-  ACTIVE = 'active',
-  VERY_ACTIVE = 'very_active',
-}
-export enum BFP_CALCULATING_METHOD {
-  BMI = 'bmi',
-  US_NAVY = 'us_navy',
-  YMCA = 'ymca',
-}
+import { ActivityLevel } from 'src/helpers/enums/activity-level.enum';
+import { BFPCalculatingMethod } from 'src/helpers/enums/bfp-calculating-method.enum';
 
 @ApiSchema({ name: FitnessProfile.name, description: 'FitnessProfile entity' })
 @Entity('fitness_profiles')
@@ -60,9 +49,9 @@ export class FitnessProfile {
   @Column({ type: 'float' })
   body_fat_percentages: number;
 
-  @ApiProperty({ enum: BFP_CALCULATING_METHOD })
-  @Column({ type: 'enum', enum: BFP_CALCULATING_METHOD })
-  body_fat_calculating_method: BFP_CALCULATING_METHOD;
+  @ApiProperty({ enum: BFPCalculatingMethod })
+  @Column({ type: 'enum', enum: BFPCalculatingMethod })
+  body_fat_calculating_method: BFPCalculatingMethod;
 
   @ApiProperty()
   @Column({ type: 'float' })

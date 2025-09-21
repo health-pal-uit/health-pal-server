@@ -2,14 +2,7 @@ import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { ActivityRecord } from 'src/activity_records/entities/activity_record.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-
-export enum FitnessGoalType {
-  CUT = 'cut',
-  BULK = 'bulk',
-  MAINTAIN = 'maintain',
-  RECOVERY = 'recovery',
-  GAIN_MUSCLES = 'gain_muscles',
-}
+import { FitnessGoalType } from 'src/helpers/enums/fitness-goal-type.enum';
 
 @ApiSchema({ name: FitnessGoal.name, description: 'FitnessGoal entity' })
 @Entity('fitness_goals')

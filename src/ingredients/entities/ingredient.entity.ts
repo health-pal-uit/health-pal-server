@@ -10,7 +10,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { FoodType } from '../food-type.enum';
+import { FoodType } from '../../helpers/enums/food-type.enum';
 
 @ApiSchema({ name: Ingredient.name, description: 'Ingredient entity' })
 @Check(

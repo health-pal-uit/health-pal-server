@@ -9,12 +9,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-
-export enum MessageType {
-  TEXT = 'text',
-  IMAGE = 'image',
-  FILE = 'file',
-}
+import { MessageType } from 'src/helpers/enums/message-type.enum';
 
 @ApiSchema({ name: ChatMessage.name, description: 'Chat message entity' })
 @Entity('chat_messages')

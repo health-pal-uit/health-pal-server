@@ -10,7 +10,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { MealType } from '../meal-type.enum';
+import { MealType } from '../../helpers/enums/meal-type.enum';
 
 @ApiSchema({ name: DailyIngre.name, description: 'DailyIngre entity' })
 @Check(`quantity_kg > 0`)

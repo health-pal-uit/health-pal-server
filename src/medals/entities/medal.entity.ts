@@ -2,13 +2,7 @@ import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { ChallengesMedal } from 'src/challenges_medals/entities/challenges_medal.entity';
 import { MedalsUser } from 'src/medals_users/entities/medals_user.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-
-export enum MedalTier {
-  BRONZE = 'bronze',
-  SILVER = 'silver',
-  GOLD = 'gold',
-  PLATINUM = 'platinum',
-}
+import { MedalTier } from 'src/helpers/enums/medal-tier.enum';
 
 @ApiSchema({ name: Medal.name, description: 'Medal entity' })
 @Entity('medals')

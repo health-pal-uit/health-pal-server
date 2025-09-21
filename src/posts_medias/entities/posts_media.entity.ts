@@ -1,12 +1,7 @@
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { Post } from 'src/posts/entities/post.entity';
 import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
-
-export enum MediaType {
-  IMAGE = 'image',
-  VIDEO = 'video',
-  FILE = 'file',
-}
+import { MediaType } from 'src/helpers/enums/media-type.enum';
 
 @ApiSchema({ name: PostsMedia.name, description: 'Media entity for posts' })
 @Index('idx_posts_media_post', ['post'])

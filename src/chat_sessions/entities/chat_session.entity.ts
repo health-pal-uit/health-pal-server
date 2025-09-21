@@ -2,11 +2,7 @@ import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { ChatMessage } from 'src/chat_messages/entities/chat_message.entity';
 import { ChatParticipant } from 'src/chat_participants/entities/chat_participant.entity';
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-
-export enum ChatSessionStatus {
-  CHAT = 'chat',
-  CONSULT = 'consult',
-}
+import { ChatSessionStatus } from 'src/helpers/enums/chat-session-status.enum';
 
 @ApiSchema({ name: ChatSession.name, description: 'Chat session entity' })
 //@Check(`(status = 'chat' AND consultation_id IS NULL) OR (status = 'consult' AND consultation_id IS NOT NULL)`)
