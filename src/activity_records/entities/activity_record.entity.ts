@@ -13,12 +13,7 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-
-export enum RecordType {
-  DAILY = 'daily',
-  GOAL = 'goal',
-  CHALLENGE = 'challenge',
-}
+import { RecordType } from 'src/helpers/enums/record-type.enum';
 
 @ApiSchema({ name: ActivityRecord.name, description: 'ActivityRecord entity' })
 @Check(`reps IS NULL OR reps > 0`)

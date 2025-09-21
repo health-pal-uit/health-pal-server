@@ -8,13 +8,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-
-export enum ActivityType {
-  CARDIO = 'cardio',
-  STRENGTH = 'strength',
-  FLEXIBILITY = 'flexibility',
-  BALANCE = 'balance',
-}
+import { ActivityType } from 'src/helpers/enums/activity-type.enum';
 
 @ApiSchema({ name: Activity.name, description: 'Activity entity' })
 @Check(`met_value >= 0`)

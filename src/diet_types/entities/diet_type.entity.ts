@@ -1,14 +1,7 @@
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { FitnessProfile } from 'src/fitness_profiles/entities/fitness_profile.entity';
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-
-export enum DietTypeName {
-  KETO = 'keto',
-  PALEO = 'paleo',
-  VEGAN = 'vegan',
-  MEDITERRANEAN = 'mediterranean',
-  DASH = 'dash',
-}
+import { DietTypeName } from 'src/helpers/enums/diet-type-name.enum';
 
 @ApiSchema({ name: DietType.name, description: 'DietType entity' })
 @Entity('diet_types')

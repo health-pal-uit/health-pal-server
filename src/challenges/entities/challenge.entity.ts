@@ -3,12 +3,7 @@ import { ActivityRecord } from 'src/activity_records/entities/activity_record.en
 import { ChallengesMedal } from 'src/challenges_medals/entities/challenges_medal.entity';
 import { ChallengesUser } from 'src/challenges_users/entities/challenges_user.entity';
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-
-export enum ChallengeDifficulty {
-  EASY = 'easy',
-  MEDIUM = 'medium',
-  HARD = 'hard',
-}
+import { ChallengeDifficulty } from 'src/helpers/enums/challenge-difficulty.enum';
 
 @ApiSchema({ name: Challenge.name, description: 'Challenge entity' })
 @Entity('challenges')

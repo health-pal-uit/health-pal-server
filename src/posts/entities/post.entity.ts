@@ -15,11 +15,7 @@ import {
 } from 'typeorm';
 import { Comment } from 'src/comments/entities/comment.entity';
 import { Like } from 'src/likes/entities/like.entity';
-
-export enum AttachTypes {
-  NONE = 'none',
-  IN_APP = 'in_app',
-}
+import { AttachType } from 'src/helpers/enums/attach-type.enum';
 
 @ApiSchema({ name: Post.name, description: 'Post entity' })
 @Index('idx_posts_created_at', ['created_at'])
@@ -38,9 +34,9 @@ export class Post {
   @Column({ type: 'text' })
   content: string;
 
-  @ApiProperty({ example: AttachTypes.NONE, description: 'Type of the attachment' })
-  @Column({ type: 'enum', enum: AttachTypes, default: AttachTypes.NONE, nullable: true })
-  attach_type?: AttachTypes | null;
+  @ApiProperty({ example: AttachType.NONE, description: 'Type of the attachment' })
+  @Column({ type: 'enum', enum: AttachType, default: AttachType.NONE, nullable: true })
+  attach_type?: AttachType | null;
 
   @ApiProperty({ example: false, description: 'Indicates if the post is approved' })
   @Column({ type: 'boolean', default: false })
