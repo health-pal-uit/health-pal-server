@@ -8,24 +8,19 @@ import { ChatSessionStatus } from 'src/helpers/enums/chat-session-status.enum';
 //@Check(`(status = 'chat' AND consultation_id IS NULL) OR (status = 'consult' AND consultation_id IS NOT NULL)`)
 @Entity('chat_sessions')
 export class ChatSession {
-  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty({ enum: ChatSessionStatus })
-  @Column({ type: 'enum', enum: ChatSessionStatus })
+  @Column({ type: 'enum', enum: ChatSessionStatus, default: ChatSessionStatus.CHAT })
   status: ChatSessionStatus;
 
-  @ApiProperty()
-  @Column({ type: 'varchar', length: 255, nullable: true })
-  title: string | null;
+  @Column({ type: 'varchar', length: 255 })
+  title: string;
 
-  @ApiProperty()
   @Column({ type: 'boolean', default: false })
   is_group: boolean;
 
-  @ApiProperty()
-  @CreateDateColumn({ type: 'timestamptz' })
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
   // relations

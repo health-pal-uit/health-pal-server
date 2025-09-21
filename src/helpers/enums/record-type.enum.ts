@@ -1,5 +1,5 @@
 export enum RecordType {
   DAILY = 'daily',
-  GOAL = 'goal',
+  //GOAL = 'goal',
   CHALLENGE = 'challenge',
 }

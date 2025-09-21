@@ -7,15 +7,12 @@ import { MediaType } from 'src/helpers/enums/media-type.enum';
 @Index('idx_posts_media_post', ['post'])
 @Entity('posts_media')
 export class PostsMedia {
-  @ApiProperty({ example: 'uuid', description: 'Unique identifier for the media' })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty({ example: MediaType.IMAGE, description: 'Type of the media' })
-  @Column({ type: 'enum', enum: MediaType })
+  @Column({ type: 'enum', enum: MediaType, default: MediaType.IMAGE })
   media_type: MediaType;
 
-  @ApiProperty({ example: 'https://example.com/image.jpg', description: 'URL of the media' })
   @Column({ type: 'text', nullable: false })
   url: string;
 

@@ -15,43 +15,37 @@ import { ActivityType } from 'src/helpers/enums/activity-type.enum';
 @Check(`kcal_per_rep >= 0`)
 @Check(`kcal_per_hour >= 0`)
 @Entity('activities')
+@Check(
+  `(supports_rep = false AND kcal_per_rep IS NULL) OR (supports_rep = true AND kcal_per_rep IS NOT NULL)`,
+)
+@Check(
+  `(supports_hour = false AND kcal_per_hour IS NULL) OR (supports_hour = true AND kcal_per_hour IS NOT NULL)`,
+)
 export class Activity {
-  @ApiProperty({ example: 'uuid', description: 'Unique identifier' })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty({ example: 'Running', description: 'Name of the activity' })
   @Column({ type: 'varchar', length: 255, unique: true })
   name: string;
 
-  @ApiProperty({ example: 8, description: 'Metabolic equivalent of task (MET) value' })
   @Column({ type: 'float' })
   met_value: number;
 
-  @ApiProperty({ example: 100, description: 'Calories burned per repetition' })
-  @Column({ type: 'float' })
-  kcal_per_rep: number;
+  @Column({ type: 'float', nullable: true })
+  kcal_per_rep?: number;
 
-  @ApiProperty({ example: 800, description: 'Calories burned per hour' })
-  @Column({ type: 'float' })
-  kcal_per_hour: number;
+  @Column({ type: 'float', nullable: true })
+  kcal_per_hour?: number;
 
-  @ApiProperty({ example: true, description: 'Indicates if the activity supports repetitions' })
   @Column({ type: 'boolean', default: false })
   supports_rep: boolean;
 
-  @ApiProperty({ example: true, description: 'Indicates if the activity supports hours' })
   @Column({ type: 'boolean', default: false })
   supports_hour: boolean;
 
-  @ApiProperty({
-    example: [ActivityType.CARDIO],
-    description: 'Categories the activity belongs to',
-  })
   @Column({ type: 'enum', enum: ActivityType, array: true })
   categories: ActivityType[];
 
-  @ApiProperty({ example: '2023-01-01T00:00:00Z', description: 'Creation date of the activity' })
   @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;
 
