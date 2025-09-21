@@ -7,11 +7,9 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique }
 @Unique('UQ_challenges_users_user_challenge', ['user', 'challenge'])
 @Entity('challenges_users')
 export class ChallengesUser {
-  @ApiProperty({ example: 'uuid', description: 'Unique identifier' })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty({ example: new Date(), description: 'Date when the challenge was achieved' })
   @Column('timestamptz')
   achieved_at: Date;
 
