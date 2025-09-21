@@ -7,7 +7,6 @@ import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 't
 @Unique('UQ_challenges_medals_challenge_medal', ['challenge', 'medal'])
 @Entity('challenges_medals')
 export class ChallengesMedal {
-  @ApiProperty({ example: 'uuid', description: 'Unique identifier' })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

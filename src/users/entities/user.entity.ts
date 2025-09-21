@@ -2,6 +2,7 @@ import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import {
   Column,
   Entity,
+  JoinColumn,
   JoinTable,
   ManyToMany,
   ManyToOne,
@@ -30,58 +31,52 @@ import { PremiumPackage } from 'src/premium_packages/entities/premium_package.en
 @ApiSchema({ name: User.name, description: 'User entity' })
 @Entity('users')
 export class User {
-  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string; // @IsUUID() in dto
 
-  @ApiProperty()
   @Column({ type: 'varchar', length: 255, unique: true })
   username!: string; // @IsString() in dto
 
-  @ApiProperty()
   @Column({ type: 'varchar', length: 255 })
   @Exclude({ toPlainOnly: true }) // Exclude password from the response
   hashed_password!: string; // @IsString() in dto
 
-  @ApiProperty()
   @Column({ type: 'varchar', length: 255, unique: true })
   email!: string;
 
-  @ApiProperty()
   @Column({ type: 'varchar', length: 255, nullable: true })
   phone: string;
 
-  @ApiProperty()
   @Column({ type: 'varchar', length: 255, nullable: true })
   fullname: string;
 
-  @ApiProperty()
   @Column({ type: 'boolean', default: false })
   gender: boolean;
 
-  @ApiProperty()
   @Column({ type: 'date', nullable: true })
   birth_date: Date;
 
-  @ApiProperty({ type: String, nullable: true, description: 'Avatar URL' })
+  // @ApiProperty({ type: String, nullable: true, description: 'Avatar URL' })
   @Column({ type: 'text', nullable: true })
   avatar_url?: string;
 
-  @ApiProperty()
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  created_at!: Date;
+  created_at: Date;
 
-  @ApiProperty()
   @Column({ type: 'timestamptz', nullable: true })
   deactivated_at?: Date;
 
   // relations
 
-  @OneToMany(() => Role, (role) => role.user)
-  roles: Role[];
+  // @OneToMany(() => Role, (role) => role.user)
+  // roles: Role[];
+  @ManyToOne(() => Role, (role) => role.users)
+  @JoinColumn({ name: 'role_id' })
+  role: Role;
 
   @ManyToOne(() => PremiumPackage, (premiumPackage) => premiumPackage.users, { nullable: true })
-  premiumPackage: PremiumPackage;
+  @JoinColumn({ name: 'premium_package_id' })
+  premium_package: PremiumPackage; // default...
 
   // reflects
 
@@ -94,8 +89,8 @@ export class User {
   @OneToMany(() => FitnessGoal, (fg) => fg.user)
   fitness_goals: FitnessGoal[];
 
-  @OneToOne(() => FitnessProfile, (fitness_profile) => fitness_profile.user)
-  fitness_profile: FitnessProfile;
+  @OneToMany(() => FitnessProfile, (fitness_profile) => fitness_profile.user)
+  fitness_profiles: FitnessProfile[];
 
   @OneToMany(() => DailyLog, (daily_log) => daily_log.user)
   daily_logs: DailyLog[];

@@ -1,52 +1,40 @@
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { FitnessProfile } from 'src/fitness_profiles/entities/fitness_profile.entity';
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-
-export enum DietTypeName {
-  KETO = 'keto',
-  PALEO = 'paleo',
-  VEGAN = 'vegan',
-  MEDITERRANEAN = 'mediterranean',
-  DASH = 'dash',
-}
+import {
+  Check,
+  Column,
+  CreateDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @ApiSchema({ name: DietType.name, description: 'DietType entity' })
 @Entity('diet_types')
+@Check(`"protein_percentages" + "fat_percentages" + "carbs_percentages" = 100`)
+@Check(`"protein_percentages" >= 0 AND "fat_percentages" >= 0 AND "carbs_percentages" >= 0`)
 export class DietType {
-  @ApiProperty({ example: 'uuid', description: 'Unique identifier' })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty({ enum: DietTypeName, description: 'Name of the diet type' })
-  @Column({ type: 'enum', enum: DietTypeName, unique: true })
-  name: DietTypeName;
+  @Column('varchar', { length: 255, unique: true })
+  name: string;
 
-  @ApiProperty({ example: 20, description: 'Percentage of protein in the diet type' })
   @Column({ type: 'float' })
   protein_percentages: number;
 
-  @ApiProperty({ example: 30, description: 'Percentage of fat in the diet type' })
   @Column({ type: 'float' })
   fat_percentages: number;
 
-  @ApiProperty({ example: 40, description: 'Percentage of carbohydrates in the diet type' })
   @Column({ type: 'float' })
   carbs_percentages: number;
 
-  @ApiProperty({
-    example: '2022-01-01T00:00:00.000Z',
-    description: 'Creation date of the diet type',
-  })
-  @CreateDateColumn({ type: 'timestamptz' })
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
   // relations
 
   // reflects
-  @ApiProperty({
-    type: () => [FitnessProfile],
-    description: 'List of fitness profiles associated with this diet type',
-  })
   @OneToMany(() => FitnessProfile, (fitness_profile) => fitness_profile.diet_type)
   fitness_profiles: FitnessProfile[];
 }
