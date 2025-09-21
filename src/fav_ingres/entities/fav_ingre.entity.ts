@@ -8,7 +8,6 @@ import { Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 't
 @Entity('fav_ingres')
 export class FavIngre {
   @PrimaryGeneratedColumn('uuid')
-  @ApiProperty({ example: 'uuid', description: 'Unique identifier' })
   id: string;
 
   // relations => 2

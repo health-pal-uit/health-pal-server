@@ -24,39 +24,30 @@ import {
 @Index('idx_daily_logs_user_date', ['user', 'date'])
 @Entity('daily_logs')
 export class DailyLog {
-  @ApiProperty({ description: 'Unique identifier for the daily log' })
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty({ description: 'Date of the daily log' })
   @Column({ type: 'date' })
   date: Date;
 
-  @ApiProperty({ description: 'Total calories consumed on the daily log' })
-  @Column({ type: 'float' })
+  @Column({ type: 'float', default: 0 })
   total_kcal: number;
 
-  @ApiProperty({ description: 'Total protein consumed on the daily log' })
-  @Column({ type: 'float' })
+  @Column({ type: 'float', default: 0 })
   total_protein_gr: number;
 
-  @ApiProperty({ description: 'Total fat consumed on the daily log' })
-  @Column({ type: 'float' })
+  @Column({ type: 'float', default: 0 })
   total_fat_gr: number;
 
-  @ApiProperty({ description: 'Total carbohydrates consumed on the daily log' })
-  @Column({ type: 'float' })
+  @Column({ type: 'float', default: 0 })
   total_carbs_gr: number;
 
-  @ApiProperty({ description: 'Total fiber consumed on the daily log' })
-  @Column({ type: 'float' })
+  @Column({ type: 'float', default: 0 })
   total_fiber_gr: number;
 
-  @ApiProperty({ description: 'Total water consumed on the daily log' })
-  @Column({ type: 'float' })
+  @Column({ type: 'float', default: 0 })
   water_drank_l: number;
 
-  @ApiProperty({ description: 'Date when the daily log was last updated' })
   @UpdateDateColumn({ type: 'timestamptz' })
   updated_at: Date;
 

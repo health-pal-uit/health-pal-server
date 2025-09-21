@@ -7,15 +7,12 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique }
 @Unique('UQ_chat_participants_session_user', ['chat_session', 'user'])
 @Entity('chat_participants')
 export class ChatParticipant {
-  @ApiProperty()
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ApiProperty()
   @Column({ type: 'boolean', default: false })
   is_admin: boolean;
 
-  @ApiProperty()
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   joined_at: Date;
 
