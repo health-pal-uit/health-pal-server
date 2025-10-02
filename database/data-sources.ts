@@ -9,6 +9,7 @@ import { ChatMessage } from 'src/chat_messages/entities/chat_message.entity';
 import { ChatParticipant } from 'src/chat_participants/entities/chat_participant.entity';
 import { ChatSession } from 'src/chat_sessions/entities/chat_session.entity';
 import { Comment } from 'src/comments/entities/comment.entity';
+import { Contribution } from 'src/contributions/entities/contribution.entity';
 import { DailyIngre } from 'src/daily_ingres/entities/daily_ingre.entity';
 import { DailyLog } from 'src/daily_logs/entities/daily_log.entity';
 import { DailyMeal } from 'src/daily_meals/entities/daily_meal.entity';
@@ -73,6 +74,7 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
       PremiumPackage,
       User,
       Role,
+      Contribution,
     ], // change later
     autoLoadEntities: true,
     migrations: [__dirname + '/../migrations/**/*{.ts,.js}'], // change later

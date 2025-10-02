@@ -22,11 +22,10 @@ import { RecordType } from 'src/helpers/enums/record-type.enum';
 @Check(`rhr IS NULL OR rhr >= 0`)
 @Check(`ahr IS NULL OR ahr >= 0`)
 @Check(`intensity_level IS NULL OR (intensity_level BETWEEN 1 AND 5)`)
-@Check(`num_nonnulls(daily_log_id, challenge_id, goal_id) = 1`)
+@Check(`num_nonnulls(daily_log_id, challenge_id) = 1`)
 @Check(`
   (type = 'daily'     AND daily_log_id  IS NOT NULL) OR
-  (type = 'challenge' AND challenge_id  IS NOT NULL) OR
-  (type = 'goal'      AND goal_id       IS NOT NULL)
+  (type = 'challenge' AND challenge_id  IS NOT NULL)
 `)
 @Index('idx_ar_activity', ['activity'])
 @Index('idx_ar_created', ['created_at'])
