@@ -35,6 +35,7 @@ import { typeOrmConfig } from '../database/data-sources';
 import { ConfigModule } from '@nestjs/config';
 import { RolesModule } from './roles/roles.module';
 import { AuthModule } from './auth/auth.module';
+import { ContributionsModule } from './contributions/contributions.module';
 
 @Module({
   imports: [
@@ -74,6 +75,7 @@ import { AuthModule } from './auth/auth.module';
     FavIngresModule,
     RolesModule,
     AuthModule,
+    ContributionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
