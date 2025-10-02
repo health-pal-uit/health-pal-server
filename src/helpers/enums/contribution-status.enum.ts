@@ -1,0 +1,6 @@
+export enum ContributionStatus {
+  PENDING = 'PENDING',
+  NEEDS_CHANGES = 'NEEDS_CHANGES',
+  APPROVED = 'APPROVED',
+  REJECTED = 'REJECTED',
+}
