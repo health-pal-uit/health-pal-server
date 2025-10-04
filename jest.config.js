@@ -19,10 +19,10 @@ module.exports = {
     },
   },
   testPathIgnorePatterns: [
-    '<rootDir>/test/',                 // thư mục test mặc định của Nest
-    '<rootDir>/.*/__tests__/',         // nếu có
-    '<rootDir>/src/.*\\.spec\\.[tj]sx?$',      // *.spec.ts/tsx/js/jsx
-    '<rootDir>/src/.*\\.test\\.[tj]sx?$',      // *.test.ts/tsx/js/jsx
-    '<rootDir>/src/.*\\.e2e-spec\\.[tj]sx?$',  // *.e2e-spec.ts/tsx/...
+    '<rootDir>/test/', // thư mục test mặc định của Nest
+    '<rootDir>/.*/__tests__/', // nếu có
+    '<rootDir>/src/.*\\.spec\\.[tj]sx?$', // *.spec.ts/tsx/js/jsx
+    '<rootDir>/src/.*\\.test\\.[tj]sx?$', // *.test.ts/tsx/js/jsx
+    '<rootDir>/src/.*\\.e2e-spec\\.[tj]sx?$', // *.e2e-spec.ts/tsx/...
   ],
 };
