@@ -81,7 +81,7 @@ export class AuthService {
     return { token: data.session.access_token };
   }
 
-  async logOut() {
+  async logOut(): Promise<{ message: string }> {
     const { error } = await this.supabase.auth.signOut();
     if (error) {
       throw error;

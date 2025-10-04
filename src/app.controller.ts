@@ -1,5 +1,6 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseGuards } from '@nestjs/common';
 import { AppService } from './app.service';
+import { AdminSupabaseGuard } from './auth/guards/supabase/admin-supabase.guard';
 
 @Controller()
 export class AppController {
@@ -8,5 +9,11 @@ export class AppController {
   @Get()
   getHello(): string {
     return this.appService.getHello();
+  }
+
+  @Get('test')
+  @UseGuards(AdminSupabaseGuard)
+  test(): string {
+    return 'Test endpoint is working!';
   }
 }
