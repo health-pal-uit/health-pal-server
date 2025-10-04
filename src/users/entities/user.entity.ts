@@ -38,7 +38,7 @@ export class User {
   @Column({ type: 'varchar', length: 255, unique: true })
   username!: string; // @IsString() in dto
 
-  @Column({ type: 'varchar', length: 255 })
+  @Column({ type: 'varchar', length: 255, nullable: true })
   @Exclude({ toPlainOnly: true }) // Exclude password from the response
   hashed_password!: string; // @IsString() in dto
 
@@ -66,6 +66,9 @@ export class User {
 
   @Column({ type: 'timestamptz', nullable: true })
   deactivated_at?: Date;
+
+  @Column({ type: 'boolean', default: false })
+  isVerified: boolean; // email verified
 
   // relations
 
