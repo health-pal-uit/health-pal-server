@@ -3,6 +3,7 @@ import { SupabaseClient, User } from '@supabase/supabase-js';
 import { SUPABASE_ADMIN } from 'src/supabase/supabase-admin.provider';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
+import { LoginDto } from './dto/login.dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -68,7 +69,8 @@ export class AuthService {
     return { isVerified: !!user.confirmed_at };
   }
 
-  async logIn(email: string, password: string) {
+  async login(loginDto: LoginDto): Promise<{ token: string }> {
+    const { email, password } = loginDto;
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email,
       password,
@@ -76,7 +78,7 @@ export class AuthService {
     if (error) {
       throw error;
     }
-    return data;
+    return { token: data.session.access_token };
   }
 
   async logOut() {
