@@ -36,6 +36,7 @@ import { ConfigModule } from '@nestjs/config';
 import { RolesModule } from './roles/roles.module';
 import { AuthModule } from './auth/auth.module';
 import { ContributionsModule } from './contributions/contributions.module';
+import { SupabaseAdminModule } from './supabase/supabase-admin.module';
 
 @Module({
   imports: [
@@ -76,6 +77,7 @@ import { ContributionsModule } from './contributions/contributions.module';
     RolesModule,
     AuthModule,
     ContributionsModule,
+    SupabaseAdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],
