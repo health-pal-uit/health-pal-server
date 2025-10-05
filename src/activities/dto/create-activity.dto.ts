@@ -24,16 +24,6 @@ export class CreateActivityDto {
   @IsNumber()
   met_value: number;
 
-  @ApiProperty({ example: 100, description: 'Calories burned per repetition' })
-  @IsOptional()
-  @IsNumber()
-  kcal_per_rep?: number;
-
-  @ApiProperty({ example: 800, description: 'Calories burned per hour' })
-  @IsOptional()
-  @IsNumber()
-  kcal_per_hour?: number;
-
   @ApiProperty({ example: true, description: 'Indicates if the activity supports repetitions' })
   @IsBoolean()
   @IsNotEmpty()
