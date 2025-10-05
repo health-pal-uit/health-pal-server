@@ -1,0 +1,1112 @@
+id,name,met_values,supports_rep,supports_hour,category,created_at
+641ac604-40d6-4ba7-b590-7fe843b3e7db,"Bicycling, mountain, uphill, vigorous",14.0,False,True,{cardio},2025-10-05T19:08:24
+5b8612e2-145a-4ff3-a103-c64ca0854764,"Bicycling, mountain, competitive racing",16.0,False,True,{cardio},2025-10-05T19:08:24
+1cafd2df-49b5-4278-8d2d-0809eca6add2,"Bicycling, BMX",8.5,False,True,{cardio},2025-10-05T19:08:24
+5e03272f-1f0b-44ee-97b4-f97adc4a9ec6,"Bicycling, mountain, general",8.5,False,True,{cardio},2025-10-05T19:08:24
+1e59da97-d4aa-4b8c-853f-45a02d8d8d19,"Bicycling, <10mph, leisure, toworkorforpleasure(TaylorCode115)",4.0,False,True,{cardio},2025-10-05T19:08:24
+714bfd49-b713-4c49-8d1d-80d0b2bc38b4,"Bicycling, to/fromwork, selfselectedpace",6.8,False,True,{cardio},2025-10-05T19:08:24
+23160147-f611-4e40-8ea9-1c73939e911b,"Bicycling, ondirtorfarmroad, moderate pace",5.8,False,True,{cardio},2025-10-05T19:08:24
+c92217cf-a3d9-4134-96a8-cb7ddddf681f,"Bicycling, general",7.0,False,True,{cardio},2025-10-05T19:08:24
+85c3e554-986e-400b-8a61-e3bb3bd06956,"Bicycling, self-selected easy pace",4.3,False,True,{cardio},2025-10-05T19:08:24
+4f951736-2ef4-4de5-94bb-eb86e4ca2099,"Bicycling, self-selected moderate pace",7.0,False,True,{cardio},2025-10-05T19:08:24
+b4365736-1604-4f4c-9d24-448970078140,"Bicycling, self-selected vigorous pace",9.0,False,True,{cardio},2025-10-05T19:08:24
+37f9583d-0758-4580-b4e4-bf2edc118e94,"Bicycling, leisure5.5mph",3.5,False,True,{cardio},2025-10-05T19:08:24
+66b83e41-b3e9-420e-86bf-b82315887dd5,"Bicycling, leisure, 9.4mph",5.8,False,True,{cardio},2025-10-05T19:08:24
+af3bd113-bc33-475c-b926-13b4fcb46b09,"Bicycling, 10-11.9mph, leisure, slow, lighteffort",6.8,False,True,{cardio},2025-10-05T19:08:24
+8be02f58-237f-4958-91f4-f7b48955039f,"Bicycling, 12-13.9mph, leisure, moderateeffort",8.0,False,True,{cardio},2025-10-05T19:08:24
+b55f58e8-37cb-480d-9ac9-8204ede4c183,"Bicycling, 14-15.9mph, racingorleisure, fast, vigorouseffort",10.0,False,True,{cardio},2025-10-05T19:08:24
+72fa4d0f-8e9c-4d33-b71a-bf0022fa1f9b,"Bicycling, 16-19mph, racing/notdraftingor>19mphdrafting, veryfast, racinggeneral",12.0,False,True,{cardio},2025-10-05T19:08:24
+a84c709a-cd60-4669-8921-da9d90469d5f,"Bicycling, >20mph, racing, notdrafting",16.8,False,True,{cardio},2025-10-05T19:08:24
+6a1368e4-bf58-481b-adfb-f9307fe63645,"Bicycling, 12mph, seated, handsonbrakehoodsorbardrops, 80rpm",8.5,False,True,{cardio},2025-10-05T19:08:24
+7caa53f6-8d41-4128-b63f-1f4210027d96,"Bicycling, 12mph, standing, handsonbrakehoods, 60rpm",9.0,False,True,{cardio},2025-10-05T19:08:24
+39d2eca8-1651-47b8-bea5-1c07a1988922,Unicycling,5.0,False,True,{cardio},2025-10-05T19:08:24
+05a86166-5b45-41bb-9e88-8e6c97edb20d,E-bike(electricallyassisted)withoutelectronicsupport,6.8,False,True,{cardio},2025-10-05T19:08:24
+1501ccf4-b509-41ad-80e6-383d1be5ae61,E-bike(electricallyassisted)withlightelectronicsupport,6.0,False,True,{cardio},2025-10-05T19:08:24
+5afbf3b8-5242-4173-9565-8b062779641b,E-bike(electricallyassisted)withhighelectronicsupport,4.0,False,True,{cardio},2025-10-05T19:08:24
+b4d63d6a-f681-42c6-8243-47955d7c1f00,"Bicycling, stationary, general",6.8,False,True,{cardio},2025-10-05T19:08:24
+0c12a1b8-8a6b-495d-9afd-d131571e4eb3,"Bicycling, stationary, 25-30watts, verylighttolighteffort",3.5,False,True,{cardio},2025-10-05T19:08:24
+efff945e-39bf-4279-acb8-15e88954a1d5,"Bicycling, stationary, 50watts, lighteffort",4.0,False,True,{cardio},2025-10-05T19:08:24
+a47bea28-bcc2-44ca-b445-cde5dccf19fe,"Bicycling, stationary, 60watts, lighttomoderateeffort",5.0,False,True,{cardio},2025-10-05T19:08:24
+f459bf60-6e4d-4278-853c-c82fe724f872,"Bicycling, stationary, 70-80watts",5.8,False,True,{cardio},2025-10-05T19:08:24
+03061719-b102-431f-b7b4-f56502ef19de,"Bicycling, stationary, 90-100watts, moderatetovigorous",6.0,False,True,{cardio},2025-10-05T19:08:24
+8f905e33-e2bf-4f1d-b44f-701eccbdba97,"Bicycling, stationary, 101-125watts",6.8,False,True,{cardio},2025-10-05T19:08:24
+0f05278f-dfbf-40bb-a526-50407bd67423,"Bicycling, stationary, 126-150watts",8.0,False,True,{cardio},2025-10-05T19:08:24
+c89794b2-99f3-4957-a5f9-b061ec3d90eb,"Bicycling, stationary, 151-199watts",10.3,False,True,{cardio},2025-10-05T19:08:24
+9516533d-3a2c-42e1-8152-0cabb1d189f0,"Bicycling, stationary, 200-229watts, vigorous",10.8,False,True,{cardio},2025-10-05T19:08:24
+c681facb-229d-483d-8ac7-862bd7aa2179,"Bicycling, stationary, 230-250watts, veryvigorous",12.5,False,True,{cardio},2025-10-05T19:08:24
+65dcfcad-3c73-4673-bd0e-5b4601093671,"Bicycling, stationary, 270-305watts, veryvigorous",13.8,False,True,{cardio},2025-10-05T19:08:24
+668c5e77-67ac-4491-bb8e-03208f39cf52,"Bicycling, stationary, >325watts, veryvigorous",16.3,False,True,{cardio},2025-10-05T19:08:24
+2e9ba356-1ad7-4744-a90e-709127955f54,"Bicycling, concentriconly, 100W",5.5,False,True,{cardio},2025-10-05T19:08:24
+e18351a2-4b2d-4cc0-b99d-dfa4719e2ab1,"Bicycling, concentriconly, 200W",11.0,False,True,{cardio},2025-10-05T19:08:24
+b5b10e23-0882-4401-ac1f-38576d7ddcc3,"Bicycling, eccentriconly, 100to149W",2.3,False,True,{cardio},2025-10-05T19:08:24
+680a1446-80af-4409-b58c-ee8857eb7c2b,"Bicycling, eccentriconly, 200W",4.0,False,True,{cardio},2025-10-05T19:08:24
+50741c87-5b60-4c76-8330-f127981682d2,"Bicycling, stationary, RPM/Spinbikeclass",9.0,False,True,{cardio},2025-10-05T19:08:24
+1ed93c90-7687-4b56-a49a-ab3d46ed5a85,"Bicycling, interactivevirtualcycling, indoorcycleergometer",8.8,False,True,{cardio},2025-10-05T19:08:24
+0b50b883-e911-40fd-81a3-ba3fed814991,"Bicycling, highintensityintervaltraining",8.8,False,True,{cardio},2025-10-05T19:08:24
+de4c6691-2c93-4d15-b84b-08d9ce534f66,"Aerobic, general",7.3,False,True,{cardio},2025-10-05T19:08:24
+5087be15-97a2-4228-94fb-c33a3d5b15ab,"Aerobic, step, with4-inchstep",5.5,False,True,{cardio},2025-10-05T19:08:24
+9bfcf044-a02d-456f-9fc8-46c03e633998,"Aerobic, step, with6–8inchstep",7.3,False,True,{cardio},2025-10-05T19:08:24
+800dc78d-f4e9-4e57-b35e-de938cd743cd,"Aerobic, step, with10–12inchstep",9.0,False,True,{cardio},2025-10-05T19:08:24
+0b4b482a-46ef-40f1-917c-a3e4c4290f56,"Benchstepclass, general",7.8,False,True,{other},2025-10-05T19:08:24
+4ff641ea-8e6a-4177-b2ab-4cdd58d28144,"Aerobicdance, lowimpact, moderateeffort",4.8,False,True,{cardio},2025-10-05T19:08:24
+14e9d717-8fba-42de-82a4-007f9276ceee,"Aerobicdance, highimpact, vigorouseffort",8.0,False,True,{cardio},2025-10-05T19:08:24
+04f27415-a5d3-40a0-a981-c09299b761e9,Aerobicdancewearing10-15lbweights,10.0,True,True,{strength},2025-10-05T19:08:24
+e832db2b-a315-42b2-ac38-9bf93fcce1d1,"Armytypeobstaclecourseexercise, bootcamptrainingprogram",5.0,False,True,{other},2025-10-05T19:08:24
+00901104-606c-4d29-8f32-2b5fcca793bc,"Calisthenics(e.g., pushups, situps, pull-ups, jumpingjacks, burpees, battlingropes), vigorouseffort",7.5,True,True,{strength},2025-10-05T19:08:24
+190f2919-ea98-4c73-85c7-65d479765922,"Calisthenics(e.g., pushups, situps, pull-ups, lunges), moderateeffort",3.8,True,True,{strength},2025-10-05T19:08:24
+02c1337a-5998-4cca-b56b-ec84568d327f,"Calisthenics(e.g., curlups, abdominalcrunches, plank), lighteffort",2.8,True,True,{strength},2025-10-05T19:08:24
+847df2c1-616a-4740-bdc0-d675b11d85c1,"Calisthenics, lightormoderateeffort, general(e.g., backexercises), goingup&downfromfloor(TaylorCode150)",3.5,True,True,{strength},2025-10-05T19:08:24
+61b6b82d-9e49-4361-9e05-5feaaf748414,"Circuittraining, bodyweightexercises",6.0,True,True,{strength},2025-10-05T19:08:24
+2d9e78c1-2d08-4958-8761-e1efc2e63f3a,"Circuittraining, lighteffort",3.5,False,True,{other},2025-10-05T19:08:24
+46f88abe-6145-41d6-9dc8-0220d79da19d,"Circuittraining, moderateeffort",5.0,False,True,{other},2025-10-05T19:08:24
+97ba9ca3-b5af-452f-913d-f6562f65781a,"Circuittraining, includingkettlebells, someaerobicmovementwithminimalrest, general, vigorousintensity",7.5,True,True,{strength},2025-10-05T19:08:24
+b7162043-15a6-42ab-aa2a-ade376b05843,Curves™exerciseroutinesinwomen,3.5,False,True,{other},2025-10-05T19:08:24
+161dda16-38ca-4aaf-ba19-f2403285a0dc,"Ellipticaltrainer, moderateeffort",5.0,False,True,{cardio},2025-10-05T19:08:24
+bda8b53f-3747-4c81-af20-801c9fb4c72e,"Ellipticaltrainer, vigorouseffort",9.0,False,True,{cardio},2025-10-05T19:08:24
+3032dc90-52d9-41d6-b99e-3f3464cefb77,"Resistance(weightlifting-freeweight, nautilusoruniversal-type), powerliftingorbodybuilding, vigorouseffort(TaylorCode210)",6.0,True,True,{strength},2025-10-05T19:08:24
+41019cdd-6a5b-4e07-81cd-a314b6d69625,"Resistance(weight)training, squats, deadlift, sloworexplosiveeffort",5.0,True,True,{strength},2025-10-05T19:08:24
+acf6664b-6e89-41cd-99cd-c9a6b66c8a22,"Resistance(weight)training, multipleexercises, 8-15repsatvariedresistance",3.5,True,True,{strength},2025-10-05T19:08:24
+641291a9-0524-4f69-b38c-dc687d0513b5,"ResistanceTraining, circuit, reciprocolsupersets, peripheralhearactiontraining",5.8,True,True,{strength},2025-10-05T19:08:24
+8b8348da-587d-4321-947b-9035b3d82749,"Bodyweightresistanceexercises(e.g., squat, lunge, push-up, crunch), general",3.0,True,True,{strength},2025-10-05T19:08:24
+31c7f1d9-f5b4-4172-b4c7-8d0e36f14ad4,"Bodyweightresistanceexercises(e.g., squat, lunge, push-up, crunch), highintensity",6.5,True,True,{strength},2025-10-05T19:08:24
+d17896ee-97fb-4316-8aa8-d66fa0101bce,Kettlebellswings,9.8,True,True,{strength},2025-10-05T19:08:24
+23936265-cc4e-41b9-81d2-f5598b3d0edf,"Healthclubexercise, general(TaylorCode160)",5.5,False,True,{other},2025-10-05T19:08:24
+3bbbf89d-3341-4472-84c8-38ced3193ccc,"Healthclubexerciseclassesgeneral, gym/weighttrainingcombinedinonevisit",5.0,True,True,{strength},2025-10-05T19:08:24
+e49c01ce-fa81-4797-8193-1931b483d79b,"Healthclubexercise, conditioningclasses",7.8,False,True,{other},2025-10-05T19:08:24
+c88aa872-7862-4ee4-94a1-2fdb874c2a3b,"Homeexercise, general",3.8,False,True,{other},2025-10-05T19:08:24
+3659f6dd-929d-4bb0-9eb5-33ed89982407,"Stairtreadmillergometer, general",9.3,False,True,{cardio},2025-10-05T19:08:24
+94228f6b-60df-4ee9-b174-4e125a3231df,"Ropeskippingexercise, general",11.0,False,True,{cardio},2025-10-05T19:08:24
+8c697817-ae85-4731-b178-b1b0cfab65c7,"Jumpingrope, Digi-JumpMaching, 120jumps/minute",9.0,False,True,{other},2025-10-05T19:08:24
+b0360e34-a642-4874-a1d5-136f4edae7c9,"Rowing, stationaryergometer, general, vigorouseffort",7.3,False,True,{cardio},2025-10-05T19:08:24
+354db4d4-3cab-4f27-9dd9-9238f976d040,"Rowing, stationaryergometer, general, <100watts, moderateeffort",5.0,False,True,{cardio},2025-10-05T19:08:24
+372c2725-a9bb-430b-9069-51da1f6bd8d8,"Rowing, stationary, 100to149watts, vigorouseffort",7.5,False,True,{cardio},2025-10-05T19:08:24
+21f53864-a4cf-41fa-b2b2-3500c7a0e10e,"Rowing, stationary, 150to199watts, vigorouseffort",11.0,False,True,{cardio},2025-10-05T19:08:24
+56af2631-bcd9-47d8-83f6-56d4ef17a0cc,"Rowing, stationary, ≥200watts, veryvigorouseffort",14.0,False,True,{cardio},2025-10-05T19:08:24
+dde340cf-1c28-4d62-bb67-ca6ebf9a0a19,"Shuttlerunning, forward/backward/lateral",11.0,False,True,{cardio},2025-10-05T19:08:24
+4d4360e3-2e6d-4e87-9389-ae604e422b9b,"Skimachine, general",6.8,True,True,{strength},2025-10-05T19:08:24
+9147159c-fe74-46b4-bfe9-d7b3e15ec0b5,"Skiergometer, crosscountry, doublepoling, slowtomoderatespeed",10.5,False,True,{cardio},2025-10-05T19:08:24
+80f3da0c-d0f9-4b56-ae80-086088ae832c,"Skiergometer, crosscountry, doublepoling, fasttomaximumspeed",18.0,False,True,{cardio},2025-10-05T19:08:24
+8dd28e7b-53d0-401d-81ea-4b313f57ef0f,"Slideboardexercise, general",10.5,False,True,{other},2025-10-05T19:08:24
+75357af8-642b-42ad-86ed-c3fd0e7bab5a,"Slimnastics, jazzercise",6.0,False,True,{other},2025-10-05T19:08:24
+399a3d46-d480-4691-9d23-c04840ccca8b,"Stretching, mild",2.3,False,True,{flexibility},2025-10-05T19:08:24
+77f59679-985d-4476-81e5-8d81617bb433,"Pilates, traditional, mat",1.8,False,True,{flexibility},2025-10-05T19:08:24
+e9de4769-d7fb-452f-9ca1-09d4525363bc,"Pilates, general",2.8,False,True,{flexibility},2025-10-05T19:08:24
+8842efda-8cde-4a03-b44a-2fc49756a3f7,"Pound, combinationofPilatesandbodymovementswithdrumming",8.5,False,True,{flexibility},2025-10-05T19:08:24
+694f0212-d4a2-4caf-aae0-c4b719f66c62,"Poledancing, exerciseclass",4.5,False,True,{other},2025-10-05T19:08:24
+0d01c01b-3fc4-403c-8627-67dc93b069d5,"Teachingexerciseclasses(e.g., aerobic, water)",6.8,False,True,{cardio},2025-10-05T19:08:24
+b3bf5b03-d407-42f0-8ce1-bb7df132ec7f,"Therapeuticexerciseball, Fitballexercise",2.8,False,True,{other},2025-10-05T19:08:24
+43594399-32fc-45e2-b70d-58d06c70e092,"Therapeuticexerciseball, Fitballexercise, highintensity",9.5,False,True,{other},2025-10-05T19:08:24
+f9afd04b-4c46-4b62-a786-cb589c03d86e,"Upperbodyexercise, armergometer, general, light",2.8,False,True,{other},2025-10-05T19:08:24
+ce3b4320-f82f-41f2-ac26-0ecd1c9bf757,"ArmErgometer, handbike, 15W",2.0,False,True,{other},2025-10-05T19:08:24
+00dcd698-2f68-4330-a313-b39debdb2934,"ArmErgometer, handbike, 25-30W",2.8,False,True,{other},2025-10-05T19:08:24
+f3fde31c-6345-45fb-9401-34adb790a8b4,"ArmErgometer, handbike, 45W",3.5,False,True,{other},2025-10-05T19:08:24
+3407bfd1-682d-4cc9-8f43-ae8aa6f2bea0,"Upperbodyexercise, stationarybicycle-Airdyne(armsonly)40rpm, moderateintensity",4.3,False,True,{cardio},2025-10-05T19:08:24
+40cbf69c-d2dd-4359-8a55-a62763057628,"Wateraerobics, watercalisthenics, waterexercise",5.3,True,True,{strength},2025-10-05T19:08:24
+617383e6-2729-441b-9088-13f880bcca41,"Whirlpool, sitting",1.3,False,True,{other},2025-10-05T19:08:24
+f8262550-6ece-4241-9a62-b42f62d3b812,"Video, exerciseworkouts, TVconditioningprograms(e.g., yoga, stretching, seated), lighteffort",2.5,False,True,{flexibility},2025-10-05T19:08:24
+a3f2a70f-a88f-4522-955c-95b40d217af3,"Video, exerciseworkouts, TVconditioningprograms(e.g., cardio-resistancetraining), moderate",4.0,True,True,{strength},2025-10-05T19:08:24
+68b253b7-e2fb-41bb-9ff1-e14033233cf2,"Video, exerciseworkouts, TVconditioningprograms(e.g., cardio-resistancetraining), vigorous",6.0,True,True,{strength},2025-10-05T19:08:24
+57c28ead-3f02-4c9e-8a2a-5eef427b104c,"Yoga, Hatha",2.3,False,True,{flexibility},2025-10-05T19:08:24
+77d1b039-c73c-4322-9d99-33fbd2caf8f5,"Yoga, Hatha, highintensity",8.0,False,True,{flexibility},2025-10-05T19:08:24
+a537cdda-6eb1-4fe4-b028-544792a8b070,"Yoga, Hot",3.0,False,True,{flexibility},2025-10-05T19:08:24
+b880f22f-b9c3-4694-b693-82e944e4a2ba,"Yoga, Power",4.0,False,True,{flexibility},2025-10-05T19:08:24
+0f2b7c34-50f8-4bcb-8c4f-4c564b38c1e2,"Yoga, Nadisodhana",2.0,False,True,{flexibility},2025-10-05T19:08:24
+c68a0f53-de99-4f46-aedd-287ed6cb33ff,"Yoga, General",2.3,False,True,{flexibility},2025-10-05T19:08:24
+2aa47374-eb74-4131-b54a-41872c71ff73,"Yoga, SuryaNamaskar",3.5,False,True,{flexibility},2025-10-05T19:08:24
+65709639-f9d6-4dd7-bcd8-a8d1268742a6,"Yoga, Vinyasa",2.7,False,True,{flexibility},2025-10-05T19:08:24
+2d2244fa-51b9-4944-a073-a8af70bbb516,"NativeNewZealanderPA, (e.g., HakaPowhiri, Poi, Moteatea, etc.), generalmoderateeffort",5.3,False,True,{other},2025-10-05T19:08:24
+1d5c2e16-efa0-466c-9566-49c98a5c7ddb,"NativeNewZealanderPA, general, vigorouseffort",6.8,False,True,{other},2025-10-05T19:08:24
+cf6f18d9-5c06-4f0b-b50c-9ca257b9aff1,"Highintensityintervalexercise, moderateeffort",7.0,False,True,{cardio},2025-10-05T19:08:24
+7f769f88-1248-4d52-8ae7-24cd492ae912,"Highintensityintervalexercise, burpees, mountainclimbers, squatjumps, Tabata, vigorouseffort",11.0,True,True,{strength},2025-10-05T19:08:24
+4e4591bd-b95d-44bf-aaf2-bdc327600038,"BalanceExerciseAssistRobot(BEAR), simulatedskiing, tennis, rodeo",2.3,False,True,{sports},2025-10-05T19:08:24
+7a53d7ee-5fb5-4de2-98a3-f2f9cbc0acc3,Hooping(formerlyknownashula®hooping),5.8,False,True,{other},2025-10-05T19:08:24
+399f8286-01e4-49bb-a263-b97c5ec45c15,"ImpulseTrainingSystem, InertialExerciseTrainer",9.0,False,True,{other},2025-10-05T19:08:24
+f6c6b2b2-38f2-4bff-89c2-ef24aa9d7f27,"VirtualRealityFitness, Supernatural™“Flow”, “Boxing""vigorousintensity",7.9,False,True,{other},2025-10-05T19:08:24
+5d44f70e-9345-445c-84fc-7ea586718175,"ExerCube, workoutseries",9.3,False,True,{other},2025-10-05T19:08:24
+cefb8a81-1e9b-443a-9f64-323a14ada04f,"BlackboxImmersivevirtualrealityexergamingsystem, vigorousintensity",13.0,False,True,{other},2025-10-05T19:08:24
+440a8e36-7150-443d-8ac5-3eb95b44c32d,"Wandexercise, Life-Build-Line",3.0,False,True,{other},2025-10-05T19:08:24
+9efb8767-b41c-4e1b-a677-0937cce92a5d,"Zumba, groupclass",6.5,False,True,{cardio},2025-10-05T19:08:24
+014e9466-c881-4d13-bfb1-851cf5c537d6,"Zumba, homevideo",5.5,False,True,{cardio},2025-10-05T19:08:24
+858d35da-b286-4f81-a632-e120859b9a18,"Sittostandexercise, 6-12times/min",2.8,False,True,{other},2025-10-05T19:08:24
+8aac8135-6c4e-4cca-a5ae-6cc983eda825,"Sittostandexercise, 18-24times/min",4.0,False,True,{other},2025-10-05T19:08:24
+ed16c1e4-c84a-417a-8a35-68f944030c51,"Afro-Cubansalsa(Cubancha-cha-cha, mambo, Afrorumba, contratiemposonsteps, orisha/santomovements)",6.0,False,True,{other},2025-10-05T19:08:24
+6650a609-df4c-43ff-8b88-93a2967378b7,"Ballet, modern, orjazzgeneral, rehearsalorclass",5.0,False,True,{other},2025-10-05T19:08:24
+ec92a531-f8b0-4464-bd07-2004c933d558,"Balletexercises(plie, tendus, jetes, ronddeJambes, fondus, grandbattement, grandadage, sautes, tempLeve's)",6.3,False,True,{other},2025-10-05T19:08:24
+ca8f9473-6e62-47c2-8a65-63ba816351f0,"Ballet, modern, orjazz, performance, vigorouseffort",6.8,False,True,{other},2025-10-05T19:08:24
+1534d85e-0f31-46f3-8845-b407c956a392,Tap,4.8,False,True,{other},2025-10-05T19:08:24
+1638e4f5-a50b-48c4-9f1b-80ba5510fedd,"Ethnicorculturaldancing(e.g.Greek, MiddleEastern, hula, salsa, merengue, bambayplena, flamenco, belly, andswing)",4.5,False,True,{other},2025-10-05T19:08:24
+45e56da7-3476-482f-bbc5-f1451011cdb0,"Chinesesquaredance, Ballet&Tibetandance",5.5,False,True,{cardio},2025-10-05T19:08:24
+ab8174e7-4391-460f-b545-f769bd0198e7,"Chinesesquaredance, aerobicdance",7.3,False,True,{cardio},2025-10-05T19:08:24
+322b30ac-e55b-4da9-a454-0ef9edcbc59b,"Ballroomdancing, fast(TaylorCode125)",5.5,False,True,{other},2025-10-05T19:08:24
+15c1e577-7db2-478f-820f-2663f74994aa,"Nightcluborfolkdancing, vigorouseffort(e.g., nightclub, disco, folk, linedancing, Irishstepdancing, polka, contra)",9.8,False,True,{other},2025-10-05T19:08:24
+21e5172e-7168-4430-a9c6-884b06bb86b9,"Folkdancing, moderateeffort",5.0,False,True,{other},2025-10-05T19:08:24
+526a69f7-b6bc-422b-bd92-b295e11d5a1e,"Ballroomdancing, competitive, general",11.3,False,True,{other},2025-10-05T19:08:24
+cbe395ab-be78-476a-a197-4f4e5c9bba06,"ballroomdance, DanceSportcompetition(modernwaltz, tango, Viennesewaltz, slowfox, quickstep, samba, chacha, rumba, pasodoble, Jive)",13.0,False,True,{cardio},2025-10-05T19:08:24
+1b15b4a9-3c2d-4299-a780-a437673a46ff,"Ballroom, slow, examples:waltz, foxtrot, slowdancing, sambatango, rumba, 19thcenturydance, mambo, chacha",3.0,False,True,{cardio},2025-10-05T19:08:24
+57a5cdc0-2470-4951-bda0-9a6d804034a4,"BallroomDance, Recreational(Waltz, Foxtrot, Cha-cha, Swing)",6.0,False,True,{cardio},2025-10-05T19:08:24
+2f32b32e-4fe3-4061-abf7-b1b9d37a0427,"AnishinaabeJingledancing, briskpace, othertraditionalAmericanIndiandancingperformedbywomen, moderateeffort",5.5,False,True,{other},2025-10-05T19:08:24
+849b940a-922a-4451-9d16-abdd49b578ac,"Caribbeandance(Abakua, Beguine, Bellair, Bongo, Brukin’s, CaribbeanQuadrills, DinkiMini, Gere, Gumbay, Ibo, Jonkonnu, kumina, oreisha, jambu)",3.5,False,True,{cardio},2025-10-05T19:08:24
+8547ae8c-a652-408a-a285-1cf6178d4b4d,"Contemporarydancing, general",3.8,False,True,{other},2025-10-05T19:08:24
+3f70460f-43ec-4253-85b5-b15fb7529105,"Contemporarydancing, nightclub",4.3,False,True,{other},2025-10-05T19:08:24
+095413af-9c4a-4873-90a0-ddd0a07833a1,Flamencodance,8.5,False,True,{cardio},2025-10-05T19:08:24
+06cbf5c1-ff15-4680-a89a-998ecd570b15,"Jazzdancing, general",4.5,False,True,{other},2025-10-05T19:08:24
+8fc82cf5-d234-4f83-9034-ea02b9ad6f37,"MusicalTheater, Singing/dancing",10.3,False,True,{other},2025-10-05T19:08:24
+9cd756cb-a721-4328-a704-ad604787f887,"Polynesiandance, Hawaiianhulaslow, Maorihaka, Tongan",5.8,False,True,{cardio},2025-10-05T19:08:24
+7a183b09-eaf5-4e24-aad2-5b70d1399698,"Polynesiandance, Hawaiianhulafast, Samoansasa, Fijianstylefast, FilipinoTinikling",7.0,False,True,{cardio},2025-10-05T19:08:24
+83c250d5-67f5-4dcc-bb6f-d01aa63c0949,"Polynesiandance, Samoanslap, Tahitian",8.8,False,True,{cardio},2025-10-05T19:08:24
+d7a9edf8-7a8f-408e-ad27-c06bc32e4afd,"SalsaDancing, withpartner",4.8,False,True,{other},2025-10-05T19:08:24
+169a90ec-a230-46dc-b8ff-a8ea3c61fe60,"Salsadancing, toavideo",6.3,False,True,{other},2025-10-05T19:08:24
+3323d500-c299-4e7d-bc85-9ab3ec5d3908,"SquareDancing, AmericanWestern, country",5.5,False,True,{other},2025-10-05T19:08:24
+442f2d7a-4b28-414b-9600-82e4f8621d3a,"Fishing, general",3.5,False,True,{other},2025-10-05T19:08:24
+2903700d-cc30-4df6-9bb6-f3f7c5dc08a8,"Fishing, crabfishing",4.5,False,True,{other},2025-10-05T19:08:24
+76e344d7-a7ad-40d6-bb27-1f53fdfa59aa,"Fishing, catchingfishwithhands",4.0,False,True,{other},2025-10-05T19:08:24
+2587ef2c-cb49-4cca-9013-0be94c4755ff,"Fishingrelated, diggingworms, withshovel",4.3,False,True,{other},2025-10-05T19:08:24
+86fe9b8c-99ce-4cfe-8ff1-b7563b9d5acb,Fishingfromriverbankandwalking,4.0,False,True,{cardio},2025-10-05T19:08:24
+0e61fef2-469c-4739-8b83-8532017b9866,"Fishingfromboatorcanoe, sitting",2.0,False,True,{other},2025-10-05T19:08:24
+90eda3b5-c66e-4d85-a254-7877bb5e7eb5,"Fishingfromriverbank, standing(TaylorCode660)",3.5,False,True,{other},2025-10-05T19:08:24
+62006bd4-8752-438b-9bdd-8f859a82d8bf,"Fishinginstream, inwaders(TaylorCode670)",6.0,False,True,{other},2025-10-05T19:08:24
+0f2eb4f5-2945-4dee-8712-67d372b78ee6,"Fishing, ice, sitting",2.0,False,True,{other},2025-10-05T19:08:24
+699fdc31-7574-4b84-bad8-299d75f03f1b,"Fishing, jigorline, standing, general",1.8,False,True,{other},2025-10-05T19:08:24
+db88ad86-80d2-42b3-b48a-fb4f649bded3,"Fishing, dipnet, settingnetandretrievingfish, general",3.5,True,True,{other},2025-10-05T19:08:24
+229eedf3-abfa-49d2-b2b9-cc31cde020f7,"Fishing, setnet, settingnetandretrievingfish, general",3.8,False,True,{other},2025-10-05T19:08:24
+99361f2a-10c2-4a13-9735-7eb8fe8655a3,"Fishing, fishingwheel, settingnetandretrievingfish, general",3.0,False,True,{other},2025-10-05T19:08:24
+702502f5-dd89-404e-b9a2-5af85a4183d4,"Fishingwithaspear, standing",2.3,False,True,{other},2025-10-05T19:08:24
+782c2e99-90b6-4363-9d82-e942a636b473,"Hunting, bowandarroworcrossbow",2.5,False,True,{cardio},2025-10-05T19:08:24
+893b9d6f-0a35-40ae-8662-44fc44a76f71,"Hunting, deer, elk, largegame(TaylorCode170)",6.0,False,True,{other},2025-10-05T19:08:24
+b0074956-7d89-4769-bab6-37e1448ae543,"Huntinglargegame, draggingcarcass",9.8,False,True,{other},2025-10-05T19:08:24
+f4d27b66-eae1-4ea7-9c32-1507e780d06d,Huntinglargemarineanimals,4.0,False,True,{other},2025-10-05T19:08:24
+5213d79b-ae79-42e5-8569-0fa607f00056,"Hunting, largegamefromahuntingstand, limitedwalking",2.5,False,True,{cardio},2025-10-05T19:08:24
+3dc06bdb-906c-45c3-a4a6-e5785cf9d34f,"Huntinglargegamefromacar, plane, orboat",2.0,False,True,{other},2025-10-05T19:08:24
+7a810efe-b2b0-4f51-8b8d-7d1e952968a9,"Hunting, duck, wading",2.5,False,True,{other},2025-10-05T19:08:24
+fa3b567c-f4f7-415d-a9e8-34707b2a6476,"Huntingflyingfox, squirrel",3.0,False,True,{other},2025-10-05T19:08:24
+9db1bf31-d828-4a97-995b-1536f991db19,"Hunting, general",5.0,False,True,{other},2025-10-05T19:08:24
+af8b0c7b-66e9-4516-bef5-5c08d097353a,"Hunting, pheasantsorgrouse(TaylorCode680)",6.0,False,True,{other},2025-10-05T19:08:24
+c32a0e85-84cc-48fd-a58e-1b991f7965ba,Huntingbirds,3.3,False,True,{other},2025-10-05T19:08:24
+8589ea16-65ed-480d-b1c4-1c9fd9233c33,"Hunting, rabbit, squirrel, prairiechick, raccoon, smallgame(TaylorCode690)",5.0,False,True,{other},2025-10-05T19:08:24
+102ebaee-e005-483c-8a96-8988f9fe30ac,"Huntingpigs, wild",3.3,False,True,{other},2025-10-05T19:08:24
+617029d1-5cc2-42ac-93aa-fab7794ee1be,"Trappinggame, general",2.0,False,True,{other},2025-10-05T19:08:24
+40758f92-07e4-4aaf-8d92-d6adedac5185,Hunting-hikingwithhuntinggear,9.5,False,True,{other},2025-10-05T19:08:24
+e1b611c4-426c-411a-908a-55894cd3c5de,"Pistolshootingortrapshooting, standing",2.5,False,True,{other},2025-10-05T19:08:24
+acd92c46-8746-4474-94b3-38806696fb23,"Rifleexercises, shooting, lyingdown",2.3,False,True,{other},2025-10-05T19:08:24
+fb8313ab-fd3d-41ad-b16e-dbcd4875dfa5,"Rifleexercises, shooting, kneelingorstanding",2.5,False,True,{other},2025-10-05T19:08:24
+f15d3cb2-b25d-479c-a922-94bc0ba6c327,"Foraging, 0-9.9kgbackpack",2.8,False,True,{other},2025-10-05T19:08:24
+f9fdccd8-ebfa-4043-91ab-092ce5a9f76f,"Foraging, 10-15kgbackpack",3.0,False,True,{other},2025-10-05T19:08:24
+15e94a36-5b53-4bc1-b463-033eb5ff0d03,"Sittinginboat, passenger",1.0,False,True,{other},2025-10-05T19:08:24
+69cfe0bc-4bb5-4e0b-8eca-d5e718363e47,Standinginboat,1.5,False,True,{other},2025-10-05T19:08:24
+60d5e607-0c6d-4dfa-925c-6b4cccd86d26,"Activitiesinaboat, lifting, lowering",3.3,False,True,{other},2025-10-05T19:08:24
+adc347ed-84fd-4a5c-b1b9-6146c4b2e685,"Cleaning, sweepingcarpetorfloors, general",3.3,False,True,{household},2025-10-05T19:08:24
+5f116c42-828a-4f78-bc51-f7cf04e9d13e,"Cleaning, sweeping, slow, lighteffort",2.3,False,True,{household},2025-10-05T19:08:24
+13687601-7f43-4630-9c2f-465d69bc8924,"Cleaning, sweeping, fast, moderateeffort",3.8,False,True,{household},2025-10-05T19:08:24
+b7bf825e-0c49-4f67-88e3-004ab998ab99,"Cleaningheavyormajor(e.g., washcar, cleangarage), moderateeffort",3.5,False,True,{household},2025-10-05T19:08:24
+4c1102d5-a25d-4b54-b9b6-09c6864b7793,"Cleaning, mopping, standing, moderateeffort",3.5,False,True,{household},2025-10-05T19:08:24
+80fb8827-9294-4954-b85d-925a2bdd96a6,"Cleaningwindows, washingwindows, general",3.3,False,True,{household},2025-10-05T19:08:24
+25e9033f-68e4-45e4-8e19-207b7249a08d,"Mopping, standing, lighteffort",2.5,False,True,{household},2025-10-05T19:08:24
+fd785784-d55c-4bb0-ac01-20b1c4da1dfa,"Polishingfloors, standing, walkingslowly, usingelectricpolishingmachine",4.5,True,True,{strength},2025-10-05T19:08:24
+f2f32041-57cc-4ec9-a71a-402f739c90a3,"Multiplehouseholdtasksallatonce, lighteffort",2.8,False,True,{other},2025-10-05T19:08:24
+e3d0a1c6-8d6d-4d64-9d37-006989a26565,"Multiplehouseholdtasksallatonce, moderateeffort",3.3,False,True,{other},2025-10-05T19:08:24
+f0f66439-0765-475f-aa1f-1290d2e11365,"Multiplehouseholdtasksallatonce, vigorouseffort",4.3,False,True,{other},2025-10-05T19:08:24
+92cfb4ef-568e-4778-8e54-32066cb7baa7,"Cleaning, houseorcabin, general, moderateeffort",3.3,False,True,{household},2025-10-05T19:08:24
+80b579e3-8460-4fdb-8971-ce922c52e168,"Dustingorpolishingfurniture, general",2.5,False,True,{other},2025-10-05T19:08:24
+0ca3ba8f-33fe-430b-b8ad-6392e3c1156c,"Kitchenactivity, general, (e.g., cooking, washingdishes, cleaningup)moderateeffort",3.3,False,True,{household},2025-10-05T19:08:24
+d97aa932-ef0e-46b4-a5a5-f905d5f1aac1,"Cleaning, general(straighteningup, changinglinen, carryingouttrash), lighteffort",2.5,False,True,{household},2025-10-05T19:08:24
+0e0228cc-c375-4374-9f6f-0b5f01d985c7,"Washdishes, standingoringeneral(notbrokenintostand/walkcomponents)",2.0,False,True,{cardio},2025-10-05T19:08:24
+a4c381b1-373a-432c-adf8-5b9cb45b9e2c,"Washdishes, clearingdishesfromtable, walking, lighteffort",2.0,False,True,{cardio},2025-10-05T19:08:24
+06fc243a-a28a-42f5-abb1-0fe116ab7703,"Vacuuming, general, moderateeffort",3.0,False,True,{household},2025-10-05T19:08:24
+da974c1e-eca5-42d9-9bd5-c566dd212d2c,"Butcheringanimals, small",3.0,False,True,{other},2025-10-05T19:08:24
+bd3daa3e-9810-40e9-9a9a-7adf571186c4,"Butcheringanimals, large, vigorouseffort",6.0,False,True,{other},2025-10-05T19:08:24
+a1d79f44-a595-4975-8381-5286944a4bc4,"Cuttingandsmokingfish, dryingfishormeat",2.3,False,True,{other},2025-10-05T19:08:24
+8f3fa1d2-7875-4aa4-a630-bf57b883343c,"Tanninghides, general",4.0,False,True,{other},2025-10-05T19:08:24
+e11742ff-6ff5-4299-bf4a-2e2c9151d918,"Cookingorfoodpreparation, moderateeffort",3.5,False,True,{household},2025-10-05T19:08:24
+35836ea8-2699-47bf-99c0-45a12ccf5a1c,"Cookingorfoodpreparation-standingorsittingoringeneral(notbrokenintostand/walkcomponents), manualappliances, lighteffort",2.0,False,True,{household},2025-10-05T19:08:24
+cc44b07a-8964-4232-8548-12f9c94fbfd7,"Cookingorfoodpreparation, walking",2.3,False,True,{household},2025-10-05T19:08:24
+ddb10ffe-dff5-4490-82b7-6c39fc8dbde3,"Servingfood, setting/cleaningtable, impliedwalkingorstanding",2.3,False,True,{household},2025-10-05T19:08:24
+63f0557c-9139-4709-aff9-458c7b1b18d8,Feedinghouseholdanimals,2.5,False,True,{other},2025-10-05T19:08:24
+1e88e325-3834-43de-80a7-60991e9f4217,"carryinggroceries, onlevelground, walking",3.5,False,True,{cardio},2025-10-05T19:08:24
+f0503431-10e9-403a-81b6-cded268c77e7,"Puttingawaygroceries(e.g.carryinggroceries, carryingpackages)",2.5,False,True,{other},2025-10-05T19:08:24
+307e1652-01b0-441a-b913-0b71cb52c0f9,Carryinggroceriesupstairs,5.3,False,True,{cardio},2025-10-05T19:08:24
+c03ba91e-9eb6-41fb-b3bc-b7635240ad09,CookingIndianbreadorotherfoodonanoutsidestove,3.0,False,True,{household},2025-10-05T19:08:24
+68b787f3-0aa3-4cca-930b-d46ffcf35c83,Foodshoppingwithorwithoutagrocerycart;carryinga10lbbag;standingorwalking,3.3,False,True,{cardio},2025-10-05T19:08:24
+63371b69-7734-4e5b-9192-04ab9fc8be81,"Non-foodshopping, withorwithoutcart, standingorwalking",2.3,False,True,{cardio},2025-10-05T19:08:24
+d5423696-936a-4ee3-9ef8-6ede54c85a32,Ironing,1.8,False,True,{other},2025-10-05T19:08:24
+28ca2f72-3b76-49ba-b4ff-4f42ff32eb56,"Knitting, sewing, lighteffort, wrappingpresents, sitting",1.3,False,True,{other},2025-10-05T19:08:24
+c52f04af-4142-4ff3-afbd-d2870ec5f48a,Sewingwithamachine,2.8,True,True,{strength},2025-10-05T19:08:24
+b47dd96b-cc00-4163-b4c8-337f5553ed6e,"Laundry, foldorhangclothes, putclothesinwasherordryer, packingsuitcase, washingclothesbyhand, impliedstanding, lighteffort",2.3,False,True,{household},2025-10-05T19:08:24
+4b77012e-8008-4875-85bd-4ed71cbe3881,"Laundry, foldorhangclothes, sitting",2.0,False,True,{household},2025-10-05T19:08:24
+68ae256a-e344-4bea-9033-f01b7ad7da7e,"Laundry, moderateeffort",4.0,False,True,{household},2025-10-05T19:08:24
+626be14a-bdce-412f-b02a-83d5757830da,"Laundry, puttingawayclothes, gatheringclothestopack, puttingawaylaundry, impliedwalking",2.0,False,True,{household},2025-10-05T19:08:24
+9bdc5e86-1240-455c-b8fc-a0e703f34d75,"Makingbed, changinglinens",3.0,False,True,{other},2025-10-05T19:08:24
+d482196c-3036-4b9d-8d6a-446876570744,"Maplesyruping/sugarbushing(includingcarryingbuckets, carryingwood)",5.0,False,True,{other},2025-10-05T19:08:24
+3ad44a09-388e-41ba-83db-ca03d88b9c6e,"Movingfurniture, householditems, carryingboxes",5.8,False,True,{other},2025-10-05T19:08:24
+b9373cdd-effa-4cee-ab4f-c96176f72883,"Moving, liftinglightloads",5.0,False,True,{other},2025-10-05T19:08:24
+bbd1f886-023d-4809-8fe0-a4a3f54fdf1b,Organizingaroom,4.8,False,True,{other},2025-10-05T19:08:24
+8fd1833f-2a7c-4adf-ab08-9fb470ce34bd,"Scrubbingfloors, onhandsandknees, scrubbingbathroom, bathtub, moderateeffort",3.5,False,True,{other},2025-10-05T19:08:24
+8b4a399d-40dc-412b-a608-6194c2f9e272,"Scrubbingfloors, onhandsandknees, scrubbingbathroom, bathtub, lighteffort",2.0,False,True,{other},2025-10-05T19:08:24
+92fb8ea2-0fd4-447e-90ab-edb8d1406696,"Scrubbingfloors, onhandsandknees, scrubbingbathroom, bathtub, vigorouseffort",6.5,False,True,{other},2025-10-05T19:08:24
+d9671f67-66e2-492d-b76b-73f3496a2c6e,"Sweepinggarage, sidewalk, oroutsidehouse",3.0,False,True,{cardio},2025-10-05T19:08:24
+20a6f58e-2064-4828-a076-5d3a83beb03a,"Standing, packing/unpackingboxes, occasionalliftinglightweighthouseholditems, loadingorunloadingitemsintoacar, moderateeffort",3.8,True,True,{strength},2025-10-05T19:08:24
+e905191b-5bc6-41bb-9d06-e4842867c80c,"Impliedwalking, puttingawayhouseholditems, moderateeffort",3.0,False,True,{cardio},2025-10-05T19:08:24
+c172ce69-4342-4bde-9980-23c86cfbfb49,Wateringplants,2.0,False,True,{other},2025-10-05T19:08:24
+761683bf-0fa5-410d-82d0-1b8a99c6fe0d,Buildingafireinside,2.5,False,True,{other},2025-10-05T19:08:24
+7cde5e87-764c-4740-9dd3-41548c992aa3,"Movinghouseholditemsupstairs, carryingboxesorfurniture",9.0,False,True,{cardio},2025-10-05T19:08:24
+9050916d-d639-4b3a-8421-2614acba587a,"Standing, lightefforttasks(pumpgas, changelightbulb, etc.)",2.0,False,True,{other},2025-10-05T19:08:24
+c4453a26-705d-4b2a-b56d-adbeb8e0ec52,"Walking, moderateefforttasks, non-cleaning(readyingtoleave, shut/lockdoors, closewindows, etc.",3.5,False,True,{household},2025-10-05T19:08:24
+9afd3366-8727-462a-a758-6085fc1a3dbe,"Sitting, playingwithchild(ren), lighteffort, onlyactiveperiods",2.3,False,True,{other},2025-10-05T19:08:24
+3aabc675-2153-43b1-a760-a73c1f543f51,"Standing, playingwithchild(ren), lighteffort, onlyactiveperiods",2.8,False,True,{other},2025-10-05T19:08:24
+7e51db17-a3b6-42a1-b849-2f3cd2237bf2,"Walking/running, playingwithchild(ren), moderateeffort, onlyactiveperiods",3.5,False,True,{cardio},2025-10-05T19:08:24
+73e92dfb-c086-4dbb-8348-5b1c740ceed4,"Walking/running, playingwithchild(ren), vigorouseffort, onlyactiveperiods",5.8,False,True,{cardio},2025-10-05T19:08:24
+137795e5-3639-48fb-a234-9fdf42710de6,"Walkingandcarryingsmallchild, childweighing15lbsormore",3.0,False,True,{cardio},2025-10-05T19:08:24
+f522552a-0e35-458d-8d09-bee318f92748,"Walkingandcarryingsmallchild, childweighinglessthan15lbs",2.5,False,True,{cardio},2025-10-05T19:08:24
+1912aae4-f326-4462-b373-52f38e356799,"Standing, holdingchild",2.0,False,True,{other},2025-10-05T19:08:24
+3a260020-3170-4a90-85f6-1c2e0309bbf9,"Childcare, infant, general",2.5,False,True,{other},2025-10-05T19:08:24
+ae09dac3-ab44-4016-8ae1-e943c38af6a4,"Childcare:sittingorkneeling, dressing, bathing, grooming, feeding, occasionalliftingofchild-lighteffort, general",2.0,False,True,{other},2025-10-05T19:08:24
+06904e8e-b2d3-44f5-b865-e7b1eb81d747,"Childcare:standing, dressing, bathing, grooming, feeding, occasionalliftingofchild-lighteffort",3.5,False,True,{other},2025-10-05T19:08:24
+91cba2db-8c0a-45b4-a6ae-4b5cb59f84d4,Recliningwithbaby,1.5,False,True,{other},2025-10-05T19:08:24
+bd9c9087-6df4-452c-bbba-a51a982d3159,"Breastfeeding, sittingorreclining",2.0,False,True,{other},2025-10-05T19:08:24
+dde4f17a-12eb-425f-ac10-804bdc1810cd,"Sit, playingwithanimals, light, onlyactiveperiod",2.5,False,True,{other},2025-10-05T19:08:24
+7f91911f-ea5d-472b-b10e-8491c2c7e35a,"Stand, playingwithanimals, lighteffort, onlyactiveperiods",2.8,False,True,{other},2025-10-05T19:08:24
+1e784f03-94b3-4573-971b-b7f67c1c858f,"Walkorrun, playingwithanimals, general, lighteffort, onlyactiveperiods",2.8,False,True,{cardio},2025-10-05T19:08:24
+a5fc4de4-93b9-44dc-9bed-d9d34eb20148,"Walk/run, playingwithanimals, moderateeffort, onlyactiveperiods",4.0,False,True,{cardio},2025-10-05T19:08:24
+502aa5b0-26fd-474e-808d-74e31347723e,"Walk/run, playingwithanimals, vigorouseffort, onlyactiveperiods",5.0,False,True,{cardio},2025-10-05T19:08:24
+a3f2ca84-7877-4623-97e0-0b622a11cda7,"Standing, bathingdog",3.5,False,True,{other},2025-10-05T19:08:24
+b5a9cf4d-369b-4037-a3dc-a9e2a7f0664e,"Animalcare, householdanimals, general",2.3,False,True,{other},2025-10-05T19:08:24
+c3a5541e-32c0-42d4-8a4a-e09e47f6ae21,"Eldercare, disabledadult, bathing, dressing, movingintoandoutofbed, onlyactiveperiods",3.0,False,True,{other},2025-10-05T19:08:24
+d5fe84af-3f93-45d0-81b4-67035a8ece5f,"Eldercare, disabledadult, feeding, combinghair, lighteffort, onlyactiveperiods",1.8,False,True,{other},2025-10-05T19:08:24
+99d61162-3b39-40b8-a6f6-17906da0e82e,Handwashing,1.3,False,True,{other},2025-10-05T19:08:24
+90821ebf-1bba-408d-b041-f6aa6c2c8080,Airplanerepair,3.0,False,True,{other},2025-10-05T19:08:24
+9ea6c0dd-7d35-4ad9-8ecf-31892310a6e1,Automobilebodywork,4.0,False,True,{other},2025-10-05T19:08:24
+b93ca2f7-36ca-44c9-ab66-70ea0ec74e3d,"Automobilerepair, lightormoderateeffort",3.3,False,True,{other},2025-10-05T19:08:24
+e0a4472a-2c2a-42c9-8de2-cc2fe2b6f6c5,"Carpentry, general, workshop(TaylorCode620)",3.0,False,True,{occupation},2025-10-05T19:08:24
+f22a1fac-4361-4dea-bdc3-72baec2f2a5f,"Carpentry, outsidehouse, (TaylorCode640)",6.0,False,True,{occupation},2025-10-05T19:08:24
+118b5466-1241-4f6c-80bf-423cb5a07e2c,"Carpentry, outsidehouse, buildingafence",3.8,False,True,{occupation},2025-10-05T19:08:24
+b57eeb4c-804b-4e76-ae32-6ada3c25e9d3,"Carpentry, finishing, varnishing, orrefinishingcabinetsorfurniture",3.3,False,True,{occupation},2025-10-05T19:08:24
+a9b26ad0-69ed-4641-bdd4-0cdda06c49c4,"Carpentry, sawinghardwood, planinganddrillingwood, moderate-to-vigorouseffort",6.0,False,True,{occupation},2025-10-05T19:08:24
+bb0d7143-88e2-4d55-ac7b-08f6ea344bad,"Carpentry, homeremodelingtasks, moderateeffort",4.0,False,True,{occupation},2025-10-05T19:08:24
+28048dc1-e4a9-4425-8f94-633083a537b8,"Carpentry, homeremodelingtasks, lighteffort",2.3,False,True,{occupation},2025-10-05T19:08:24
+2a2ad50b-40b8-4408-997b-b9a205603c26,"Caulking, chinkinglogcabin",5.0,False,True,{other},2025-10-05T19:08:24
+fd2d2e53-b6ca-4604-8534-848799ac5dd5,"Caulking, exceptlogcabin",4.5,False,True,{other},2025-10-05T19:08:24
+bc01b515-b1eb-4b3c-97db-8592e559d7a0,Cleaninggutters,5.0,False,True,{household},2025-10-05T19:08:24
+1b87a75a-7480-4cf5-ba9a-3d5eaf229700,Excavatinggarage,5.0,False,True,{other},2025-10-05T19:08:24
+3fa35eec-953a-47ec-8886-15dbf2105e7d,Hangingstormwindows,5.0,False,True,{other},2025-10-05T19:08:24
+801d7b11-0a14-496f-9979-0d1148a29d95,Hangingsheetrockinsidehouse,5.0,False,True,{other},2025-10-05T19:08:24
+ccea65b3-fa61-4a71-9040-bd630dcfbb1a,Hammeringnails,3.0,False,True,{other},2025-10-05T19:08:24
+c42ab19a-0947-4c72-864b-c80a2f8b85cc,"Homerepair, general, lighteffort",2.5,False,True,{other},2025-10-05T19:08:24
+9918ecdb-ca49-46b5-8433-0d53cbb6a317,"Homerepair, general, moderateeffort",4.5,False,True,{other},2025-10-05T19:08:24
+4249b625-2a8a-45ef-8983-5bc115f7456f,"Homerepair, general, vigorouseffort",6.0,False,True,{other},2025-10-05T19:08:24
+b911dd28-d74c-4a76-a609-0d4f62ba0786,Layingorremovingcarpet,4.5,False,True,{other},2025-10-05T19:08:24
+8b77bb34-4cdc-4772-87fa-a9e898d9ecb0,Layingtileorlinoleum,3.8,False,True,{other},2025-10-05T19:08:24
+dd85f893-5243-4e23-8032-9542fc03cd39,Repairingappliances,3.0,False,True,{other},2025-10-05T19:08:24
+fb683c13-decf-4511-a5d8-37b77f749132,"Painting, outsidehome(TaylorCode650)",5.0,False,True,{other},2025-10-05T19:08:24
+4f0421f2-bf2c-4fb6-9e72-2bdfae4334af,"Paintinginsidehouse, wallpapering, scrapingpaint",3.3,False,True,{other},2025-10-05T19:08:24
+d7456237-ae73-4d10-ab79-f5dc6bd04d00,Painting(TaylorCode630),4.5,False,True,{other},2025-10-05T19:08:24
+7d9424a8-2673-4aeb-9e21-80231bd0cbb2,"Plumbing, general",3.0,False,True,{other},2025-10-05T19:08:24
+387e050b-5be9-4056-88ed-af8b8b593990,Putonandremovaloftarp–sailboat,3.0,False,True,{other},2025-10-05T19:08:24
+da467a7f-4d3f-4a9c-8d30-345412087399,Roofing,6.0,False,True,{other},2025-10-05T19:08:24
+45bc308a-4987-438c-bf70-1c9dbc66c3cf,Sandingfloorswithapowersander,4.5,False,True,{other},2025-10-05T19:08:24
+dd5f4e42-9aff-47d6-875b-91c1330424c5,Scrapingandpaintingsailboatorpowerboat,4.5,False,True,{other},2025-10-05T19:08:24
+e7d89ff3-366e-4d09-ad94-b9a2e22c8ae7,Sharpeningtools,2.0,False,True,{other},2025-10-05T19:08:24
+43e1626f-2e9f-4187-bcb4-c54081947913,Spreadingdirtwithashovel,5.0,False,True,{other},2025-10-05T19:08:24
+e6546772-228a-4917-b051-090750f379c8,Washingandwaxinghullofsailboatorairplane,4.5,False,True,{other},2025-10-05T19:08:24
+c65c4b0b-d75c-4934-8360-8c3b599361c1,Washingandwaxingcar,2.0,False,True,{other},2025-10-05T19:08:24
+9daa3401-fe7a-4761-a884-4a9051cc1c72,"Washingfence, paintingfence, moderateeffort",4.5,False,True,{other},2025-10-05T19:08:24
+63400408-d299-4d6b-9aaa-46d3721b1668,"Wiring, tapping-splicing",3.3,False,True,{other},2025-10-05T19:08:24
+a5e38c5e-abe2-42ce-afd8-1de62adff535,Lyingquietlyandwatchingtelevision,1.0,False,True,{other},2025-10-05T19:08:24
+39ea8929-6219-453f-83c2-93c3f3b09c29,"Lyingquietly, doingnothing, lyinginbedawake, listeningtomusic(nottalkingorreading)",1.0,False,True,{other},2025-10-05T19:08:24
+35f6adcc-e43c-4700-bbba-cedd7a8ec770,"Sit, watchtelevision",1.0,False,True,{other},2025-10-05T19:08:24
+f4b6e7f2-0ecd-4309-8b3a-fb7fc0156043,"Sittingquietly, general",1.0,False,True,{other},2025-10-05T19:08:24
+d2841fbd-c210-4239-af26-84de817741e8,"Sittingquietly, fidgeting, general, fidgetinghands",1.5,False,True,{other},2025-10-05T19:08:24
+effd4363-1c9f-41e1-9600-d71f1e2b262e,"Sitting, fidgetfeet",1.8,False,True,{other},2025-10-05T19:08:24
+3a7ad14c-0e12-4d6d-a8aa-c57d9c0849e8,Sittingsmoking,1.3,False,True,{other},2025-10-05T19:08:24
+3fbcb895-9036-4950-a2a9-9f5836a92174,"Sitting, listeningtomusic(nottalkingorreading)orwatchingamovieinatheater",1.5,False,True,{other},2025-10-05T19:08:24
+91bbce67-dcfd-4066-843d-683ed383958c,"Sittingatadesk, restingheadinhands",1.3,False,True,{other},2025-10-05T19:08:24
+adcef4ef-b7e6-42bd-ab4a-782e5489d10b,Sleeping,1.0,False,True,{other},2025-10-05T19:08:24
+fd7552d2-1f11-4b66-88e2-7374c22bc0c2,Standingquietly(standinginaline),1.3,False,True,{other},2025-10-05T19:08:24
+9a7f8c30-46e8-47e2-b843-96c046a90d77,Standing(fidgeting),1.5,False,True,{other},2025-10-05T19:08:24
+238c3b26-e1be-44d1-b22c-cc62c12c761a,Standingwatchingtelevision,1.3,False,True,{other},2025-10-05T19:08:24
+e0ac32a4-4bfb-419f-96f6-453cb22255e2,"Reclining, writing",1.5,False,True,{other},2025-10-05T19:08:24
+898589ee-3f4d-439a-a1e2-494a2e362bf7,"Reclining, talkingortalkingonphone",1.3,False,True,{other},2025-10-05T19:08:24
+205e20c1-2178-412e-bc1c-4e7619f71cff,"Reclining, reading",1.3,False,True,{other},2025-10-05T19:08:24
+07153a68-827a-4f01-8531-3c0a40a66cee,Meditating,1.0,False,True,{other},2025-10-05T19:08:24
+6f1f792b-dc24-4c82-a970-837b66eca5f0,"Carrying, loadingorstackingwood, loading/unloadingorcarryinglumber, light-to-moderateeffort",4.1,False,True,{other},2025-10-05T19:08:24
+c5317a3b-d671-44bc-a692-d050f0bbc9ea,"Carrying, loadingorstackingwood, loading/unloadingorcarryinglumber, moderateeffort",5.5,False,True,{other},2025-10-05T19:08:24
+c8785e67-386d-4cf3-9784-c6907dabc8e1,"Choppingwood, splittinglogs, moderateeffort",4.5,False,True,{other},2025-10-05T19:08:24
+64890353-6959-4bf0-916c-97b2d0b73db3,"Choppingwood, splittinglogs, vigorouseffort",6.5,False,True,{other},2025-10-05T19:08:24
+dadaef80-b5bf-4826-a03a-95508c6a4f98,"Clearinglightbrush, thinninggarden, moderateeffort",3.5,False,True,{other},2025-10-05T19:08:24
+13de8b04-5f9e-4539-a079-001f29700320,"Clearingland, haulbrush, undergrowth, orground, vigorouseffort",6.3,False,True,{cardio},2025-10-05T19:08:24
+38707932-34ee-483d-85e2-c13ef9a3473d,"Diggingsandbox, shovelingsand",5.0,False,True,{other},2025-10-05T19:08:24
+b2eab768-c1e3-4195-9434-3c357ee8d720,"Digging, spading, fillinggarden, composting, light-to-moderateeffort",3.5,False,True,{other},2025-10-05T19:08:24
+356879a9-d49d-45cf-a9a1-b8f016f59b25,"Digging, spading, fillinggarden, composting(TaylorCode590)",5.0,False,True,{other},2025-10-05T19:08:24
+93cf05f4-7261-4d71-b697-d390a9ac2314,"Digging, spading, fillinggarden, composting, vigorouseffort",7.3,False,True,{other},2025-10-05T19:08:24
+fea9ae5d-d12d-41b2-8923-4483507dae36,Drivingtractor,2.8,False,True,{other},2025-10-05T19:08:24
+4ecad555-bec7-4631-9a33-5aa18d19976f,"Fellingtrees, largesize",8.3,False,True,{other},2025-10-05T19:08:24
+3b206e4d-7ccb-4145-b989-f50b5e9b7cfa,"Fellingtrees, small-mediumsize",5.3,False,True,{other},2025-10-05T19:08:24
+1f6da7c0-8995-483c-b378-9ec1a25e5ea4,"Gardeningwithheavypowertools, usingchainsaw, tillingagarden",5.8,False,True,{household},2025-10-05T19:08:24
+f5d1a69e-d90a-4aba-ac17-efd321a68f3c,"gardening, general",2.0,False,True,{household},2025-10-05T19:08:24
+fca73f0e-21d5-426b-a28f-e4b9108bbe74,"Irrigationchannels, openingandclosingports",4.0,False,True,{other},2025-10-05T19:08:24
+099fbf11-1a0d-42db-82cf-1a0bdcfb344d,Layingcrushedrockorgravel,6.3,False,True,{other},2025-10-05T19:08:24
+cb7eb6f4-283c-4a6f-8e0c-b97d4768c962,Layingsod,5.0,False,True,{other},2025-10-05T19:08:24
+e5de0176-c676-427e-858d-ba4d3d337a96,"Mowinglawn, general, walking, moderateeffort",5.5,False,True,{cardio},2025-10-05T19:08:24
+7d672ec3-a095-4684-b1c5-9feb7e3f7283,"Mowinglawn, ridingmower(TaylorCode550)",2.5,False,True,{other},2025-10-05T19:08:24
+1b7c1922-4380-45b9-86c9-3873f7259d99,"Mowinglawn, handmower, vigorouseffort(TaylorCode570)",6.0,False,True,{other},2025-10-05T19:08:24
+cb982880-3711-443f-856b-f2849d74e6db,"Mowinglawn, walk, powermower, moderateorvigorouseffort",5.0,False,True,{cardio},2025-10-05T19:08:24
+9ddbf68a-4ca3-445c-a556-370e880e75e6,"Mowinglawn, powermower, lightormoderateeffort(TaylorCode590)",4.5,False,True,{other},2025-10-05T19:08:24
+d5769796-fa1a-4cd6-9fb6-282aa714e89a,"Operatingsnowblower, walking",2.5,False,True,{cardio},2025-10-05T19:08:24
+54ab5128-3765-4fcf-88f4-a07c31880952,"Planting, potting, transplantingseedlingsorplants, lighteffort",2.6,False,True,{other},2025-10-05T19:08:24
+f314822a-dcd6-4483-9b72-5cbca271203b,"Plantingseedlings, shrubs, stooping, moderateeffort",4.3,False,True,{other},2025-10-05T19:08:24
+4afee2de-e9e0-4774-9110-28469f7df54a,"Plantingcropsorgarden, stooping, moderateeffort",4.3,False,True,{other},2025-10-05T19:08:24
+eec92c10-40dd-4c59-bc7c-d43ea5145872,Plantingtrees,4.5,False,True,{other},2025-10-05T19:08:24
+00e77a13-12fe-40f3-b1c5-93e1b44db0b2,"Rakinglawnorleaves, moderateeffort",4.0,False,True,{other},2025-10-05T19:08:24
+463cc038-5834-4c85-9fe4-70e2ca3d85bc,Rakinglawn(TaylorCode600),4.0,False,True,{other},2025-10-05T19:08:24
+ebfe7ac7-7835-4ac0-aa55-634433283eb9,Rakingroofwithsnowrake,4.0,False,True,{other},2025-10-05T19:08:24
+1c496c99-9b2f-460f-95ed-fbdd89315d46,Ridingsnowblower,3.0,False,True,{other},2025-10-05T19:08:24
+00d5078c-8578-4b85-a84c-4ed3a03db056,"Sackinggrass, leaves",4.0,False,True,{other},2025-10-05T19:08:24
+1ed83fb1-3960-4a2d-bbf9-df29c1da0e47,Shovelingdirtormud,5.5,False,True,{other},2025-10-05T19:08:24
+e69591eb-56cd-4581-b86d-0a537d2874ae,"Shovelingsnow, byhand, moderateeffort",5.3,False,True,{other},2025-10-05T19:08:24
+59f2a6bb-0fbe-48be-9213-e8c545689b44,"Shovelingsnow, byhand(TaylorCode610)",6.0,False,True,{other},2025-10-05T19:08:24
+e5d619a4-951c-4b4c-a079-4f4cce008259,"Shovelingsnow, byhand, vigorouseffort",7.5,False,True,{other},2025-10-05T19:08:24
+9a8a9c02-f2ec-49e5-9ee7-21914b590f34,"Trimmingshrubsortrees, manualcutter",3.8,False,True,{other},2025-10-05T19:08:24
+b4e80cab-5f18-4ccc-9690-fe0a6161f46d,"Trimmingshrubsortrees, powercutter, usingleafblower, edger, moderateeffort",3.3,False,True,{other},2025-10-05T19:08:24
+15c3f512-0414-4b00-9319-571da863482f,"Walking, applyingfertilizerorseedingalawn, pushapplicator",3.0,False,True,{cardio},2025-10-05T19:08:24
+3b49d250-7886-4a10-bd8b-cd9330e91f74,"Wateringlawnorgarden, standingorwalking",4.0,False,True,{cardio},2025-10-05T19:08:24
+ce61c353-e6b7-4e6f-83b1-75950c776ea3,"Weeding, cultivatinggarden, light-to-moderateeffort",3.8,False,True,{other},2025-10-05T19:08:24
+e3ae0447-a5f0-459a-8e3a-45d1fc577f30,"Weeding, cultivatinggarden, moderateeffort(TaylorCode580)",4.5,False,True,{other},2025-10-05T19:08:24
+57fa222a-1ed9-4335-a09d-c4e087015efe,"Weeding, cultivatinggarden, usinghoemoderate-to-vigorouseffort",5.0,False,True,{other},2025-10-05T19:08:24
+aa4fce4b-c777-4054-9bd7-68b66320e869,"Gardening, general, moderateeffort",3.8,False,True,{household},2025-10-05T19:08:24
+ab89195b-a2e1-4bd7-aaf9-3a2c0d045d4a,"Pickingfruitorcoffeefromtrees, moderateeffort",3.5,False,True,{other},2025-10-05T19:08:24
+179ce38a-00b7-4458-bb03-991fb13618c4,"HarvestingProduce, Pickingfruitofftrees, gleaningfruits, pickingfruits/vegetables, climbingladdertopickfruit, vigorouseffort",4.5,False,True,{cardio},2025-10-05T19:08:24
+40b208eb-a94d-415a-bb01-c188c3a73324,"Impliedwalking/standing-pickingupyard, light, pickingflowersorvegetables",3.0,False,True,{cardio},2025-10-05T19:08:24
+9d0a3894-28c0-4d27-bf5b-7c9c83c129a0,"Walking, gatheringgardeningtools",3.0,False,True,{household},2025-10-05T19:08:24
+6a086b65-5c20-4305-a31d-71ff94dc2380,"Wheelbarrow, pushinggardencartorwheelbarrow, general",4.8,False,True,{cardio},2025-10-05T19:08:24
+2ca78e7f-7cbd-40e7-8967-e7084d5b8e2d,"Wheelbarrow, pushinglargegardencartorheavywheelbarrowupto150kg",6.0,False,True,{cardio},2025-10-05T19:08:24
+fd7d23f6-e485-40e8-aab0-26262f4a292e,"Yardwork, general, lighteffort",2.3,False,True,{other},2025-10-05T19:08:24
+abb8d3d0-7fca-4adf-a1fc-5de14a8c0fbb,"Yardwork, general, moderateeffort",4.0,False,True,{other},2025-10-05T19:08:24
+dc29809c-7182-4234-aa26-7653223bb12e,"Yardwork, general, vigorouseffort",6.0,False,True,{other},2025-10-05T19:08:24
+aeeb365b-1b4e-47a1-b64f-09248f4d2480,"Boardgameplaying, sitting",1.3,False,True,{other},2025-10-05T19:08:24
+35c38bd4-cd3b-495f-ab14-9e402f40b4fe,"Casinogambling, standing",2.5,False,True,{other},2025-10-05T19:08:24
+d2d2f7e1-0a69-488c-8028-4bd03e179acd,"Cardplaying, sitting",1.5,False,True,{other},2025-10-05T19:08:24
+7cc594b1-95bf-4d75-aee5-07f09e4b6d85,"Chessgame, sitting",1.5,False,True,{other},2025-10-05T19:08:24
+116df9e6-b882-4747-8ee9-7d527febf061,"Copyingorfilingdocuments, standing",1.5,False,True,{other},2025-10-05T19:08:24
+2ed09321-b88d-4be6-8a1b-af3946b7ee48,"Drawing, writing, painting, standing",1.8,False,True,{other},2025-10-05T19:08:24
+cd4c969b-c167-42cd-a5a6-371c38355946,"Laughter, sitting",1.0,False,True,{other},2025-10-05T19:08:24
+d9e3f1f2-29ab-43f8-ac34-aee12f490e41,"Sitting:reading, book, newspaper, magazine",1.0,False,True,{other},2025-10-05T19:08:24
+39963045-8ffd-4e9d-ab56-ff229c8099a1,"sitting, typingorreadingonabalancechair/stabilityball",1.8,False,True,{other},2025-10-05T19:08:24
+473bf698-3d51-427b-905f-39325a0d05b6,"watchingtv, steppingduringcommercialbreaks",2.0,False,True,{other},2025-10-05T19:08:24
+6fe082ca-8894-4a5d-adc8-24105463338c,"Sitting:writing, deskwork, typing",1.3,False,True,{other},2025-10-05T19:08:24
+77a18e04-b209-42ac-b014-6f81fb9c10f7,"Standing:talkinginperson, onthephone, computer, textmessaging, writing",1.3,False,True,{other},2025-10-05T19:08:24
+0927472a-2974-4b9e-b236-42c6ee55e589,"Sitting:talkinginperson, onthephone, computer, ortextmessaging, lighteffort",1.3,False,True,{other},2025-10-05T19:08:24
+af6605f1-90c6-45b1-9574-8040c6bb7212,"Sitting-studying, general, includingreadingand/orwriting, lighteffort",1.5,False,True,{other},2025-10-05T19:08:24
+4971f6eb-b211-4e8c-b2a8-babe2938edeb,"Sitting-inclass, general, includingnote-takingorclassdiscussion",1.8,False,True,{other},2025-10-05T19:08:24
+b333081b-4f82-4f5c-8411-03ed9b03dafb,Standing-reading,1.0,False,True,{other},2025-10-05T19:08:24
+3f49e599-ee81-4587-a84f-c4a3563e3821,Standing:miscellaneous,2.5,False,True,{other},2025-10-05T19:08:24
+1e1fd2b9-f348-4463-9cc1-fa68be959a88,"Sitting:artsandcrafts, carvingwood, weaving, spinningwool, lighteffort",1.8,False,True,{other},2025-10-05T19:08:24
+f8baafc6-b6c1-4101-b28f-6fcc320c3357,"Sitting:artsandcrafts, carvingwood, weaving, spinningwool, moderateeffort",3.0,False,True,{other},2025-10-05T19:08:24
+accfcdc0-611c-4673-bca8-d1c14f65bce6,"Standing:artsandcrafts, sandpainting, carving, weaving, lighteffort",2.5,False,True,{other},2025-10-05T19:08:24
+7954d07f-727a-452c-b1d2-49219650469f,"Standing-artsandcrafts, sandpainting, carving, weaving, moderateeffort",3.3,False,True,{other},2025-10-05T19:08:24
+35009cc2-bfab-4545-8c72-dcad5a75f720,"Standing-artsandcrafts, sandpainting, carving, weaving, vigorouseffort",3.5,False,True,{other},2025-10-05T19:08:24
+48c57a5b-5f67-4fd4-9f6f-1746b9e13e8b,"Retreat/familyreunionactivitiesinvolvingsitting, relaxing, talking, eating",1.5,False,True,{other},2025-10-05T19:08:24
+67d3fb53-3d6d-4b66-8c3f-f793f530d90b,Retreat/familyreunionactivitiesinvolvingplayinggameswithchildren,2.5,False,True,{other},2025-10-05T19:08:24
+6dd49dd4-d4bd-463d-befc-0529d2f08baf,Touring/traveling/vacationinvolvingridinginvehicle,2.0,False,True,{other},2025-10-05T19:08:24
+5d017460-f899-409d-b1e2-90aeb3e4adb2,Touring/traveling/vacationinvolvingwalking,3.5,False,True,{cardio},2025-10-05T19:08:24
+14f96422-aacb-475c-a71a-cf875e7fff44,"Campinginvolvingstanding, walking, sitting, light-to-moderateeffort",2.5,False,True,{cardio},2025-10-05T19:08:24
+74c136d3-14a6-491b-a530-c92d385a3dfd,"Sittingatasportingevent, spectator",1.5,False,True,{other},2025-10-05T19:08:24
+00b71241-70b3-48ec-a2e6-add078100359,"Accordion, sitting",1.8,False,True,{other},2025-10-05T19:08:24
+f6e4fff7-587b-41bd-8751-e8b48295289b,"Cello, sitting",2.3,False,True,{other},2025-10-05T19:08:24
+b4f5101b-01e6-4609-85fd-4821eaf2b406,"Conductingorchestra, standing",2.3,False,True,{other},2025-10-05T19:08:24
+b71517d8-e71b-44bd-9ab3-4a70e19d4336,"Doublebass, standing",2.5,False,True,{other},2025-10-05T19:08:24
+ae1f69c3-2323-4d3a-851c-6ede03f8ebc4,"Drums, sitting",3.8,False,True,{other},2025-10-05T19:08:24
+839bef0c-6f1d-4eed-bd93-c84feb94dee1,"Drumming(e.g., bongo, conga, benbe), moderate, sitting",3.0,False,True,{other},2025-10-05T19:08:24
+a11c67ee-9358-4763-bcb6-d1089231cc0e,"Drumming, concert/liveshow",8.3,False,True,{other},2025-10-05T19:08:24
+45763a5a-5c9f-4c25-85cd-bf24b53359ef,"Flute, sitting",2.0,False,True,{other},2025-10-05T19:08:24
+3f4cc829-9c18-414c-8fa8-d0b2e71fbb09,"Horn, standing",1.8,False,True,{other},2025-10-05T19:08:24
+2b0bc43c-bfb6-40cf-bb5c-b2fda5661b9a,"Piano, sitting",2.3,False,True,{other},2025-10-05T19:08:24
+d03666cc-8b22-4797-b10d-f96bf2b22535,"Playingmusicalinstruments, general",2.0,False,True,{other},2025-10-05T19:08:24
+5f9280ab-2c50-41e6-a200-16b616c43166,"Organ, sitting",2.0,False,True,{other},2025-10-05T19:08:24
+f53fb525-37d4-4c6b-9ea7-e3194a983353,"Trombone, standing",3.5,False,True,{other},2025-10-05T19:08:24
+57010661-086e-4367-8b02-d32d6e456794,"Trumpet, standing",2.5,False,True,{other},2025-10-05T19:08:24
+c6da3485-78f8-4022-b9bd-a1d5e2a4a7f7,"Violin, sitting",2.5,False,True,{other},2025-10-05T19:08:24
+f74821a0-0cea-4c5b-8fd5-4652d9d2f9cc,"Woodwindinstruments, sitting",1.8,False,True,{other},2025-10-05T19:08:24
+a56f0b93-da92-4c95-ab67-807b9b831630,"Brassinstruments, sitting",1.8,False,True,{other},2025-10-05T19:08:24
+51b16fde-faee-49e7-ac43-82dd2205af5c,"Guitar, classical, folk, sitting",2.0,False,True,{other},2025-10-05T19:08:24
+f0476760-cb3b-449c-b94e-ddd44003706c,"Guitar, rockandrollband, standing",3.0,False,True,{other},2025-10-05T19:08:24
+91464641-495d-4be3-8858-bad0df3b8c7d,"Marchingband, batontwirling, walking, moderate pace, general",4.0,False,True,{cardio},2025-10-05T19:08:24
+da1b4c5e-47b3-431d-a5ff-64941835b016,"Marchingband, playinganinstrument, walking, briskpace, general",5.5,False,True,{cardio},2025-10-05T19:08:24
+5a251c32-c7f7-4a75-84c8-9f0f22c42881,"Marchingband, drummajor, walking",3.5,False,True,{cardio},2025-10-05T19:08:24
+06e40eaf-d93a-46cf-b01d-1bf187ee94c4,"Activeworkstation, Pedaldesk, balancechair/ball, General, lighteffort",2.0,False,True,{occupation},2025-10-05T19:08:24
+0eeeb11a-f4fa-4605-b57a-f448da96d4da,"Activeworkstation, Pedaldesk(40watts)",3.5,False,True,{occupation},2025-10-05T19:08:24
+9c909b15-7e74-49b5-b135-d2b69257f122,"Activeworkstation, Pedaldesk(80watts)",5.3,False,True,{occupation},2025-10-05T19:08:24
+65ebb356-6c0d-494b-a07f-5cf791d8f4a3,"Activeworkstation, treadmilldesk, walkingslowly1.0mphorless",2.0,False,True,{occupation},2025-10-05T19:08:24
+84b774bf-dc9b-44c4-aa73-82e45a754a88,"Activeworkstation, treadmilldesk, walking1.0-2.0mph",2.8,False,True,{occupation},2025-10-05T19:08:24
+efbda327-b80f-4cf3-9596-4bd9dc5590d5,Airlineflightattendant,3.0,False,True,{occupation},2025-10-05T19:08:24
+e59581a9-d502-41fc-8b8a-fa2cc9ebaf0a,AppleHarvesting,4.8,False,True,{occupation},2025-10-05T19:08:24
+a743487d-07a9-47ba-9d98-b7689573b620,"Bakery, general, moderateeffort",4.0,False,True,{occupation},2025-10-05T19:08:24
+618b80c2-bff0-4018-8355-e899dcd485d3,"Bakery, lighteffort",2.0,False,True,{occupation},2025-10-05T19:08:24
+27753a8c-0d2e-452f-a601-2c8aa3ef34ba,Bookbinding,2.3,False,True,{occupation},2025-10-05T19:08:24
+137b0376-b308-47e4-b4ff-2b0e1258135a,"Buildingroad, drivingheavymachinery",6.0,True,True,{strength},2025-10-05T19:08:24
+d8f309b0-5749-4c0c-af41-9ad3ea402640,"Buildingroad, directingtraffic, standing",2.0,False,True,{occupation},2025-10-05T19:08:24
+71cc308a-799c-4b42-be1f-ebec55d828e7,"Carpentry, general, lighteffort",2.5,False,True,{occupation},2025-10-05T19:08:24
+14d270f3-138c-4377-8b3b-2d75cb0ad294,"Carpentry, general, moderateeffort",4.3,False,True,{occupation},2025-10-05T19:08:24
+e9497d12-07ad-4bfe-b0fe-50225f771133,"Carpentry, general, heavyorvigorouseffort",7.0,False,True,{occupation},2025-10-05T19:08:24
+324dab72-9c33-4e7b-9ea8-c7865ea14d67,"Carryingheavyloads(e.g., bricks, tools)",8.0,False,True,{occupation},2025-10-05T19:08:24
+2fbdb3df-3540-4a51-a7a8-89f73fc63ec5,"Carryingmoderateloadsupstairs, movingboxes, 25-49lbs",8.0,False,True,{occupation},2025-10-05T19:08:24
+2da82c65-9994-40e5-a647-30f9529d3f7a,"Chambermaid, hotelhousekeeper, makingbed, cleaningbathroom, pushingcart",4.0,False,True,{household},2025-10-05T19:08:24
+8a522814-2ee4-4950-9919-6c3836ed07b9,"Cleaning, vacuumingcommercialspace",4.3,False,True,{household},2025-10-05T19:08:24
+8f37f83f-9258-4abb-8db3-5866b9514c54,"Coalmining, drillingcoal, rock",5.3,False,True,{occupation},2025-10-05T19:08:24
+fbf74563-e1c8-47bd-95dd-cc644d27a398,"Coalmining, erectingsupports",5.0,False,True,{occupation},2025-10-05T19:08:24
+b4d6b5dd-343e-402e-b659-291a74a46a40,"Coalmining, general",5.5,False,True,{occupation},2025-10-05T19:08:24
+3f5008d1-df68-4d40-b6b6-57d699a566b9,"Coalmining, shovelingcoal, byhand",6.3,False,True,{occupation},2025-10-05T19:08:24
+b206c82c-15aa-48ef-a2c1-6e6cb4394fec,"Cook, chef",2.5,False,True,{occupation},2025-10-05T19:08:24
+0ab15591-452d-48bc-b361-ec57fdd97af1,"Construction, outside, remodeling, newstructures(e.g., roofrepair, miscellaneous)",4.0,False,True,{occupation},2025-10-05T19:08:24
+76939620-b5e0-4666-887e-ce51d37485b6,"Construction, rebar, barbending/fixing",2.3,False,True,{occupation},2025-10-05T19:08:24
+c9c3adc8-da42-4a16-98c1-86ba82c3788c,"Custodialwork, lighteffort(e.g., cleaningsinkandtoilet, dusting, vacuuming, lightcleaning)",2.3,False,True,{household},2025-10-05T19:08:24
+ec49f253-9675-4c01-9681-0f90398d605a,"Custodialwork, moderateeffort(e.g., buffingfloorswithelectricbuffer, featheringorsweepingarenafloors, mopping, takingoutthetrash, vaccuming)",3.8,False,True,{household},2025-10-05T19:08:24
+c5804543-9b7a-4fa8-9471-c275459b83e0,"Electricalwork(e.g., hookupwire, tappingsplicing);plumbingmovedto11516",3.3,False,True,{occupation},2025-10-05T19:08:24
+e2cf4cf7-70da-474c-8a66-b3d5b679119b,"Engineer(e.g., mechanicalorelectrical)",1.8,False,True,{occupation},2025-10-05T19:08:24
+fb187b36-acfd-4a86-9e85-28c2fbaa5dd5,"Farming, vigorouseffort(e.g., balinghay, cleaningbarn), includesformercode11200",7.8,False,True,{household},2025-10-05T19:08:24
+ab7e8db6-fd14-408f-9e2e-177e48d0e4dd,"Farming, moderateeffort(e.g., feedinganimals, chasingcattlebywalkingand/orhorseback, spreadingmanure, harvestingcrops)",4.8,False,True,{occupation},2025-10-05T19:08:24
+68d4a4d1-2e13-4d60-9ffd-5a62e5dd9635,"Farming, lighteffort, (e.g., cleaninganimalsheds, preparinganimalfeed)",2.0,False,True,{household},2025-10-05T19:08:24
+f7247147-c0ac-4cc8-8445-3351a3489d5a,"Farming, drivingtasks(e.g., drivingtractororharvester)",2.8,False,True,{occupation},2025-10-05T19:08:24
+169427bc-0000-4274-bb0f-447959d13723,"Farming, feedingsmallanimals",3.5,False,True,{occupation},2025-10-05T19:08:24
+c5e24c12-ce29-4870-92a1-4688daaad770,"Farming, feedingcattle, horses",4.3,False,True,{occupation},2025-10-05T19:08:24
+19362a18-6c5b-47d4-b85c-85581df67671,"Farming, haulingwaterforanimals, fetchingwaterfromwellorstream",4.3,False,True,{occupation},2025-10-05T19:08:24
+78184a85-bd8f-410a-833c-c63acb7ea972,"Farming, takingcareofanimals(e.g., grooming, brushing, shearingsheep, assistingwithbirthing, medicalcare, branding), general",4.5,False,True,{occupation},2025-10-05T19:08:24
+cfa43835-3132-4a09-bbae-c403ecef1cc0,"Farming, rice, planting, grainmillingactivities",3.8,False,True,{occupation},2025-10-05T19:08:24
+6fd53896-d36f-4211-89bb-77aebadef504,"Farming, milkingbyhand, cleaningpails, moderateeffort",3.5,False,True,{household},2025-10-05T19:08:24
+45115b9f-b48c-4530-bc47-b7069c598248,"Farming, milkingbymachine, lighteffort",1.3,True,True,{strength},2025-10-05T19:08:24
+26c531ce-d37e-4c61-9463-1f33abdd7c29,"Farming, milkingCows, fullmilkingprocess, modernmilkingparlorwithmilkingmachines",3.0,True,True,{strength},2025-10-05T19:08:24
+5c43a270-00ac-409e-97a3-3eb3670c312b,"Firefighter, general",8.0,False,True,{occupation},2025-10-05T19:08:24
+fb06a305-2cc9-4d7a-8725-87351735e1d7,"Firefighter, rescuevictim, automobileaccident, usingpikepole",6.8,False,True,{occupation},2025-10-05T19:08:24
+da36b5cd-9c14-42b4-a5bb-8dc2e3131de1,"Firefighter, raisingandclimbingladderwithfullgear, simulatedfiresuppression",8.0,True,True,{strength},2025-10-05T19:08:24
+9a34e7c4-12c3-4527-954d-65db72a7065a,"Firefighter, haulinghosesonground, carrying/hoistingequipment, breakingdownwallsetc., wearingfullgear",9.0,False,True,{occupation},2025-10-05T19:08:24
+b3e5470c-531a-46ca-8999-af1e7cff9b25,"Fishing, commercial, lighteffort",3.5,False,True,{occupation},2025-10-05T19:08:24
+c7dda21a-5ba0-4e40-aa79-b138e15415e7,"Fishing, commercial, moderateeffort",5.0,False,True,{occupation},2025-10-05T19:08:24
+aa8ce853-27c7-41c6-97bc-6f10185cab08,"Forestry, axchopping, veryfast, 1.25kgaxe, 51blows/min, extremelyvigorouseffort",17.5,False,True,{occupation},2025-10-05T19:08:24
+56ecaacf-4ccf-46d4-83d4-d6c91f6a09bc,"Forestry, axchopping, slow, 1.25kgaxe, 19blows/min, moderateeffort",5.0,False,True,{occupation},2025-10-05T19:08:24
+2cd4d641-34c2-410b-bf5a-8d6c09257423,"Forestry, axchopping, fast, 1.25kgaxe, 35blows/min, vigorouseffort",8.0,False,True,{occupation},2025-10-05T19:08:24
+758b6e34-ae4e-4fc3-9209-ed5ddfa7b584,"Forestry, moderateeffort(e.g., sawingwoodwithpowersaw, weeding, hoeing)",5.0,False,True,{occupation},2025-10-05T19:08:24
+1b4f2a1e-e4ac-4cca-9da4-bc09906db5a3,"Forestry, vigorouseffort(e.g., barking, felling, ortrimmingtrees, carryingorstackinglogs, plantingseeds, sawinglumberbyhand)",8.5,False,True,{occupation},2025-10-05T19:08:24
+7e310932-d885-4008-a241-891850526a26,Furriery,4.8,False,True,{occupation},2025-10-05T19:08:24
+e1dc38e8-e48b-41b2-a27d-35dc6ba24663,"Garbagecollector, walking, dumpingbinsintotruck, streetcleaning",3.8,False,True,{household},2025-10-05T19:08:24
+c7b2109a-2049-4b76-bee1-014c6d5b3cfc,"Hairstylist(e.g., plaitinghair, manicure, makeupartist)",1.8,False,True,{occupation},2025-10-05T19:08:24
+3f1554a7-f7c4-40f5-b433-fb1f2457ee94,"Horsegrooming, includingfeeding, cleaningstalls, bathing, brushing, clipping, longeingandexercisinghorses.",7.3,False,True,{household},2025-10-05T19:08:24
+f379bc1a-8fa3-4a5d-8755-7e1e09d79aa1,"Horse, feeding, watering, cleaningstalls, impliedwalkingandliftingloads",4.3,False,True,{household},2025-10-05T19:08:24
+7889b50b-8619-42bd-be4c-b5d6c4ffbc0f,"Horsebackriding, working, cuttingcows",4.5,False,True,{occupation},2025-10-05T19:08:24
+6d33ba10-9323-46a5-9987-4012da872fcb,"Horseracing, galloping, cantor",7.8,False,True,{occupation},2025-10-05T19:08:24
+01c5e3c8-06b5-4119-85fe-3538df6f00ce,"Horseracing, Jockey, trotting",6.3,False,True,{occupation},2025-10-05T19:08:24
+fe37f9c8-0641-46cf-b1cc-157b6c8927eb,"Horseracing, Jockey, walking",2.3,False,True,{occupation},2025-10-05T19:08:24
+9f7d2c20-d2fa-4eb6-9fff-f0701982bddf,Kitchenmaid,3.0,False,True,{occupation},2025-10-05T19:08:24
+98a470c3-b847-4411-884b-ed7e0c6e13a3,"Lawnkeeper, yardwork, general",4.0,False,True,{occupation},2025-10-05T19:08:24
+af3dd01f-2a6b-45fa-8f9b-6777c9cc4ea6,"Lawnkeeper, weeding, gaspowered",3.0,False,True,{occupation},2025-10-05T19:08:24
+384a010a-ab62-475b-8c8c-69522d47b7e1,Laundryworker,3.3,False,True,{household},2025-10-05T19:08:24
+cd68248a-f23d-44b0-a066-00e8888b0e67,Locksmith,3.0,False,True,{occupation},2025-10-05T19:08:24
+bd882e86-e68e-4d8c-b48d-1ade1322feed,"Machinetooling(e.g., machining, workingsheetmetal, machinefitter, operatinglathe, welding)light-to-moderateeffort",3.0,True,True,{strength},2025-10-05T19:08:24
+8682740c-7bc6-4c95-b0e8-11c81f38379d,"Machinetooling, operatingpunchpress, moderateeffort",5.0,True,True,{strength},2025-10-05T19:08:24
+93952816-d71c-4d66-8898-f4b642c072d8,"Manager, property",1.8,False,True,{occupation},2025-10-05T19:08:24
+3681521d-c28c-42d6-9bab-29998dd2e35d,"Manualorunskilledlabor, general, lighteffort",2.8,False,True,{occupation},2025-10-05T19:08:24
+0814ddaf-5d41-4215-8687-166bfd2bf6e4,"Manualorunskilledlabor, general, moderateeffort",4.5,False,True,{occupation},2025-10-05T19:08:24
+8bd11461-9d6c-475e-92d3-eba89123252a,"Manualorunskilledlabor, general, vigorouseffort",6.5,False,True,{occupation},2025-10-05T19:08:24
+6bd936d3-86a1-4071-8fb9-0ae44d7441dd,"Masonary, concrete, moderateeffort",4.3,False,True,{occupation},2025-10-05T19:08:24
+27a55e58-2125-4c57-8d7f-1c25184ed167,"Masonry, concrete, lighteffort",2.5,False,True,{occupation},2025-10-05T19:08:24
+d8c1bbbf-2f18-4cac-bc27-27738326c8f2,"Massagetherapist, standing",5.5,False,True,{occupation},2025-10-05T19:08:24
+53f78505-0c4b-4733-8c48-34571dfddba3,"Mailcarrier, walkingtodelivermail",2.3,False,True,{occupation},2025-10-05T19:08:24
+478ce2eb-4f09-4bee-99b9-7a60599cdc58,"Maildelivery, motorbike",1.5,False,True,{occupation},2025-10-05T19:08:24
+9fe7fbc2-806a-4089-8673-418f46d8d239,"Maildelivery, ElectronicallyAssistedBicycle",3.5,False,True,{occupation},2025-10-05T19:08:24
+35210726-e3b5-4ee8-90c0-75c7913751d0,"Moving, carryingorpushingheavyobjects, 75lbsormore, onlyactivetime(e.g., desks, movingvanwork)",7.5,False,True,{occupation},2025-10-05T19:08:24
+191663a9-d3ec-49fe-bd79-c85e1c002edc,"Mining, generalservices, drilling, miningsupportjobs(mechanical, welding, pipeinstallation, generalconstruction)",8.5,False,True,{occupation},2025-10-05T19:08:24
+0024845b-7039-487f-9701-2e8c1646c31e,"SkindivingorSCUBAdivingasafrogman, NavySeal",12.0,False,True,{occupation},2025-10-05T19:08:24
+996d44c7-59c5-4772-90b7-aec42827c4af,"Operatingheavydutyequipment, automated, notdriving",2.5,False,True,{occupation},2025-10-05T19:08:24
+04edf7d2-9322-4abd-8889-4e1ff2a9b435,"Orangegrovework, pickingfruit",3.5,False,True,{occupation},2025-10-05T19:08:24
+7f62be73-7af4-4181-9b1f-407f7312cb59,"Painting, house, furniture, moderateeffort",3.3,False,True,{occupation},2025-10-05T19:08:24
+49d29e4f-48cb-46d0-a97e-ccb0963228e6,Plumbingactivities,3.0,False,True,{occupation},2025-10-05T19:08:24
+bd718b3a-d85d-417e-9ef3-8ed3fe799b16,"Printing, paperindustryworker, standing",2.0,False,True,{occupation},2025-10-05T19:08:24
+9a2e7c3b-4564-4ad1-8d91-46ddcb4da93e,"PoliceOfficer, Walking",3.8,False,True,{occupation},2025-10-05T19:08:24
+86b2aa4b-a002-4415-b223-65036999952c,"Police, directingtraffic, standing",2.5,False,True,{occupation},2025-10-05T19:08:24
+12865be4-797c-4b31-831f-727c3af50748,"Police, drivingasquadcar, sitting",2.0,False,True,{occupation},2025-10-05T19:08:24
+ebb329f5-131b-40f5-8c32-9c471ef10808,"Police, ridinginasquadcar, sitting",1.3,False,True,{occupation},2025-10-05T19:08:24
+7df2a7d8-38e8-4c94-8353-afb76a0553c7,"Police, makinganarrest, standing",4.0,False,True,{occupation},2025-10-05T19:08:24
+3a9b3c01-db70-4268-ae00-fa7687d6a485,"Counterterrorismmaneuvers, clearingbuilding",9.0,False,True,{occupation},2025-10-05T19:08:24
+c96915fc-9da1-4808-85e0-1de11095126e,"Shoerepair, general",2.0,False,True,{occupation},2025-10-05T19:08:24
+4fa6d0da-5723-4901-ad10-a6556533bf13,"Shoveling, diggingditches",7.3,False,True,{occupation},2025-10-05T19:08:24
+fbff29ab-19e6-475f-a2dc-1872efd63a5e,"Shoveling, morethan16lbs/minute, deepdigging, vigorouseffort",8.8,False,True,{occupation},2025-10-05T19:08:24
+a13b2a1c-a942-49b4-8f2f-5ee0bedf4594,"Shoveling, lessthan10lbs/minute, moderateeffort",5.0,False,True,{occupation},2025-10-05T19:08:24
+838f9329-b820-48b6-b7d5-01086d929666,"Shoveling, 10to15lbs/minute, vigorouseffort",6.5,False,True,{occupation},2025-10-05T19:08:24
+6e7a0461-5e7c-4058-a895-78bb1f17a030,"Sittingtasks, lighteffort(e.g., officework, chemistrylabwork, lightassemblyrepair, watchrepair, reading, deskwork)",1.5,False,True,{occupation},2025-10-05T19:08:24
+040f1f61-e029-47d8-98f8-61f568c98118,"Sitting, computerwork",1.3,False,True,{occupation},2025-10-05T19:08:24
+90546f05-6875-441a-a896-e093157893c2,"Standingworkstation, typing, computerwork",1.3,False,True,{occupation},2025-10-05T19:08:24
+0e929195-b296-4601-aa25-f1e3d63d55e6,"Sittingmeetings, lighteffort, general, and/orwithtalkinginvolved(e.g., eatingatabusinessmeeting)",1.3,False,True,{occupation},2025-10-05T19:08:24
+6d26f983-dd0e-4dc8-a876-f5be5354cd0e,"Sittingtasks, moderateeffort(e.g.pushingheavylevers, ridingmower/forklift, craneoperation)",2.5,False,True,{occupation},2025-10-05T19:08:24
+603cd1ba-f02b-4233-b06b-859e83a3ce90,"Sitting, teachingstretchingoryoga, orlighteffortexerciseclasses",2.8,False,True,{flexibility},2025-10-05T19:08:24
+08bd0f88-ac17-4b7e-a4cf-05730ce61e58,"Standingtasks, lighteffort(e.g., bartending, storeclerk, assembling, filing, duplicating, librarian, puttingupaChristmastree, standingandtalkingatwork, changingclotheswhenteaching",1.8,False,True,{occupation},2025-10-05T19:08:24
+9d6eeeca-12a4-4797-85c4-d05922b16feb,"Standing, light/moderateeffort(e.g., assemble/repairheavyparts, welding, stockingparts, autorepair, packingboxes, nursingpatientcare, laundry)",3.3,False,True,{household},2025-10-05T19:08:24
+5c7278af-eed9-42c1-8d99-64274249d515,"Standing, moderateeffort, liftingitemscontinuously, 10–20lbs, withlimitedwalkingorresting",4.5,False,True,{occupation},2025-10-05T19:08:24
+f9979430-4143-4c6a-961e-b88c0701d532,"Standing, moderateeffort, intermittentlifting50lbs, hitchortwistingropes",3.8,False,True,{occupation},2025-10-05T19:08:24
+8ab0e38f-2311-4cdb-86f3-49976425284d,"Standing, moderate/heavytasks(e.g., liftingmorethan50lbs, masonry, painting, paperhanging)",4.5,False,True,{occupation},2025-10-05T19:08:24
+30ecd531-42aa-4aa5-bc10-eb45f70573cb,"Patientcare, healthcareactivites",2.3,False,True,{occupation},2025-10-05T19:08:24
+52158de8-9a52-4504-81a3-2cba73d18d85,"Patientcare, roomcleaning/preperation",3.5,False,True,{household},2025-10-05T19:08:24
+46c3d73f-6cd1-48aa-8a43-38000d781b8c,"Steelmill, moderateeffort(e.g., fettling, forging, tippingmolds)",5.3,False,True,{occupation},2025-10-05T19:08:24
+edae3b9d-04f0-42e3-9e3e-b6176c87470f,"Steelmill, vigorouseffort(e.g., handrolling, merchantmillrolling, removingslag, tendingfurnace)",8.3,False,True,{occupation},2025-10-05T19:08:24
+d65cb4c8-40b1-4ea4-9974-0ecd58a0ae7e,"Tailoring, cuttingfabric",2.3,False,True,{occupation},2025-10-05T19:08:24
+9f544045-965f-4ff9-8105-cc884f11882c,"Tailoring, general",2.5,False,True,{occupation},2025-10-05T19:08:24
+7b516c07-d2ce-4d7c-9549-547140964a3e,"Tailoring, handsewing",1.8,False,True,{occupation},2025-10-05T19:08:24
+89cc881d-9246-486a-bcd8-d7a7fa64bd08,"Tailoring, machinesewing",2.5,True,True,{strength},2025-10-05T19:08:24
+e669e9d4-58cc-456c-97e2-982dee6eea7a,"Tailoring, pressing",3.5,True,True,{strength},2025-10-05T19:08:24
+d9a70b64-d814-419d-8fd3-e22fe87b9772,"Tailoring, weaving, lighteffort(e.g., finishingoperations, washing, dyeing, inspectingcloth, countingyards, paperwork)",2.0,False,True,{occupation},2025-10-05T19:08:24
+708d5bdf-a478-4f3f-960c-1ca7d50850b7,"Tailoring, weaving, moderateeffort(e.g., spinningandweavingoperations, deliveringboxesofyarntospinners, loadingofwarpbean, pinwinding, conewinding, warping, clothclutting)",4.0,False,True,{occupation},2025-10-05T19:08:24
+d0635aef-2dc3-4518-8902-8831a3b68af4,"Truckdriving, loadingandunloadingtruck, tyingdownload, standing, walkingandcarryingheavyloads",6.5,False,True,{occupation},2025-10-05T19:08:24
+d1eea4f0-871f-4445-bb5d-f9432e0c7340,"Truckdriving, deliverytruck, taxi, shuttlebus, schoolbus",2.0,False,True,{occupation},2025-10-05T19:08:24
+d8a8d238-b547-4425-ae19-cbc0ff219a16,"Typing, electric, manualorcomputer",1.3,False,True,{occupation},2025-10-05T19:08:24
+c78a23f3-db73-444a-837d-4d1a2ebfd568,"Usingheavypowertoolssuchaspneumatictools(e.g., jackhammers, drills, etc.)",6.3,False,True,{occupation},2025-10-05T19:08:24
+fdfd5cae-6182-4be9-9edd-c2d8d373c03f,"Usingheavytools(notpower)suchasshovel, pick, tunnelbar, spade",7.8,False,True,{occupation},2025-10-05T19:08:24
+cc631246-3f39-47ad-bb21-fe5f675202f6,"Walkingonjob, lessthan2.0mph, veryslowspeed, inofficeorlabarea",2.0,False,True,{occupation},2025-10-05T19:08:24
+90633e93-dcc2-43bd-9837-d521e2c1a4ce,"Walkingonjob, 2.8to3.4mph, inoffice, moderatespeed, notcarryinganything",3.8,False,True,{occupation},2025-10-05T19:08:24
+abde2f71-0774-4ef9-beb1-7b47bb7f565f,"Walkingonjob, 3.5to3.9mph, inoffice, briskspeed, notcarryinganything",4.8,False,True,{occupation},2025-10-05T19:08:24
+1c1484eb-74d4-4008-9294-85846ebe6d65,"Walkingonjob, 2.5mph, slowspeed, carryinglightobjectslessthan25lbs",3.5,False,True,{occupation},2025-10-05T19:08:24
+12818d67-dad5-4a4b-9fe2-be82d541b0f3,"Walking, gatheringthingsatwork, readytoleave",3.0,False,True,{occupation},2025-10-05T19:08:24
+5e5c158d-e43b-4a77-adc1-3cae84255ae2,"Walking, 2.5mph, slowspeed, carryingheavyobjectsmorethan25lbs",3.8,False,True,{occupation},2025-10-05T19:08:24
+c9c2b872-0d6a-48c4-8a3a-d1ea11c76221,"Walking, 3.0mph, moderatelyandcarryinglightobjectslessthan25lbs",4.5,False,True,{occupation},2025-10-05T19:08:24
+5b60889b-1da5-4281-a0f8-c5abf1bf3e5e,"Walking, pushingawheelchair",3.8,False,True,{occupation},2025-10-05T19:08:24
+1545a28a-e42b-402b-bcd0-4fc5035c35a9,"Walking, 3.5mph, brisklyandcarryingobjectslessthan25lbs",4.5,False,True,{occupation},2025-10-05T19:08:24
+7927587b-f212-4a93-bdfd-224f0b79ed4d,"Walkingorwalkdownstairsorstanding, carryingobjectsabout25to49lbs",4.0,False,True,{occupation},2025-10-05T19:08:24
+f5c34e17-aee5-4596-b1da-9a30f712ca5b,"Walkingorwalkdownstairsorstanding, carryingobjectsabout50to74lbs",5.5,False,True,{occupation},2025-10-05T19:08:24
+7b8a6e7d-85a9-4533-8d84-6c2406bd4e03,"Walkingorwalkdownstairsorstanding, carryingobjectsabout75to99lbs",7.0,False,True,{occupation},2025-10-05T19:08:24
+db150942-49f7-4d5b-b8db-9c11f00eef0d,"Walkingorwalkdownstairsorstanding, carryingobjectsabout100lbsormore",7.3,False,True,{occupation},2025-10-05T19:08:24
+02c20117-cf79-499b-a965-0d9dd03d9eb2,"Warehouse/ShippingCenter, Loading/Unloadingboxes",2.3,False,True,{occupation},2025-10-05T19:08:24
+8738dcae-4b83-4781-9875-72e3c22d34b0,"Warehouse/ShippingCenter, Movingboxes(~5kg)",4.3,False,True,{occupation},2025-10-05T19:08:24
+81079154-3a15-40e3-bdc2-c1af25e0fb68,"Workinginsceneshop, theateractor, backstageemployee",3.0,False,True,{occupation},2025-10-05T19:08:24
+8264971f-bd35-457f-9008-b0dbcc718f3b,"Soldiers, militarymarching, unloaded1.5-2.5mph",3.5,False,True,{occupation},2025-10-05T19:08:24
+f3d4cd7c-be45-4fbe-bd2e-f1f9cec58ccf,"Soldiers, militarymarching, 1.5-2.5mph, 10to30kgload",4.0,False,True,{occupation},2025-10-05T19:08:24
+fca2ed58-1e32-482d-9c7b-2950518c9c15,"AirborneShuffle, 2.5to3.5mph, 20-30kgload",5.0,False,True,{occupation},2025-10-05T19:08:24
+bc3f0fc7-016f-4a3f-9997-491d3df628a6,"Soldiers, militaryloadedmarching, varyingterrain, 25-40kgload",6.3,False,True,{occupation},2025-10-05T19:08:24
+c209ad81-5ec8-46fb-906a-f2da7229b870,"Soldiers, walking, 2.8mph, 5%grade, upto21.5kgload",6.0,False,True,{occupation},2025-10-05T19:08:24
+00ee31cc-983f-479c-8b73-67d104223a91,"Soldiers, walking, 2.8mph, 10%grade, upto21.5kgload",8.5,False,True,{occupation},2025-10-05T19:08:24
+07cb6174-798f-4893-9085-d3f84cda2a3d,"Soldiers, walking, 2.8mph, 15%grade, upto21.5kgload",11.0,False,True,{occupation},2025-10-05T19:08:24
+829eb173-e6a5-4d0b-a53a-3af0b79a653b,"Militaryactivities, arterialfieldpreparation, diggingdefensivepositions",6.0,False,True,{occupation},2025-10-05T19:08:24
+7dc6be94-8337-450f-bc9e-c9819a7a231a,Jog/walkcombination(joggingcomponentoflessthan10minutes)(TaylorCode180),6.0,False,True,{cardio},2025-10-05T19:08:24
+d16dca4f-578a-4721-b488-bf122d737265,"Jogging, general, self-selected pace",7.5,False,True,{cardio},2025-10-05T19:08:24
+adb3473f-a320-47db-9ef3-61b01648ecc7,"Jogging, inplace",4.8,False,True,{cardio},2025-10-05T19:08:24
+a5c0280a-0099-44fe-a128-69d4d1e0bb49,Jogging2.6to3.7mph,3.3,False,True,{cardio},2025-10-05T19:08:24
+681982c4-9d4e-4670-89ea-6aa9368dfaaa,Joggingonamini-tramp,4.5,False,True,{cardio},2025-10-05T19:08:24
+a1b9e79c-2d85-41f4-9265-8ea261613468,"Running, 4to4.2mph(13min/mile)",6.5,False,True,{cardio},2025-10-05T19:08:24
+943f3878-a208-4c55-8363-79e293093d3e,Running4.3to4.8mph,7.8,False,True,{cardio},2025-10-05T19:08:24
+a118822c-079d-425f-af8c-fe0f63044a76,"Running, 5.0to5.2mph(12min/mile)",8.5,False,True,{cardio},2025-10-05T19:08:24
+f6cb7aac-5a21-42b9-b1f3-b9cbf2a29e6b,"Running, 5.5-5.8mph",9.0,False,True,{cardio},2025-10-05T19:08:24
+a90f3576-e0d7-410f-b80a-21dcfdce3951,"Running, 6-6.3mph(10min/mile)",9.3,False,True,{cardio},2025-10-05T19:08:24
+3f06377c-ab53-4f9a-9045-74c82b8c03c6,"Running, 6.7mph(9min/mile)",10.5,False,True,{cardio},2025-10-05T19:08:24
+8ffe0541-b0b6-4628-b3c5-25d894978d8e,"Running, 7mph(8.5min/mile)",11.0,False,True,{cardio},2025-10-05T19:08:24
+a1de5b0a-ca56-4039-b44e-b01149938480,"Running, 7.5mph(8min/mile)",11.8,False,True,{cardio},2025-10-05T19:08:24
+1a4f8827-2717-4e2c-a84e-861d3cc5534d,"Running, 8mph(7.5min/mile)",12.0,False,True,{cardio},2025-10-05T19:08:24
+aaf8f3b4-68b7-4806-afd7-a9a9b566fc9a,"Running, 8.6mph(7min/mile)",12.5,False,True,{cardio},2025-10-05T19:08:24
+2eb4cfa4-28fa-4ad0-8f9c-82aaf677a41c,"Running, 9mph(6.5min/mile)",13.0,False,True,{cardio},2025-10-05T19:08:24
+4c9c0155-bea4-4676-8885-1096fa5cb46d,"Running, 9.3to9.6mph",14.8,False,True,{cardio},2025-10-05T19:08:24
+d55b097f-5bee-44dd-994e-edd4dfefb217,"Running, 10mph(6min/mile)",14.8,False,True,{cardio},2025-10-05T19:08:24
+4719ffbb-021b-46f1-a557-b3eb6715666e,"Running, 11mph(5.5min/mile)",16.8,False,True,{cardio},2025-10-05T19:08:24
+b86d67fe-64fa-4f57-843e-bf5a7cbe01fd,"Running, 12mph(5.0min/mile)",18.5,False,True,{cardio},2025-10-05T19:08:24
+058b7ce3-6658-434e-a4ef-71a37e4c3e22,"Running, 13mph(4.6min/mile)",19.8,False,True,{cardio},2025-10-05T19:08:24
+065831a7-2ed5-4916-a94c-bb9fc2f0d1ef,"Running, 14mph(4.3min/mile)",23.0,False,True,{cardio},2025-10-05T19:08:24
+faec9d03-94d7-4a04-8e5d-1baa1a7e7c3f,"Running, crosscountry",9.3,False,True,{cardio},2025-10-05T19:08:24
+ee5b5c25-0441-40fc-a02d-4e96bdef751d,"Running, self-selected pace",10.5,False,True,{cardio},2025-10-05T19:08:24
+8b5f7ec7-1ba1-4b85-ba97-4f177b2049d9,Running(TaylorCode200),8.0,False,True,{cardio},2025-10-05T19:08:24
+43a4e110-0e0e-4c43-95e5-b093124570cc,"Running, stairs, up",15.0,False,True,{cardio},2025-10-05T19:08:24
+6b2958ed-0728-40a2-9b9f-06b467311b11,"Running, onatrack, teampractice",10.0,False,True,{cardio},2025-10-05T19:08:24
+22536cd6-0d4c-4772-b638-51f2cd6f7d8d,"Running, ontrack, 500-1500m, competitive",18.0,False,True,{cardio},2025-10-05T19:08:24
+d82f47e2-3e98-4099-acc9-907740062c35,"Running, ontrack, 2000-3000m, competitive",19.3,False,True,{cardio},2025-10-05T19:08:24
+768ad951-d32d-4240-8b4b-996d0cc6f0ca,"Running, training, pushingawheelchairorbabycarrier",8.0,False,True,{cardio},2025-10-05T19:08:24
+009db6f2-4af6-4ca4-a253-b0ea26816725,"Running, marathon",13.3,False,True,{cardio},2025-10-05T19:08:24
+5b91863b-cb91-4239-8391-1945019f6e28,"Runninguphill, 4.5mph, 5%incline",10.3,False,True,{cardio},2025-10-05T19:08:24
+fe14c297-e1ca-4940-8dd7-46892728a3d7,"Runninguphill, 6.0mph, 5%incline",13.3,False,True,{cardio},2025-10-05T19:08:24
+127040cc-adc6-4573-8801-682c60fc000e,"Runninguphill, 7.0mph, 5%incline",15.5,False,True,{cardio},2025-10-05T19:08:24
+87431b5c-dd65-476b-a45c-df7e5bdf3cac,"Runninguphill, 5.0to5.9mph, 15%incline",17.5,False,True,{cardio},2025-10-05T19:08:24
+8a574bb8-60d6-4cd6-b80c-ebdbd7b8f8f7,"Runninguphill, 0.6to0.79mph, 30%incline",8.8,False,True,{cardio},2025-10-05T19:08:24
+a6e9edec-ffc2-45aa-93b7-d1f4f9d2b44d,"Runninguphill, 0.8to0.99mph, 30%incline",10.3,False,True,{cardio},2025-10-05T19:08:24
+9a4a78a2-0ac1-4608-8415-95ccb9ce554d,"Runninguphill, 1.0to1.19mph, 30%incline",11.8,False,True,{cardio},2025-10-05T19:08:24
+4c2dad62-a197-4c06-8826-6027dac6344a,"Runninguphill, 1.2to1.39mph, 30-40%incline",13.5,False,True,{cardio},2025-10-05T19:08:24
+26e1ed85-54b5-41a2-bb4b-f0e13a30cd85,"Runninguphill, 1.4to1.59mph, 30%incline",14.8,False,True,{cardio},2025-10-05T19:08:24
+c3459886-c0df-4cda-ac6d-d6f4334d439e,"Runninguphill, >1.6mph, 10-30%incline",16.3,False,True,{cardio},2025-10-05T19:08:24
+f75fb007-932e-4e56-a6af-f714d3d4f059,"Running, hillyterrain, ±100mchangeinelevation",16.0,False,True,{cardio},2025-10-05T19:08:24
+acb0e357-e213-43d9-b367-5b25487aaa8c,"Runningdownhill, 5.0to5.9mph, -10%to-15%",5.8,False,True,{cardio},2025-10-05T19:08:24
+cbf8e372-c687-4f22-b5e7-841f1abea9c4,"Runningdownhill, 6.0to6.9mph, -10%to-15%",7.5,False,True,{cardio},2025-10-05T19:08:24
+4566d0ab-3149-40e9-919c-a4b2779d4559,"Runningdownhill, 7.0to8.9mph, -10%to-15%",9.0,False,True,{cardio},2025-10-05T19:08:24
+4d204599-933e-49d4-bdd6-87060470c128,"Runningdownhill, 6.0to7.9mph, -3%to-9%",9.3,False,True,{cardio},2025-10-05T19:08:24
+3ae838ab-f6c2-4b4f-98a1-3f16ebc0a20f,"Runningdownhill, 8.0to10.5mph, -3%to-9%",13.8,False,True,{cardio},2025-10-05T19:08:24
+a8bb29b0-d418-4b7c-abe3-ba77366fa0a1,"Running/jogging, curvedtreadmill, 3.0to3.9mph",5.3,False,True,{cardio},2025-10-05T19:08:24
+cf64a8e1-1f13-4231-9f79-b65d8624dcd1,"Running/jogging, curvedtreadmill, 4.0to4.9mph",6.5,False,True,{cardio},2025-10-05T19:08:24
+07346971-9566-4f7f-be0a-3e481fb45545,"Runningcurvedtreadmill, 5.0to5.9mph",11.0,False,True,{cardio},2025-10-05T19:08:24
+2535720a-b650-457f-a456-d92f7fc0fd45,"Runningcurvedtreadmill, 7.0to7.9mph",12.0,False,True,{cardio},2025-10-05T19:08:24
+7e765ff4-2741-49e5-a96c-75c97b3c36f2,"Runningcurvedtreadmill, 8.0to8.9mph",14.0,False,True,{cardio},2025-10-05T19:08:24
+5050b07a-bbdb-480d-a6b4-d28c203184b5,"Runningcurvedtreadmill, 9.0to9.9mph",16.8,False,True,{cardio},2025-10-05T19:08:24
+a7ff0e8d-831e-427f-9bc5-316adbbea671,"Running, 5.0-5.9mph, 1.0to3.0kgbackpack",8.5,False,True,{cardio},2025-10-05T19:08:24
+0e21682f-aaff-4e63-a947-1828beb92540,"Running, 6.0-6.9mph, 1.0to3.0kgbackpack",9.5,False,True,{cardio},2025-10-05T19:08:24
+511c5be0-5961-4023-a756-e470ebc66bf9,"Running, 7.0-7.9mph, 1.0to3.0kgbackpack",9.8,False,True,{cardio},2025-10-05T19:08:24
+6a21406d-c95f-4c90-9381-e4e02292b147,"Running, 8.0-8.9mph, 1.0to3.0kgbackpack",12.0,False,True,{cardio},2025-10-05T19:08:24
+e1d06596-dc0d-461c-aa61-f8965a32d2b2,"Running, barefoot, 3.5-5.9mph",7.8,False,True,{cardio},2025-10-05T19:08:24
+377a509a-7a08-4244-80f3-acaefa8aa6ef,"Running, barefoot, 6.0-7.9mph",12.0,False,True,{cardio},2025-10-05T19:08:24
+f9f93f95-6238-428d-850b-a22f6f7b3707,"Running, barefoot, 8.0-8.9mph",13.5,False,True,{cardio},2025-10-05T19:08:24
+0fa83119-0ea9-4766-b208-b93567a1363e,"Running, joggingstroller, indoors, 5mph",8.0,False,True,{cardio},2025-10-05T19:08:24
+c195379e-b9f5-494c-af63-aa3a43d194f4,"Running, joggingstroller, indoors, 6mph",9.0,False,True,{cardio},2025-10-05T19:08:24
+cf45f087-8e2d-4227-a9b2-3f7b22feb78f,"Running, joggingstroller, outdoors, 5mph",10.0,False,True,{cardio},2025-10-05T19:08:24
+acadf1b0-6a81-48f4-bf18-951d03e9d2e4,"Running, joggingstroller, outdoors, 6mph",11.5,False,True,{cardio},2025-10-05T19:08:24
+d7feca4d-e742-419f-80ca-d3a20a85bcb3,"Skipping, 5.5-6.0mph",11.5,False,True,{cardio},2025-10-05T19:08:24
+46b9c5d6-3423-42e2-9159-2c1866a63bcb,"Triathlon, Running",13.0,False,True,{cardio},2025-10-05T19:08:24
+d35e41ff-6df5-43ea-98d5-1dab0d79e85b,"Gettingreadyforbed, general, standing",2.3,False,True,{other},2025-10-05T19:08:24
+8d063ef4-34a4-49f2-bdb0-031b412c1c68,"Sittingontoilet, eliminatingwhilestandingorsquatting",2.3,True,True,{strength},2025-10-05T19:08:24
+4bffadf9-5816-4fb9-baba-a27bcac54c71,"Bathing, sitting",1.5,False,True,{other},2025-10-05T19:08:24
+16e6f1b5-ddd4-4bb1-82de-69853d59e077,"Dressing, undressing, standingorsitting",2.8,False,True,{other},2025-10-05T19:08:24
+436d4ced-19cc-4204-ab4d-d5419075da05,"Eating, sitting",1.5,False,True,{other},2025-10-05T19:08:24
+b6611e80-6e8c-449a-a98a-8692d5f7f700,"Talkingandeatingoreatingonly, standing",2.0,False,True,{other},2025-10-05T19:08:24
+eeb947ab-d618-4f6c-9883-22eba29803c8,"Takingmedication, sittingorstanding",1.5,False,True,{other},2025-10-05T19:08:24
+9acdc1ed-5e0f-40d3-a426-5c42d05ba2d8,"Grooming, washinghands, shaving, brushingteeth, puttingonmake-up, sittingorstanding",2.0,False,True,{other},2025-10-05T19:08:24
+c2fc449d-b7aa-4ed4-a218-a044dae4a2cd,"Hairstyling, standing",2.5,False,True,{other},2025-10-05T19:08:24
+1a9062c5-7d0f-4179-8a96-72ef86bb1a63,"Havinghairornailsdonebysomeoneelse, sitting",1.3,False,True,{other},2025-10-05T19:08:24
+88ee2de8-5790-46d2-9aa0-92594259f424,"Showering, towelingoff, standing",2.0,False,True,{other},2025-10-05T19:08:24
+2e2f9911-ddda-4de3-9aac-30d57982376a,"Active, vigorouseffort",5.8,False,True,{other},2025-10-05T19:08:24
+ed9aaca4-d9c0-49f7-8941-cf3ba784a87b,"General, moderateeffort",3.0,False,True,{other},2025-10-05T19:08:24
+52fb4323-8b68-441e-b45e-2de3f9818f19,"Passive, lighteffort, kissing, hugging",1.8,False,True,{other},2025-10-05T19:08:24
+722f2a48-6327-43cd-8c48-9783d144ac58,"AlaskaNativeGames, EskimoOlympics, general",5.5,False,True,{cardio},2025-10-05T19:08:24
+58c35bad-bd75-48dc-b570-f60c29c7f99e,Archery(non-hunting),4.3,False,True,{other},2025-10-05T19:08:24
+ff5a0592-efe9-4ef3-9060-e70e80b28378,"Badminton, competitive(TaylorCode450)",7.0,False,True,{sports},2025-10-05T19:08:24
+8d3b156a-a93f-45fb-9a58-7bb6e214f8b2,"Badminton, competitive, matchplay",9.0,False,True,{sports},2025-10-05T19:08:24
+66940d3c-c2d5-45a0-8668-28d85254f653,"Badminton, socialsinglesanddoubles, general",5.5,False,True,{sports},2025-10-05T19:08:24
+028c9545-abcb-4f31-ac29-2b7a832183cc,"Basketball, game(TaylorCode490)",8.0,False,True,{sports},2025-10-05T19:08:24
+37a83fbe-dd27-45af-a0a5-6bbe6c21017c,"Basketball, non-game, general(TaylorCode480)",6.0,False,True,{sports},2025-10-05T19:08:24
+a7019dc0-dd0b-4fc1-bdce-e9324e564857,"Basketball, general",7.5,False,True,{sports},2025-10-05T19:08:24
+68faede9-e2d7-464f-825b-dad891a9f8b1,"Basketball, officiating(TaylorCode500)",7.0,False,True,{sports},2025-10-05T19:08:24
+199e3b32-2290-4d01-bf74-15cfcbe71a06,"Basketball, officiating",5.8,False,True,{sports},2025-10-05T19:08:24
+5608820b-4272-4790-b860-236943de4ddb,"Basketball, shootingbaskets",5.0,False,True,{sports},2025-10-05T19:08:24
+1f9db53b-f5c9-4b48-ae07-b5337194b57a,"Basketball, drills, practice",9.3,False,True,{sports},2025-10-05T19:08:24
+6b6bc956-5460-4701-8097-767f5c406222,Billiards,2.5,False,True,{other},2025-10-05T19:08:24
+ad9f3a4b-e573-4dde-93f0-79b253f2e2ba,Bowling(TaylorCode390),3.0,False,True,{other},2025-10-05T19:08:24
+d42a73f0-b0bf-4786-b7df-59a9dfd7ffc3,"Bowling, indoor, bowlingalley",3.8,False,True,{other},2025-10-05T19:08:24
+60b99444-b9d5-4c23-a2a7-e1f38443f041,"Boxing, inring, general",12.3,False,True,{other},2025-10-05T19:08:24
+7f080eef-9d5f-4426-b2e3-d442a8876ef2,"Boxing, punchingbag",5.8,False,True,{other},2025-10-05T19:08:24
+614557dc-44e5-4da8-bc78-fb02aa66c1ea,"Boxing, punchingbag, 60b/min",7.0,False,True,{other},2025-10-05T19:08:24
+0a1e2ea8-c25e-41f8-b83f-4defc5545457,"Boxing, punchingbag, 120b/min",8.5,False,True,{other},2025-10-05T19:08:24
+7bb56881-9d47-4284-abbb-efebb2e7fe12,"Boxing, punchingbag, 180b/min",10.8,False,True,{other},2025-10-05T19:08:24
+d4c47950-a474-4b81-8572-990113c74ac1,"Boxing, sparring",7.8,False,True,{other},2025-10-05T19:08:24
+ed0ecc6b-b7cc-42c1-96ea-fc588f75b2fd,"Boxing, simulatedboxinground, exercise",9.3,False,True,{other},2025-10-05T19:08:24
+d86222a0-33d8-4cae-96be-57d1a7b91fff,Broomball,7.0,False,True,{other},2025-10-05T19:08:24
+e01009d5-7af3-40a6-9ee2-2897afcf2737,"Children’sgames, adultsplaying(e.g., hopscotch, 4-square, dodgeball, playgroundapparatus, t-ball, tetherball, marbles, jacks, arcadegames), moderateeffort",5.8,False,True,{other},2025-10-05T19:08:24
+076046c0-b799-4a08-a49b-2ff996231d8a,"Cheerleading, gymnasticmoves, competitive",6.0,False,True,{other},2025-10-05T19:08:24
+ed396725-9e1b-465a-9cb3-e582ec2cb1ee,"Coaching, football, soccer, basketball, baseball, swimming, etc.",4.0,False,True,{sports},2025-10-05T19:08:24
+6df1b3f5-3d09-4b4d-b4fa-746431c1f66a,"Coaching, activelyplayingsportwithplayers",8.0,False,True,{other},2025-10-05T19:08:24
+4f29c1a9-7538-4374-aafd-3fb49b08c131,"Cricket, batting, bowling, fielding",4.8,False,True,{sports},2025-10-05T19:08:24
+c47dbf86-5f66-4a42-8b6f-3e02adf76d58,Croquet,3.3,False,True,{other},2025-10-05T19:08:24
+b45436cd-9b8a-4070-af3b-c3ddabcda830,Curling,4.0,True,True,{strength},2025-10-05T19:08:24
+e0795651-6fd2-4e8f-9249-46ad0f643dda,"Darts, wallorlawn",2.5,False,True,{other},2025-10-05T19:08:24
+ef9415bf-56b9-4088-b32a-3910e104009d,"Dragracing, pushingordrivingacar",6.0,False,True,{other},2025-10-05T19:08:24
+ce6f6fef-6458-42b5-91cd-f355a8f2b37f,"Autoracing, openwheel",8.5,False,True,{other},2025-10-05T19:08:24
+02792ad1-d75b-4ecd-90f6-53ffa814ec50,Futsal,7.8,False,True,{other},2025-10-05T19:08:24
+f35dc484-c3bd-4f74-844a-a7c642c51016,"Fencing, general",6.0,False,True,{other},2025-10-05T19:08:24
+0879f353-33a2-4948-a656-5af8577419a1,"Fencing, epee, competitive",9.8,False,True,{other},2025-10-05T19:08:24
+a07ae60c-33f4-4ee3-a8c7-97b3172269f2,Floorball,10.5,False,True,{other},2025-10-05T19:08:24
+b1d2e122-38c4-45a4-8d2f-25a776671f0d,"Football, competitive",8.0,False,True,{sports},2025-10-05T19:08:24
+7c41c61d-7b07-4a22-b083-21ee176dec0a,"Football, touch, flag, general(TaylorCode510)",8.0,False,True,{sports},2025-10-05T19:08:24
+ceb41768-0fe4-4151-b91d-2b1b4b334de0,"Football, touch, flag, lighteffort",4.0,False,True,{sports},2025-10-05T19:08:24
+72864b9f-62fb-4473-9a5c-cf135c405fd3,"Footballorbaseball, playingcatch",2.5,False,True,{sports},2025-10-05T19:08:24
+819107fb-e57c-4c5b-a292-4811b3914e13,"Frisbeeplaying, general",3.0,False,True,{other},2025-10-05T19:08:24
+68ea9c06-a654-47ea-b9e1-b9858c719f19,"Frisbee, ultimate",8.0,False,True,{other},2025-10-05T19:08:24
+df924ea2-b573-440c-8dea-37a9cb3bf83c,Frisbeegolf,3.8,False,True,{sports},2025-10-05T19:08:24
+de69169c-b5cd-489b-a9f0-114b3dfcd156,"Golf, general",4.5,False,True,{sports},2025-10-05T19:08:24
+d7251095-debe-45e4-9ac5-25b2c542b16f,"Golf, walking, carryingclubs",4.3,False,True,{sports},2025-10-05T19:08:24
+676ce65b-8d38-439e-bb03-1181aab9ce53,"Golf, miniature, drivingrange",3.5,False,True,{sports},2025-10-05T19:08:24
+62e2b5f5-af56-41cf-9935-0cad06c5cca7,"Golf, walking, pullingclubs",4.5,False,True,{sports},2025-10-05T19:08:24
+143a64a8-95e0-469c-bd42-0590d5adb0ee,"Golf, usingpowercart(TaylorCode070)",3.5,False,True,{sports},2025-10-05T19:08:24
+4edb2a40-da90-4e8c-9cc7-d96db301f282,"Gymnastics, general",3.8,False,True,{other},2025-10-05T19:08:24
+a66d951d-7826-4930-910c-508667f0ddda,Hackysack,4.0,False,True,{other},2025-10-05T19:08:24
+1ce5f641-7afa-4aeb-bcb2-1e186010eb1b,"Handball, general(TaylorCode520)",12.0,False,True,{other},2025-10-05T19:08:24
+9323d686-22bf-467f-87b1-7bc948ec47c9,"Handball, team",8.0,False,True,{other},2025-10-05T19:08:24
+5f741783-a1da-4e47-a321-cfdeff1fa93e,"Highropescourse, multipleelements",4.0,False,True,{other},2025-10-05T19:08:24
+51558218-0883-4bcc-b527-8403fdeb145d,Hanggliding,3.5,False,True,{other},2025-10-05T19:08:24
+c84a2c49-a0b8-4db1-8d2f-d3f7f0437177,"Hockey, field",7.8,False,True,{sports},2025-10-05T19:08:24
+c0722df2-e2ec-4f9f-858e-2a6c3afe7bf1,"Hockey, ice, general",8.0,False,True,{sports},2025-10-05T19:08:24
+08096ef6-6eff-4f8d-8876-43bf91a5a352,"Hockey, ice, competitive",10.0,False,True,{sports},2025-10-05T19:08:24
+0c6f9bfd-1e91-479f-afa2-271eb623fd1b,"Horsebackriding, general",5.5,False,True,{other},2025-10-05T19:08:24
+65cd0447-7c48-46fb-adb6-5bc5d727066c,"Horsegrooming, maintenance, saddlingtasks",4.5,False,True,{other},2025-10-05T19:08:24
+6f040875-8f25-4458-ba28-f9992280960a,"Horsebackriding, trotting",5.8,False,True,{other},2025-10-05T19:08:24
+ced68ca6-37b4-483c-837f-29de3c3423a6,"Horsebackriding, canterorgallop",7.3,False,True,{other},2025-10-05T19:08:24
+e129c0ce-6921-4708-9904-f16d2fdc4d49,"Horsebackriding, walking",3.8,False,True,{cardio},2025-10-05T19:08:24
+d4fc262b-fbe8-4ed8-b57d-10e4ebbad838,"Horsebackriding, jumping",9.0,False,True,{other},2025-10-05T19:08:24
+260a01cc-50a0-4aa6-abda-f161da9c5242,"Horsebackriding, reining",6.0,False,True,{other},2025-10-05T19:08:24
+80bade24-84a4-4b1e-9fbe-a0f55622af24,"Horsebackriding, simulator",2.1,False,True,{other},2025-10-05T19:08:24
+daa6b9d8-af39-4699-a0e4-9edd56c0cc1e,"Horsecart, driving, standingorsitting",1.8,False,True,{other},2025-10-05T19:08:24
+28e63759-a5f3-4aa6-b853-ccc7914b57e4,"Horseshoepitching, quoits",3.0,False,True,{other},2025-10-05T19:08:24
+b78e3c23-91d6-428b-97bb-df2df9e62267,Jaialai,12.0,False,True,{other},2025-10-05T19:08:24
+b3f7757d-3691-40f4-9bf2-ea00d9567242,"MartialArts, differenttypes, slowerpace, noviceperformers, practice",5.3,False,True,{other},2025-10-05T19:08:24
+386d4581-c197-427c-b53d-329301389a36,"MartialArts, differenttypes, moderate pace(e.g., judo, jujitsu, karate, kickboxing, taekwondo, tai-bo, MuayThaiboxing)",10.3,False,True,{other},2025-10-05T19:08:24
+3592c7c2-5a8b-4983-9008-c3f0ea050952,"Taekwondo, combatsimulation",14.3,False,True,{other},2025-10-05T19:08:24
+bffc416a-625b-41a5-b018-141ddec40f76,Judo,11.3,False,True,{other},2025-10-05T19:08:24
+577373b8-2d6e-4c4c-952c-1b5e6592131e,Juggling,4.0,False,True,{other},2025-10-05T19:08:24
+ae850b90-048e-49d4-bd03-706bf1d31c87,"Kendu, kihon-keikostyle, moderateintensity",6.5,False,True,{other},2025-10-05T19:08:24
+7d435424-1146-4fa4-83a5-5bf4583047ac,"Kendu, kirikaeshistyle, highintensity",9.6,False,True,{other},2025-10-05T19:08:24
+4015378b-1362-4414-92f3-35e75edf1faa,"Kendu, kakarikeikostyle, veryhighintensity",11.3,False,True,{other},2025-10-05T19:08:24
+c3dcff48-25f8-4ff8-8ef5-d951245d8268,Kickball,7.0,False,True,{other},2025-10-05T19:08:24
+6e0cc34f-feef-430f-a947-5b90b164bcf3,KungFuGymnastics,5.5,False,True,{other},2025-10-05T19:08:24
+3a300c6b-5375-42d8-bdee-54f02612588f,Kickboxing,7.3,False,True,{other},2025-10-05T19:08:24
+c635f5cf-c897-4184-9d8e-64a4c8a9ef41,Lacrosse,8.0,False,True,{other},2025-10-05T19:08:24
+7c105fd5-b03b-4575-86ac-1d3c26aed382,"Lawnbowling, bocceball, outdoor",3.3,False,True,{other},2025-10-05T19:08:24
+2b3fb523-4164-44bc-96c0-2d75173aa25a,"Motocross, off-roadmotorsports, all-terrainvehicle, general",4.0,False,True,{other},2025-10-05T19:08:24
+c6b64cd9-f2a7-482d-a035-0631a313b532,"Motorcycleracing, Supormotoracing",5.3,False,True,{cardio},2025-10-05T19:08:24
+fcf5beed-0380-474e-af83-f6a61133ba98,Netball,7.0,False,True,{other},2025-10-05T19:08:24
+2ff45b99-58fc-4a28-b115-9df0f85f6232,Orienteering,9.0,False,True,{other},2025-10-05T19:08:24
+a126a051-6446-403d-b6e9-c5bffe77b0c1,"Paddleball, competitive",10.0,False,True,{other},2025-10-05T19:08:24
+3ed3fbbc-80cf-41a5-af74-df3f84b0f63c,"Paddleball, casual, general(TaylorCode460)",6.0,False,True,{other},2025-10-05T19:08:24
+818880e1-5cd0-4b12-81fc-97a7aa16d862,"Paragliding, moderatealtitude",1.8,False,True,{other},2025-10-05T19:08:24
+59df428e-116c-464c-9254-04270ae01a9d,Prusikclimbing,6.5,False,True,{cardio},2025-10-05T19:08:24
+befaa502-0e8e-4f08-be3f-c266f622a499,"Polo, onhorseback",8.0,False,True,{other},2025-10-05T19:08:24
+a966fae8-45e7-4e36-b86c-b79ce08d6b0e,"Racquetball, competitive",10.0,False,True,{other},2025-10-05T19:08:24
+8794e540-88ef-40d0-ad79-407030ff75d9,"RaceWalking, 3.1m/s(6.9mph)",10.3,False,True,{cardio},2025-10-05T19:08:24
+8e1d7b1c-09ba-4609-aa1c-51c0b7b072d9,"RaceWalking, 3.7m/s(8.3mph)",13.8,False,True,{cardio},2025-10-05T19:08:24
+fc0dc81e-9277-4db9-b38c-ee5229048634,"RaceWalking, racingspeed, 4.0m/s(8.95mph)",15.5,False,True,{cardio},2025-10-05T19:08:24
+e685c1d3-ded2-4690-ba95-23c313cc6c59,"Racquetball, general(TaylorCode470)",7.0,False,True,{other},2025-10-05T19:08:24
+3c3d85b8-93a3-42e1-a8aa-c1bd97e3fe0f,"Rockormountainclimbing(TaylorCode060), (formerlycode17120)",8.0,False,True,{cardio},2025-10-05T19:08:24
+2ef9dbf9-2984-483f-9e7b-365e1bd750ff,"Rockclimbing, freeboulder",8.8,False,True,{cardio},2025-10-05T19:08:24
+68a451ab-d573-4245-9211-7a62267c0ffb,"Rockclimbing, ascendingrock, highdifficulty",7.3,False,True,{cardio},2025-10-05T19:08:24
+f8dac946-b719-44f7-a6b9-c0baebf70558,"Rockclimbing, speedclimbing, verydifficult",10.5,False,True,{cardio},2025-10-05T19:08:24
+30bfe1c1-1fe2-4d5d-927a-677496edeb6f,"Rockclimbing, ascendingortraversingrock, low-to-moderatedifficulty",5.8,False,True,{cardio},2025-10-05T19:08:24
+6ffdf74e-dce0-45dd-9ccc-f122b29aa877,"Rockclimbing, treadwall, 4-6m/min",10.5,False,True,{cardio},2025-10-05T19:08:24
+72e6078d-f020-4f0d-8ccd-d1b89cd47f89,"Rockclimbing, treadwall, 7-10m/min",10.5,False,True,{cardio},2025-10-05T19:08:24
+404b8f5e-e933-4a0a-ad8e-60ec2fb8e2c7,"Rockclimbing, rappelling, ",5.0,False,True,{cardio},2025-10-05T19:08:24
+56f69ac2-3eb2-4e6f-b81d-9cca1e58ca51,"Rodeosports, general, lighteffort",4.0,False,True,{other},2025-10-05T19:08:24
+7bca39aa-867f-46b2-b42b-1acb1c5c863f,"Rodeosports, general, moderateeffort",5.5,False,True,{other},2025-10-05T19:08:24
+5258bbba-199c-44e8-9221-fa1b1a600c04,"Rodeosports, general, vigorouseffort",7.0,False,True,{other},2025-10-05T19:08:24
+8c4e5275-e893-470d-b2e8-6ef8df45538b,"Ropejumping, fastpace, 120-160skips/min",12.3,False,True,{cardio},2025-10-05T19:08:24
+0bfc0042-c5be-4fb7-8e80-65290cc2da99,"Ropejumping, moderate pace, general, 100to120skips/min, 2footskip, plainbounce",11.8,False,True,{cardio},2025-10-05T19:08:24
+b0036dfa-b9d2-47d7-90c2-b1add9d7d2ef,"Ropejumping, slowpace, <100skips/min, 2footskip, rhythmbounce",8.3,False,True,{cardio},2025-10-05T19:08:24
+d811c6c5-f431-4120-9219-1b524966fe07,"Ropejumping, doubleunderormore",10.0,False,True,{other},2025-10-05T19:08:24
+f5de2e9d-08d0-4c61-bc5d-49a6510e77b8,"Rugby, union, team, competitive",8.3,False,True,{sports},2025-10-05T19:08:24
+b2f95b24-85db-45aa-8deb-a8cd18cd061f,"Rugby, touch, non-competitive",6.3,False,True,{sports},2025-10-05T19:08:24
+59deeb60-d673-4c76-9d51-6c4798095ea6,Shuffleboard,3.0,False,True,{other},2025-10-05T19:08:24
+f41b70e2-6887-461e-8f74-583de9f6c72c,"Skateboarding, general, moderateeffort",5.0,False,True,{cardio},2025-10-05T19:08:24
+e7a6a57d-abfd-4fc0-8bbe-cef8cef94b91,"Skateboarding, competitive, vigorouseffort",6.0,False,True,{cardio},2025-10-05T19:08:24
+16e7187b-cb2a-4a15-a44c-6f81681b0b89,"Skating, roller(TaylorCode360)",7.0,False,True,{other},2025-10-05T19:08:24
+e0ae0e49-db8c-4ddd-bb32-038a5fd560b6,"Rollerblading, in-lineskating, 14.4km/h(9.0mph), recreationalpace",7.5,False,True,{other},2025-10-05T19:08:24
+4dbc186f-ba48-4ff1-abe2-efb31c9bf1a4,"Rollerblading, in-lineskating, 17.7km/h(11.0mph), moderate pace, exercisetraining",9.8,False,True,{other},2025-10-05T19:08:24
+efba1e19-ad19-4e07-8d05-7d4111a9562a,"Rollerblading, in-lineskating, 21.0to21.7km/h(13.0to13.6mph), fastpace, exercisetraining",12.3,False,True,{other},2025-10-05T19:08:24
+59819759-53fb-49bf-8c42-19d760ab552f,"Rollerblading, in-lineskating, 24.0km/h(15.0mph), maximaleffort",15.5,False,True,{other},2025-10-05T19:08:24
+d5f4fa3f-1b9c-4fcb-9b5d-d699f62138aa,"Skateboard, longboard, 13.3km/h, slowspeed",6.8,False,True,{cardio},2025-10-05T19:08:24
+ce3afdc4-6b6c-464e-88a0-1f42a046538c,"Skateboard, longboard, 16.2km/h, typicalspeed",8.3,False,True,{cardio},2025-10-05T19:08:24
+01978448-4c77-4787-89ae-133f809dd790,"Skateboard, longboard, 13.3km/h, fastspeed",10.5,False,True,{cardio},2025-10-05T19:08:24
+78ad0b06-9adc-4142-ad6d-cae9b538ba53,"Skydiving, base-jumping, bungeejumping",3.5,False,True,{other},2025-10-05T19:08:24
+890e32ad-92f2-4d3d-873c-adaaea1486d9,"Soccer, competitive",9.5,False,True,{sports},2025-10-05T19:08:24
+4e9d7a24-aa0c-46ef-8bcd-6810d3df1841,"Soccer, casual, general(TaylorCode540)",7.0,False,True,{sports},2025-10-05T19:08:24
+2b86248c-3a58-4240-ad02-41db3f73377c,Walkingfootball/soccer,3.5,False,True,{sports},2025-10-05T19:08:24
+fe6f78fe-f76d-412d-997a-d18c9cd9d48e,"Softballorbaseball, fastorslowpitch, general, moderateeffort(TaylorCode440)",5.0,False,True,{sports},2025-10-05T19:08:24
+e8219ac1-d544-4988-833d-6fb5157fcfdb,"Softball, practice",4.0,False,True,{sports},2025-10-05T19:08:24
+17a2a181-463b-4c65-a87f-b9951b08d45d,"Softball, officiating",4.0,False,True,{sports},2025-10-05T19:08:24
+42925b6c-5bdc-4ca0-9e76-345c103ed233,"Softball, pitching",6.0,False,True,{sports},2025-10-05T19:08:24
+a618e925-f252-407a-9fb0-3e66a4720334,"Sportsspectator, veryexcited, emotional, physicallymoving",3.3,False,True,{other},2025-10-05T19:08:24
+298f76de-92a3-48bc-a1cf-079af9d6ea17,Squash(TaylorCode530),12.0,False,True,{other},2025-10-05T19:08:24
+7c94283d-7c12-437b-abb2-de0c8a4f81fd,"Squash, general",7.3,False,True,{other},2025-10-05T19:08:24
+62dc8d97-5d22-43a8-9a64-3432985e31c2,"Tabletennis, pingpong(TaylorCode410)",4.0,False,True,{sports},2025-10-05T19:08:24
+662746e3-1347-470e-8f61-450b909a9613,"Taichi, qigong, general",3.3,False,True,{other},2025-10-05T19:08:24
+cf6a2ef4-4237-41a0-96c0-f7ff82241068,"Taichi, qigong, sitting, lighteffort",1.5,False,True,{other},2025-10-05T19:08:24
+c9c065e6-fccd-4770-a733-cc3e8af35059,"Taichichuan, Yangstyle",6.0,False,True,{other},2025-10-05T19:08:24
+ee34514b-ac11-44ae-a5a0-fa49750cc995,"Tennis, general, moderateeffort",6.8,False,True,{sports},2025-10-05T19:08:24
+99ca22a7-2044-4a73-aa1b-ffee773ddefb,"Tennis, general, competitive",8.0,False,True,{sports},2025-10-05T19:08:24
+fa294368-4341-4e58-b0f9-513376f36790,"Tennis, doubles(TaylorCode430)",6.0,False,True,{sports},2025-10-05T19:08:24
+76ce23e2-13ef-4539-a121-c156b90eb0e0,"Tennis, doubles",4.5,False,True,{sports},2025-10-05T19:08:24
+7459c6b5-58c2-4599-b842-a83d6ce955ca,"Tennis, singles(TaylorCode420)",8.0,False,True,{sports},2025-10-05T19:08:24
+9575fe43-f03b-4186-b47d-306a453be1e4,"Tennis, hittingballs, non-gameplay, moderateeffort",5.0,False,True,{sports},2025-10-05T19:08:24
+cdd21495-ffea-44e6-a984-ffdf6a9bc9bb,"Trampoline, recreational",6.3,False,True,{other},2025-10-05T19:08:24
+589d4fb2-fbe9-4bb4-bff9-167924cfd8de,"Trampoline, competitive",10.3,False,True,{other},2025-10-05T19:08:24
+f82ad93d-ff41-4723-86ee-851e4b926d9c,Volleyball(TaylorCode400),4.0,False,True,{sports},2025-10-05T19:08:24
+3781806c-3189-47c6-9336-77c58c0611db,"Volleyball, competitive, ingymnasium",6.0,False,True,{sports},2025-10-05T19:08:24
+03395cf8-6e47-46de-8804-6d1488d07b61,"Volleyball, non-competitive, 6-9memberteam, general",3.0,False,True,{sports},2025-10-05T19:08:24
+55aa3eeb-4166-42e0-83d7-b5353ac47cde,"Volleyball, beach, insand",8.0,False,True,{sports},2025-10-05T19:08:24
+0829785d-0c50-4140-a6e1-3c5efc385786,"Wrestling, competitive(onematch=5minutes)",6.0,False,True,{other},2025-10-05T19:08:24
+ba560ed8-4e6f-4965-8753-7eb0d1487077,"Wallyball, general",7.0,False,True,{other},2025-10-05T19:08:24
+87aa8ae1-b29a-4a25-a64b-37a713afae72,"Trackandfield(e.g., shot, discus, hammerthrow)",4.0,False,True,{cardio},2025-10-05T19:08:24
+7b7bd50b-811d-46b4-9fa1-147fc5ef281e,"Trackandfield(e.g., highjump, longjump, triplejump, javelin, polevault)",6.0,False,True,{other},2025-10-05T19:08:24
+bff841f2-2467-4789-9c92-69e867dc513f,"Trackandfield(e.g., steeplechase, hurdles)",10.0,False,True,{other},2025-10-05T19:08:24
+1f339c44-fa6a-4ee9-bb2e-7e22f91bff35,"Bicyclingfortransportation, lighteffort",9.3,False,True,{cardio},2025-10-05T19:08:24
+f25effd7-4547-4881-b1eb-4acbea9e3544,"Bicyclingfortransportation, higheffort",9.3,False,True,{cardio},2025-10-05T19:08:24
+0febb2fd-0452-433b-b051-0e6aaf6e650b,E-bike(electricallyassisted)fortransportation,6.8,False,True,{other},2025-10-05T19:08:24
+97c00597-9955-429d-972f-587c4e0e26be,Automobileorlighttruck(notasemi)driving,2.0,False,True,{other},2025-10-05T19:08:24
+9e2eefd9-da74-45d4-9de3-70bf13e156dc,Ridinginacarortruck,1.3,False,True,{other},2025-10-05T19:08:24
+c66e18ef-302a-4f19-a527-06cc5cb7806e,Ridinginabusortrain,1.3,False,True,{other},2025-10-05T19:08:24
+2c79f513-77ec-4fe2-b4b0-811a39e19a12,Flyingairplaneorhelicoptor,1.8,False,True,{other},2025-10-05T19:08:24
+f65da589-19db-45ba-93f0-90123b7f6190,"Motorscooter, motorcycle",2.8,False,True,{cardio},2025-10-05T19:08:24
+745dc2c8-94aa-49c7-b0bf-036adb36db36,Pullingrickshaw,6.3,False,True,{other},2025-10-05T19:08:24
+22db368a-66d5-4295-96a3-84218df473e2,Pushingplaneinandoutofhangar,6.0,False,True,{other},2025-10-05T19:08:24
+21954d08-ff43-4512-9f96-ee943a3863f7,"Truck, semi, tractor, ≥1ton, orbus, driving",2.5,False,True,{other},2025-10-05T19:08:24
+197aaf74-bdc4-4227-86de-0d8ba427b0b2,"Walkingfortransportation, 2.8-3.2mph, level, moderate pace, firmsurface",3.5,False,True,{cardio},2025-10-05T19:08:24
+cf89c3c6-c8b0-43b5-af55-f6930d37c153,Backpacking(TaylorCode050),7.0,False,True,{cardio},2025-10-05T19:08:24
+8e09b14c-bf15-4a26-b386-daca4ef82d30,"Walkingwithadaypack, levelground, assumedinthecity",3.5,False,True,{cardio},2025-10-05T19:08:24
+48ea0c9c-c40c-42e3-9a60-91933daebcf4,"Backpacking, hikingwithadaypack, organizedwalkingwithdaypack",7.8,False,True,{cardio},2025-10-05T19:08:24
+11afcaf3-a54e-4528-ba94-a613f7130448,"Carrying5to14lb(2.3to6.4kg)load(e.g.suitcase, boxes, groceries), levelground, moderate pace",4.0,False,True,{cardio},2025-10-05T19:08:24
+c6c89ab0-e3bc-49cb-b1a3-0da13899ba6e,"Carrying15-155lb(6.8-70.4kg)load(e.g.suitcase, boxes, furniture), levelgroundordownstairs, slowpace",4.5,False,True,{cardio},2025-10-05T19:08:24
+0ead7392-3cd1-4906-b771-c3122f192352,"Carrying50to150poundload(e.g., equineorbovinefeed, fencepipes, furniture), levelground, moderate pace",6.5,False,True,{cardio},2025-10-05T19:08:24
+620b7efb-28a6-4295-a52a-b3516f49af44,"Carrying~10lbchild, slowwalking",2.3,False,True,{cardio},2025-10-05T19:08:24
+fb378861-8251-45ac-8028-a116884054b7,"Carryingloadupstairs, general",8.3,False,True,{cardio},2025-10-05T19:08:24
+6513c921-81f5-48d5-bed0-559b2ffa6517,"Carryingload, 1to15lbload, upstairs",5.5,False,True,{cardio},2025-10-05T19:08:24
+5e61f4f4-6313-4726-8524-1710e609ae58,"Carryingload, 16to24lbload, upstairs",6.0,False,True,{cardio},2025-10-05T19:08:24
+4d7e9324-b19a-4367-94fc-686d489c22d8,"Carryingload, 25to49lbload, upstairs",8.0,False,True,{cardio},2025-10-05T19:08:24
+7895a154-9023-4c9b-8ce7-dc3c37cb306b,"Carryingload, 50to74lbload, upstairs",10.0,False,True,{cardio},2025-10-05T19:08:24
+bb15d8fc-1e75-4bbb-99a2-958667cdbcae,"Carryingload, >74lbload, upstairs",12.0,False,True,{cardio},2025-10-05T19:08:24
+3ca4ceae-16e8-4c59-a0c1-7f7f085939fb,"Loadingand/orunloadingacar, impliedwalking",3.8,False,True,{cardio},2025-10-05T19:08:24
+bfb8dcf5-17e7-46c1-a907-340d261704f5,"Climbinghills, noload, 5to20%grade, veryslowpace",5.0,False,True,{cardio},2025-10-05T19:08:24
+cc044bf4-b1f3-4409-ad10-a51d6e4d2627,"Climbinghills, 15-50lbload, 1to2%grade, slowpace",3.8,False,True,{cardio},2025-10-05T19:08:24
+b5d873e9-194e-430f-aa6d-f5f467be75ff,"Climbinghills, noload, 1to5%grade, moderate-to-briskpace",5.3,False,True,{cardio},2025-10-05T19:08:24
+1a951cf9-3aa3-4cd4-8418-a02c91dce8cc,"Climbinghills, noload, 6to10%grade, moderate-to-briskpace",7.0,False,True,{cardio},2025-10-05T19:08:24
+d69fb28b-8f5c-4a9e-922e-846698b790b0,"Climbinghills, noload, 11to20%grade, slow-to-moderate pace",8.8,False,True,{cardio},2025-10-05T19:08:24
+c9da7394-aca4-4414-8876-4c5b7e3f2272,"Climbinghills, noload, 4.0to5.0mph, 3to5%grade, veryfastpace",10.0,False,True,{cardio},2025-10-05T19:08:24
+7d0b2d91-68d6-4a03-b8e3-79377672b0e6,"Climbinghills, noload, steepgrade(30%), slowpace(lessthan1.2mph)",8.5,False,True,{cardio},2025-10-05T19:08:24
+91dd6396-0e36-45ab-8942-5f673c732dbd,"Climbinghills, noload, verysteepgrade(30-40%), 1.2to1.8mph",15.5,False,True,{cardio},2025-10-05T19:08:24
+549c9cd9-73b6-4b96-8007-4c7f87a9b685,"Climbinghills, noload, steepgrade(10-40%), 1.8to5.0mph",16.3,False,True,{cardio},2025-10-05T19:08:24
+4be61796-21d0-4e2e-a57a-7b7b0a71bd1b,"Climbinghills, 10to20lbload, 5to10%grade, moderate",6.5,False,True,{cardio},2025-10-05T19:08:24
+e8b2589c-9dc0-4b5d-bb12-88f23cf16271,"Climbinghills, 21to40lbload, 3to10%grade, moderate-to-briskpace",7.5,False,True,{cardio},2025-10-05T19:08:24
+706e5560-b570-4eca-99ed-3d1a574d2af2,"Climbinghills, 20+poundload, 5to20%grade, moderatetobriskpace",10.0,False,True,{cardio},2025-10-05T19:08:24
+82ba4714-c3bf-487a-a32d-028a5c5dcecd,Descendingstairs,3.5,False,True,{cardio},2025-10-05T19:08:24
+d661f0d4-fd5f-415a-9d59-b0f173635f29,"Haulingwater, headhauling, walkingonflatsurface",4.5,False,True,{cardio},2025-10-05T19:08:24
+9c64a7f9-00ff-4290-9eb7-61b32ef9ed00,"Hiking, crosscountry(TaylorCode040)",6.0,False,True,{cardio},2025-10-05T19:08:24
+a921e7be-dfcb-4bdd-9775-122039837174,"Hikingslowlyoramblingthroughfieldsandhillsides, noload",3.8,False,True,{cardio},2025-10-05T19:08:24
+c204dbe7-2262-4bcc-aa14-4b80d7ecf605,"Hikingorwalkingatanormalpacethroughfieldsandhillsides, noload",5.3,False,True,{cardio},2025-10-05T19:08:24
+a3267838-fbd7-4aff-a1e4-3ceee7672000,"Birdwatching, walkingandstopping",2.5,False,True,{cardio},2025-10-05T19:08:24
+fb3ac5e8-1cc2-4f07-98e4-fbe4c9fc1f98,"Marching, moderatespeed, military, nopack",4.5,False,True,{cardio},2025-10-05T19:08:24
+fd395485-ccc0-40e4-a78e-2f61e0bf8c55,"Marchingrapidly, military, nopack",8.0,False,True,{cardio},2025-10-05T19:08:24
+d20f5dff-6c10-47a8-8650-18b05858b742,"Pushingorpullingstrollerwithchildorwalkingwithchildren, 2.5to3.1mph",3.8,False,True,{cardio},2025-10-05T19:08:24
+f0ad946e-f63f-49be-b80f-d4db706629c4,"Pushingawheelchair, non-occupational",3.8,False,True,{occupation},2025-10-05T19:08:24
+e80c6107-db50-4eaf-9d28-7af2f4d76c06,Racewalking,6.5,False,True,{cardio},2025-10-05T19:08:24
+2234da7d-779f-44d5-bdf6-8569f182117e,"Stairclimbing, usingorclimbingupladder(TaylorCode030)",8.0,False,True,{cardio},2025-10-05T19:08:24
+69fc759c-f308-4d44-bc40-ff3d8cfbb1eb,"Stairclimbing, general",6.8,False,True,{cardio},2025-10-05T19:08:24
+be705ab9-7332-4288-adbf-3042375508b4,"Stairclimbing, slowpace",4.5,False,True,{cardio},2025-10-05T19:08:24
+91ef167d-f112-4627-98bb-9a90217a2c2b,"Stairclimbing, fastpace, onestepatatime",9.3,False,True,{cardio},2025-10-05T19:08:24
+50b365f1-72de-44ae-a944-90c9925e7fc1,"Stairclimbing, twostepsatatime",7.5,False,True,{cardio},2025-10-05T19:08:24
+6284ef5a-ab01-4039-bdd0-a5e749a57901,"Stairclimbing, ascendinganddescendingstairs",7.5,False,True,{cardio},2025-10-05T19:08:24
+8af68fc7-b69d-4b0e-8a81-4ee4a895ecdd,"Usingcrutches, levelground, general",4.5,False,True,{cardio},2025-10-05T19:08:24
+635d2d24-e771-4ab9-8076-f6460d94b27f,"Usingcrutches, fastpace",7.0,False,True,{cardio},2025-10-05T19:08:24
+be367ded-3e17-4ec4-b6f6-e5fe8ddc552e,Usingmedicalkneescooter,4.3,False,True,{cardio},2025-10-05T19:08:24
+ae83442e-2c50-4069-b540-7190ecb5fd44,"Walking, household",2.3,False,True,{cardio},2025-10-05T19:08:24
+f4253d73-5750-4ea6-a4cf-1f3639d4d0f8,"Walking, lessthan2.0mph, level, strolling, veryslow",2.3,False,True,{cardio},2025-10-05T19:08:24
+5ad4c67d-2689-46a6-9c33-3a43c0be9bcc,"Walking, 2.0to2.4mph, level, slowpace, firmsurface",2.8,False,True,{cardio},2025-10-05T19:08:24
+9af404c2-b882-4010-b3a0-91ee189cc6dd,Walkingforpleasure(TaylorCode010),3.5,False,True,{cardio},2025-10-05T19:08:24
+df50d2c0-640c-45e9-9329-b46dbb983c74,"Walkingfromhousetocarorbus, fromcarorbustogoplaces, fromcarorbustoandfromtheworksite",2.5,False,True,{cardio},2025-10-05T19:08:24
+e5a10c9e-535d-4553-9ce9-0aa4cb51927f,Walkingtoneighbor’shouseorfamily’shouseforsocialreasons,2.5,False,True,{cardio},2025-10-05T19:08:24
+06543545-5973-43f3-8bcb-b41176badcc1,Walkingthedog,3.0,False,True,{cardio},2025-10-05T19:08:24
+ea27a657-154b-412b-a72d-8afcd9e8adb4,"Walking, 2.5mph, firm, levelsurface",3.0,False,True,{cardio},2025-10-05T19:08:24
+d4fcf638-2c76-46b1-a946-b9bde0e4ffc0,"Walking, 2.5mph, downhill",3.3,False,True,{cardio},2025-10-05T19:08:24
+c2948a8e-5664-40e7-9f1f-14e16b84e88d,"Walking, 2.8to3.4mph, level, moderate pace, firmsurface",3.8,False,True,{cardio},2025-10-05T19:08:24
+464b74c7-eceb-4297-b382-a3ebcd7cdcbf,"Walking, 3.5to3.9mph, level, brisk, firmsurface, walkingforexercise",4.8,False,True,{cardio},2025-10-05T19:08:24
+df497eb9-51a5-4fd3-ad8c-f37782f207ee,"Walking, 4.0to4.4mph(6.4to7.0km/h), level, firmsurface, verybriskpace",5.5,False,True,{cardio},2025-10-05T19:08:24
+6fd17e42-65bb-4faa-b0f4-da51a5a47b3e,"Walking, 4.5to4.9mph, level, firmsurface, very, verybrisk",7.0,False,True,{cardio},2025-10-05T19:08:24
+7e7948c7-5db0-463b-aaab-dd1e85164591,"Walking, 5.0to5.5mph(8.8to8.9km/h), level, firmsurface",8.5,False,True,{cardio},2025-10-05T19:08:24
+6d022cf1-877b-476c-8fa6-f1cdca7cbbcc,"Walking, forpleasure, workbreak(TaylorCodexxx)",3.5,False,True,{cardio},2025-10-05T19:08:24
+e28bde0c-d9fa-4bee-b6d4-fa8c4b5cc80a,"Walking, self-selected speed, indoortrackoroutdoors, firmsurface",4.0,False,True,{cardio},2025-10-05T19:08:24
+99b4842c-3561-4513-8503-20d5326433c0,"Walking, grasstrack",4.8,False,True,{cardio},2025-10-05T19:08:24
+3213114a-5838-4dee-8991-d039d0bcd0fb,"Walking, normalpace, plowedfieldorsand",4.5,False,True,{cardio},2025-10-05T19:08:24
+86b5716e-bac6-43c4-800c-c4f01fa4e458,"Walking, toworkorclass(TaylorCode015)",4.0,False,True,{cardio},2025-10-05T19:08:24
+b368b28b-6174-4ee4-a4d5-9dab46b7e48f,"Walking, toandfromanouthouse",2.5,False,True,{cardio},2025-10-05T19:08:24
+2aaaf7ea-03a9-4b40-863c-fbc48e4d8666,"Walking, forexercise, 2.5to3.5mph(4.0to5.6km/h), withskipoles, Nordicwalking, level, moderate pace",4.3,False,True,{cardio},2025-10-05T19:08:24
+d0ef9b66-0bf5-434e-b72c-1a7b97605fd7,"Walking, forexercise, 3.6to4.4mph(5.8to7.1km/h), withskipoles, Nordicwalking, level, moderate pace",5.3,False,True,{cardio},2025-10-05T19:08:24
+5b237bf0-2ff8-42b9-95ea-e4f86f82e0dc,"Walking, forexercise, 4.5to5.0mph, withskipoles, Nordicwalking, level, fastpace",8.5,False,True,{cardio},2025-10-05T19:08:24
+a5bb19cb-359b-4613-add8-3a4b259f3c44,"Walking, forexercise, withskipoles, Nordicwalking, uphill, moderate pace",8.8,False,True,{cardio},2025-10-05T19:08:24
+966f70c8-d14a-47e7-8bd3-18edeac4b72e,"Walking, forexercise, withskipoles, Nordicwalking, levelground, carrying20to30lbload(9.0to15.0kg)",10.8,False,True,{cardio},2025-10-05T19:08:24
+86488819-e8f1-40c7-a501-40a15774755d,"Walking, forexercise, withskipoles, Nordicwalking, uphill, carrying20to30lbload(9.0to15.0kg)",12.3,False,True,{cardio},2025-10-05T19:08:24
+8e4cd070-483c-4388-b24f-90f19567d46f,"Walking, backward, 3.5mph, level",6.0,False,True,{cardio},2025-10-05T19:08:24
+d736082e-d79f-4211-9399-c4b75cf9e4d8,"Walking, backward, 3.5mph, uphill, 5%grade",7.8,False,True,{cardio},2025-10-05T19:08:24
+98266008-98d9-4d02-92ff-a41a00027c64,"Walking, Teabagwalk, MontyPythonMinistryofSillyWalks",8.0,False,True,{cardio},2025-10-05T19:08:24
+c425d629-0b17-417a-b5cc-8e80c74a3447,"Walking, Puteywalk, MontyPythonMinistryofSillyWalks",3.5,False,True,{cardio},2025-10-05T19:08:24
+2d5eab8b-e1ad-4990-810a-d98b350bb573,"Walking, treadmill, lessthan1.0mph, 0%grade",2.1,False,True,{cardio},2025-10-05T19:08:24
+1006199f-d59d-4185-b79a-51a629793083,"Walking, treadmill, 1.0mph, 0%grade",2.3,False,True,{cardio},2025-10-05T19:08:24
+a9132a4a-415d-4f64-8218-bace7e3ab15c,"Walking, treadmill, 1.2to1.9mph, 0%grade(1.9to3.0km/h)",2.8,False,True,{cardio},2025-10-05T19:08:24
+65948519-acac-475a-b4d8-e522a5b7f634,"Walking, treadmill, 2.0to2.4mph(3.2to3.9km/h), 0%grade",3.0,False,True,{cardio},2025-10-05T19:08:24
+c9420dc1-b3c6-434e-8075-37fd9bb3c625,"Walking, treadmill, 2.5to2.9mph(4.0to4.7km/h), 0%grade",3.5,False,True,{cardio},2025-10-05T19:08:24
+341b9f44-e84e-4620-bec8-95e699395577,"Walking, treadmill, 3.0to3.4mph(4.8to5.5km/h), 0%grade",3.8,False,True,{cardio},2025-10-05T19:08:24
+ad5b3979-3d49-4ed4-ba4f-4296f4b32a05,"Walking, treadmill, 3.5to3.9mph(5.6to6.3km/h), 0%grade",4.8,False,True,{cardio},2025-10-05T19:08:24
+cd4aaa4c-940b-4019-9915-c096b951aa01,"Walking, treadmill, 4.0to4.4mph(6.4to7.1km/h), 0%grade",5.8,False,True,{cardio},2025-10-05T19:08:24
+bc883311-96aa-4e00-97f9-d33891cb8dee,"Walking, treadmill, 4.5to4.9mph(7.2to7.9km/h), 0%grade",6.8,False,True,{cardio},2025-10-05T19:08:24
+e4349f22-7bb4-4e2e-9ac4-4c4b383a3370,"Walking, treadmill, 5.0to5.5mph(8.0to8.9km/h), 0%grade",8.3,False,True,{cardio},2025-10-05T19:08:24
+48aa6bb8-fe59-44f8-becd-5f5fb1d2119e,"Walking, treadmill, downhill(-3%to-12%grade), 2.8to3.1mph",3.3,False,True,{cardio},2025-10-05T19:08:24
+2e6e6195-765b-4af2-9e9b-a81161714475,"Walking, treadmill, downhill(-5%to-25%grade), 2.8mph, withNordicPoles",3.3,False,True,{cardio},2025-10-05T19:08:24
+876202cf-d995-451b-be3b-fcb71b3da1e2,"Walking, treadmill, 2.5mph, 0%grade, 5to20degreesC, 40lb(18.2kg)load",4.8,False,True,{cardio},2025-10-05T19:08:24
+1da3ab8e-9e4f-4f20-b3cb-ce07737628d1,"Walking, treadmill, 2.5mph, 0%grade, -10to0degreesC, 40lb(18.2kg)load",5.8,False,True,{cardio},2025-10-05T19:08:24
+70c48d6d-aec2-472c-818e-537ac8bc323c,"Walking, Curvedtreadmill, 3.0to5.0mph, briskpace",8.3,False,True,{cardio},2025-10-05T19:08:24
+4d56c8ec-f910-411b-b904-498b55247de8,"Walkingtreadmill, backwards, 2.5mph, +10%grade",7.8,False,True,{cardio},2025-10-05T19:08:24
+5390fe31-dbdd-483e-baec-baa4cc5a2d23,"Walking, withawalkerorstep-togaitontreadmill, 0.7mph(1.1km/h), 0%grade",1.5,False,True,{cardio},2025-10-05T19:08:24
+7494dde0-65d7-4934-a87b-4b927cc15c9c,"Boating, power, driving",2.5,False,True,{other},2025-10-05T19:08:24
+d27ce898-2322-45e9-858e-3cbcda9b0023,"Boating, power, passenger, light",1.3,False,True,{other},2025-10-05T19:08:24
+0f0727af-23e9-49c7-a708-53c5ad4eca94,"Canoeing, oncampingtrip(TaylorCode270)",4.0,False,True,{other},2025-10-05T19:08:24
+ee0c8e5b-6306-43a4-b8c6-848e8c0ffd9e,"Canoeing, harvestingwildrice, knockingriceoffthestalks",3.3,False,True,{other},2025-10-05T19:08:24
+01582d3e-388e-42d1-9262-1bb7a4e47d49,"Canoeing, portaging",7.0,False,True,{other},2025-10-05T19:08:24
+e11d2042-b64d-4ddb-a52d-d23b1357b032,"Canoeing, rowing, 2.0-3.9mph, lighteffort",2.8,False,True,{cardio},2025-10-05T19:08:24
+b63391f3-355e-498e-a440-76b73be7e535,"Canoeing, rowing, 4.0-5.9mph, moderateeffort",5.8,False,True,{cardio},2025-10-05T19:08:24
+8890fa79-30a5-4df4-badc-3b87f81b58c1,"Canoeing, rowing, kayaking, competition, >6mph, vigorouseffort",12.5,False,True,{cardio},2025-10-05T19:08:24
+ccae0902-9387-47a7-9442-c7375ced66aa,"Canoeing, rowing, forpleasure, general(TaylorCode250)",3.5,False,True,{cardio},2025-10-05T19:08:24
+16bd8e45-87b8-4631-a284-2821cb1af496,"Canoeingorrowing, incompetition, creworsculling(TaylorCode260)",12.0,False,True,{cardio},2025-10-05T19:08:24
+1639e1fd-b0ff-43be-b11f-d23a554ae41c,"Diving, springboardorplatform",3.0,False,True,{other},2025-10-05T19:08:24
+cf91c10a-6dbe-4928-ba5b-36fdc7fc2b96,"Kayaking, moderateeffort",5.0,False,True,{other},2025-10-05T19:08:24
+5a91df39-95dd-485a-aa83-8c953cd0a570,"Kayaking, competition",13.5,False,True,{other},2025-10-05T19:08:24
+7a90c521-10fe-4205-b866-664bda185a87,"Kayaking, slalom, flatwater",9.0,False,True,{other},2025-10-05T19:08:24
+52b5758b-c897-4128-84f6-f79981965356,Paddleboat,4.0,False,True,{other},2025-10-05T19:08:24
+d9869d2b-0fa4-47f3-94bb-4a6c53bcc281,"Rowing, simulatedcrewinawatertank, singleoar, 33strokes/min, ",15.5,False,True,{cardio},2025-10-05T19:08:24
+96e62d34-d474-4798-bd3e-acdbe722f9dd,"Rowing, singlescull, ergometer, ergometeronslides, racingspeed(32+strokes/min, >10mph)",15.5,False,True,{cardio},2025-10-05T19:08:24
+bdeb6ac6-e7ff-4c70-8c30-4297cfb9c1d8,"Sailing, boatandboardsailing, windsurfing, icesailing, general(TaylorCode235)",3.0,False,True,{other},2025-10-05T19:08:24
+119ba366-6ec1-412c-967f-094788c8ce8e,"Sailing, incompetition, general",4.5,False,True,{other},2025-10-05T19:08:24
+c23b5e92-0577-421e-89b7-6170b56ec7d8,"Sailing, incompetition, higheffort",9.3,False,True,{other},2025-10-05T19:08:24
+1c86b175-bfc2-4f0c-b444-eb4125cc4e23,"Sailing, Sunfish/Laser/HobbyCat, Keelboats, oceansailing, yachting, leisure",3.3,False,True,{other},2025-10-05T19:08:24
+1489480c-c9ce-43ec-82fa-eeb9a39560d8,"Sailing, dingy",2.0,False,True,{other},2025-10-05T19:08:24
+782591c1-2998-4528-8dc1-de478556fd97,"Skiing, waterorwakeboarding(TaylorCode220)",6.0,False,True,{cardio},2025-10-05T19:08:24
+5af6a582-ab9a-4bea-83b2-84471fb95de6,"Jetskiing, driving, inwater",7.0,False,True,{cardio},2025-10-05T19:08:24
+b4cb9a16-2ac1-43fa-affb-727c9395ac8b,"Skindiving, fast",15.8,False,True,{cardio},2025-10-05T19:08:24
+5ccd942f-4df0-49f2-9168-184e3b49d2e7,"Skindiving, moderate",11.8,False,True,{cardio},2025-10-05T19:08:24
+43e44f4d-e419-4768-8c22-ecf61004aeb7,"Skindiving, scubadiving, general(TaylorCode310)",7.0,False,True,{cardio},2025-10-05T19:08:24
+e109a2f4-9452-44b4-9922-61d7320d714f,"Scubadiving, general, lighteffort",5.3,False,True,{other},2025-10-05T19:08:24
+ab3f725f-7734-4fc8-8fba-1569323590c5,"Scubadiving, general, moderateeffort",5.8,False,True,{other},2025-10-05T19:08:24
+0400dd0f-afd1-42b6-a144-730b2208668d,"Scubadiving, professionaldiver",5.5,False,True,{other},2025-10-05T19:08:24
+3a17ec99-1406-4baf-abe5-535054043b1a,"Scubadiving, recreationaldiver",6.8,False,True,{other},2025-10-05T19:08:24
+e08f3684-e712-44fd-873f-ab2455d866c9,Snorkeling(TaylorCode320),5.0,False,True,{other},2025-10-05T19:08:24
+d7af50c3-13e5-4534-b0bb-17420db15b6f,"Surfing, bodyorboard, general",3.0,False,True,{other},2025-10-05T19:08:24
+c2264047-7628-48a5-9475-58465f5c0c6a,"Surfboard, paddling",6.8,False,True,{other},2025-10-05T19:08:24
+45529eef-4bcd-4cf7-99a7-30490c9e16b0,"Surfing, bodyorboard, competitive",5.0,False,True,{other},2025-10-05T19:08:24
+94e30ca7-734d-45ac-bf99-47921b0c5650,"Standuppaddleboarding, general",6.5,False,True,{other},2025-10-05T19:08:24
+b3837b8a-13ef-45c5-9fc2-5ec0ff2b149a,"StandupPaddleboard, standing, 10-19strokes/min",2.8,False,True,{other},2025-10-05T19:08:24
+29aec2aa-8570-4a46-b703-0318c1ddaa08,"StandupPaddleboard, standing, 20-29strokes/min",3.8,False,True,{other},2025-10-05T19:08:24
+f94c1fc8-89ff-40a5-8dca-658c9dea8c10,"StandupPaddleboard, standing, 30-39strokes/min",5.0,False,True,{other},2025-10-05T19:08:24
+3a7e8851-57a8-454f-b26e-bb98e964729d,"StandupPaddleboard, standing, 40-49strokes/min",9.8,False,True,{other},2025-10-05T19:08:24
+52f8be36-0d57-4f35-829b-d3e2bee99d35,"StandupPaddleboard, standing, 50-69strokes/min",11.0,False,True,{other},2025-10-05T19:08:24
+d667b377-9f5b-43b1-be97-a360885c9ead,"Swimminglaps, freestyle, fast, vigorouseffort",9.8,False,True,{cardio},2025-10-05T19:08:24
+107ef31f-9530-424c-99ff-e7713abc2ab9,"Swimminglaps, freestyle, slow, recreational",5.8,False,True,{cardio},2025-10-05T19:08:24
+f2429d83-f45f-48ef-a9f1-cf64ea6287c3,"Swimming, backstroke, trainingorcompetition",9.5,False,True,{cardio},2025-10-05T19:08:24
+1a076f8b-be4d-4ae6-8880-78a10bb57ae5,"Swimming, backstroke, recreational",4.8,False,True,{cardio},2025-10-05T19:08:24
+a3740351-6b1c-4719-94b7-a802908359c0,"Swimming, breaststroke, general, trainingorcompetition",10.3,False,True,{cardio},2025-10-05T19:08:24
+d64a7388-8c09-42d2-a086-dbfa4fe23ffd,"Swimmingbreaststroke, recreational",5.3,False,True,{cardio},2025-10-05T19:08:24
+7ba5adc1-c088-4e58-b7e7-e2ab5c93473e,"Swimming, butterfly, general",13.8,False,True,{cardio},2025-10-05T19:08:24
+c5095c7d-985d-45c3-9181-aad476d723c2,"Swimming, crawl, fastspeed, ~75yards/minute, vigorouseffort",10.5,False,True,{cardio},2025-10-05T19:08:24
+c7c3f4a2-ef23-445d-b492-7257ed47ee44,"Swimming, openwater, 5k",10.5,False,True,{cardio},2025-10-05T19:08:24
+6258cfd3-1db1-4927-a488-1cbedcd8d2ba,"Swimming, crawl, mediumspeed, ~50yards/minute, vigorouseffort",8.0,False,True,{cardio},2025-10-05T19:08:24
+ecd5ba5a-1beb-4b74-90ad-93f3c6da0ed5,"Swimming, crawl, slowspeed, 30-45yards/minute, moderateeffort",5.8,False,True,{cardio},2025-10-05T19:08:24
+9974a81c-6e22-4aaa-bdbd-0a89b0fda5ef,"Swimming, crawl, eliteswimmers, competition, >90yards/minute",14.5,False,True,{cardio},2025-10-05T19:08:24
+ff8fe719-8ab2-4b6c-8ef9-060238fadb6d,"Swimming, lake, ocean, river(TaylorCodes280, 295)",6.0,False,True,{cardio},2025-10-05T19:08:24
+dc387ed6-ca52-4ad6-8df7-d51e99272273,"Swimming, leisurely, notlapswimming, general",6.0,False,True,{cardio},2025-10-05T19:08:24
+3c97730f-ebbb-49c8-bcd0-a19eddda8d7e,"Swimming, sidestroke, general",7.0,False,True,{cardio},2025-10-05T19:08:24
+62fe621d-79c4-4c81-a1fe-330b064a53a1,"Swimming, synchronized",8.0,False,True,{cardio},2025-10-05T19:08:24
+f37de129-087b-4ceb-b237-0ef275e8fd91,"Swimming, treadingwater, fast, vigorouseffort",9.8,False,True,{cardio},2025-10-05T19:08:24
+4f60a227-7717-45e5-be95-ea56da469e73,"Swimming, treadingwater, moderateeffort, general",3.5,False,True,{cardio},2025-10-05T19:08:24
+ba917d6d-ac99-4f50-b673-2ecba8ae50eb,"Tubing, floatingonariver, general",2.3,False,True,{other},2025-10-05T19:08:24
+f2b475f3-b1e1-40dc-a074-3eb95080a2c5,"Wateraerobics, watercalisthenics, general",5.5,True,True,{strength},2025-10-05T19:08:24
+eb19f064-f5c1-405a-afb4-dd4d2403ff91,"Wateraerobics, resistanceexercises",3.8,True,True,{strength},2025-10-05T19:08:24
+15159703-867e-487a-96e8-9c6a3eb0e0de,"Wateraerobics, highintensity",7.5,False,True,{cardio},2025-10-05T19:08:24
+51c78ca1-18d6-439f-a57c-61e6c1d1386f,Waterpolo,10.0,False,True,{other},2025-10-05T19:08:24
+82689680-4dab-415f-b452-650cf6b72bd1,Watervolleyball,3.0,False,True,{sports},2025-10-05T19:08:24
+c2e110f8-5226-496c-8dc0-581e8a9bd832,"Waterjogging, vigorouseffort",9.8,False,True,{cardio},2025-10-05T19:08:24
+c3daab80-2052-4870-a72d-fd3b2d23d251,"Waterwalking, lighteffort, slowpace",2.5,False,True,{cardio},2025-10-05T19:08:24
+8852c46c-76df-4fd5-a734-036cb523901d,"Waterwalking, moderateeffort, moderate pace",4.8,False,True,{cardio},2025-10-05T19:08:24
+9ecceb6d-54e2-4d16-8daa-53681a713892,"Waterwalking, vigorouseffort, briskpace",6.8,False,True,{cardio},2025-10-05T19:08:24
+43194563-1f9b-47bd-81bf-ab6a9d7e2a9a,"Whitewaterrafting, kayaking, orcanoeing",5.0,False,True,{other},2025-10-05T19:08:24
+d55a5c4b-419b-4e29-9dc9-e6947302c2f5,"Waterrunning, 30steps/min, slow",6.5,False,True,{cardio},2025-10-05T19:08:24
+4e3b8a51-e2b2-4e66-a2ca-7a11abc4473d,"Waterrunning, 40steps/min, moderate",7.5,False,True,{cardio},2025-10-05T19:08:24
+4bd2af47-d9f6-49a5-80b3-53169775109c,"Waterrunning, 50steps/min, fast",8.5,False,True,{cardio},2025-10-05T19:08:24
+92cdeaa1-f159-49e2-8adb-68a9a1836e79,"Waterrunning, 60steps/min, veryfast",9.8,False,True,{cardio},2025-10-05T19:08:24
+8aa04666-2d42-4793-81ad-fe54de7afddc,"Windsurfing, notpumpingforspeed",5.0,False,True,{other},2025-10-05T19:08:24
+a39170e7-3f5e-4bc5-b635-ec18062d203e,"Windsurfingorkitesurfing, crossingtrial",11.0,False,True,{other},2025-10-05T19:08:24
+2411a9f6-20f9-457c-b7c5-44652fc3c7b5,"Windsurfing, competition, pumpingforspeed",14.0,False,True,{other},2025-10-05T19:08:24
+50a3345c-ac41-40cd-b3db-14cd7aba8aac,"Aquaticcycling, 25W, 40-50RPM",2.8,False,True,{other},2025-10-05T19:08:24
+0687ed9e-6a0a-4cd3-bad9-959c151492b0,"Aquaticcycling, 25W, 60-70RPM",4.8,False,True,{other},2025-10-05T19:08:24
+cf23ddf4-85d4-4730-a4e3-e8c003f6112f,"Aquaticcycling, 50W, 40-50RPM",3.8,False,True,{other},2025-10-05T19:08:24
+8552f58d-de5b-4765-85b9-8f02c58149a5,"Aquaticcycling, 50W, 60-70RPM",6.0,False,True,{other},2025-10-05T19:08:24
+9b0ccc75-471a-43f2-93b1-26c59db3e96a,"Aquaticcycling, 75W, 40-50RPM",5.0,False,True,{other},2025-10-05T19:08:24
+86b2a9f5-aa10-4ce3-a13b-0ec670a4773a,"Aquaticcycling, 75W, 60-70RPM",6.3,False,True,{other},2025-10-05T19:08:24
+e424f979-42a0-48fb-bab7-828146b648a3,"Aquaticcycling, 100W, 40-50RPM",6.3,False,True,{other},2025-10-05T19:08:24
+113fa534-7777-4ca5-87a0-083107ee8295,"Aquaticcycling, 100W, 60-70RPM",7.5,False,True,{other},2025-10-05T19:08:24
+689cf6c8-afb9-45fe-8078-20679f6556a6,"Aquaticcycling, 80-89RPM",8.5,False,True,{other},2025-10-05T19:08:24
+eb5414c0-b013-42b8-8a54-cc13fd0c940c,"Aquaticcycling, 90+RPM",10.3,False,True,{other},2025-10-05T19:08:24
+fe3756ff-9e2b-4c4f-8a0b-601cfe909322,"Dogsledding, mushing",7.5,False,True,{other},2025-10-05T19:08:24
+859d4439-143f-4079-b5f5-1bdf972b3cf9,"Dogsledding, passenger",2.5,False,True,{other},2025-10-05T19:08:24
+7e2cb9de-d327-4690-b6bf-a8822ebed0a9,"Movingicehouse, setup/drillholes",6.0,False,True,{other},2025-10-05T19:08:24
+befb63d3-22a7-4c57-8459-e628e9aab14d,Icefishing,2.0,False,True,{other},2025-10-05T19:08:24
+61a7f2db-424c-4974-b7c1-d78be0eb7fc8,"Skating, icedancing",14.0,False,True,{other},2025-10-05T19:08:24
+44cea4e4-6404-448b-b83a-32569b9bcfaa,"Skating, ice, 9mphorless",5.5,False,True,{other},2025-10-05T19:08:24
+171f0127-fcda-4a12-9223-dbaf6aab5d45,"Skating, ice, general(TaylorCode360)",7.0,False,True,{other},2025-10-05T19:08:24
+0a49c200-073a-4eb8-a4d4-6fc1d86a4e3e,"Skating, ice, rapidly, morethan9mphbutnotcompetitive",9.0,False,True,{other},2025-10-05T19:08:24
+e3dd5209-ca0a-4d1d-8b4d-2e26fb364261,"SkatingTreadmill, 6-6.9mph, 2%grade",9.0,False,True,{other},2025-10-05T19:08:24
+a88faf34-f056-4c3b-9e02-352a5ba3210c,"SkatingTreadmill, 7-7.9mph, 2%grade",10.0,False,True,{other},2025-10-05T19:08:24
+950f759e-1928-4e01-8ff8-42750fdb6578,"SkatingTreadmill, 8-8.9mph, 2%grade",10.5,False,True,{other},2025-10-05T19:08:24
+6c0d53a9-5cf7-4286-9237-53919f30845c,"SkatingTreadmill, 9-9.9mph, 2%grade",11.0,False,True,{other},2025-10-05T19:08:24
+cdef26be-ad81-4f12-b9b0-ef705072a9f7,"Skating, speed, competitive",13.8,False,True,{other},2025-10-05T19:08:24
+fd7c6e6b-e10a-460f-bb6c-ee6f0bed3445,"Skijumping, climbupcarryingskis",7.0,False,True,{cardio},2025-10-05T19:08:24
+72de7a92-76f4-4a5a-9f1c-e994b8c4b415,"Skiing, general",7.0,False,True,{cardio},2025-10-05T19:08:24
+76ef55a9-fda4-4dcc-a7f6-96464e86211a,"Skiing, crosscountry, 2.5mph, sloworlighteffort, skiwalking",6.8,False,True,{cardio},2025-10-05T19:08:24
+66ca5916-92ce-4aa9-91ae-4e128f7d463a,"Skiing, crosscountry, 4.0-4.9mph, moderatespeedandeffort, general",8.5,False,True,{cardio},2025-10-05T19:08:24
+fcc55357-287d-4a64-aa37-6a023f0c4720,"Skiing, crosscountry, 5.0-7.9mph, briskspeed, vigorouseffort",11.3,False,True,{cardio},2025-10-05T19:08:24
+44844a87-bdac-44ca-8a6e-e48b782bd05e,"Skiing, crosscountry, eliteskier, >8.0-11.9mph, racing",14.0,False,True,{cardio},2025-10-05T19:08:24
+a7351857-d61e-453a-a4cc-d05f1c952b2c,"Skiing, crosscountry, 12-16mph, eliteskier, racing",16.0,False,True,{cardio},2025-10-05T19:08:24
+a18d825a-7cbb-4b73-9b9d-a409e362db45,"Skiing, cross-countryskiinghigh-intensitytraining",9.5,False,True,{cardio},2025-10-05T19:08:24
+a56c7b10-33a2-4ebc-9d82-177868ef45e7,"Skiing, crosscountry, hardsnow, uphill, maximum, snowmountaineering",15.5,False,True,{cardio},2025-10-05T19:08:24
+dc51a479-b61a-46f2-92fd-b33ff119e59b,"Skiing, cross-country, skating",13.3,False,True,{cardio},2025-10-05T19:08:24
+22265d1c-7f56-4053-b110-86823cecc52d,"Skiing, cross-country, biathlon, skatingtechnique",13.5,False,True,{cardio},2025-10-05T19:08:24
+c506ad95-ab85-4ff3-a4ec-606862abb745,"Biathlontraining, 5degreeincline, 8km/h(5mph), with/withoutrifle",12.8,False,True,{other},2025-10-05T19:08:24
+260cd45c-4593-4028-b38e-4a8fd509250f,"Biathlontraining, 5degreeincline, 10.7km/h(5mph), with/withoutrifle",12.8,False,True,{other},2025-10-05T19:08:24
+1affa70b-7d79-4604-a074-e42ab73064bc,"Skiing, slalom",9.3,False,True,{cardio},2025-10-05T19:08:24
+f64f6e93-4357-474d-b653-44750e556a43,"Skiing, downhill, alpineorsnowboarding, lighteffort, activetimeonly",4.3,False,True,{cardio},2025-10-05T19:08:24
+931c406a-a789-48d5-a72b-dec23105f322,"Skiing, downhill, alpineorsnowboarding, moderateeffort, general, activetimeonly",6.3,False,True,{cardio},2025-10-05T19:08:24
+8c8fc210-18c8-4f9f-aa3a-e33104b0cbfa,"Skiing, downhill, alpineorsnowboarding, vigorouseffort, activetimeonly",8.0,False,True,{cardio},2025-10-05T19:08:24
+51d4ed09-710e-4ac3-984f-b6b5c52e0f38,"Skiing, Alpineskiinghigh-intensitytraining",7.3,False,True,{cardio},2025-10-05T19:08:24
+0cd9b8b1-4ee2-4604-82d6-2e12fc95e1bc,"Sledding, tobogganing, bobsledding, luge(TaylorCode370)",7.0,False,True,{other},2025-10-05T19:08:24
+2664ac57-804b-4dc3-95e9-8f8512933fee,"Snowshoeing, moderateeffort",5.3,False,True,{other},2025-10-05T19:08:24
+74cbb0dd-f2d5-4957-b407-f7aa09bc07dd,"Snowshoeing, vigorouseffort",10.0,False,True,{other},2025-10-05T19:08:24
+cc448ea1-fc4c-4d36-878c-fa901c0c77be,"Snowmobiling, driving, moderate pace, flatland",3.8,False,True,{other},2025-10-05T19:08:24
+3845d77d-a54e-4122-87ee-649d8f38eb29,"Snowboarding, recreational, moderate pace, mountain",7.5,False,True,{other},2025-10-05T19:08:24
+811b4ef6-6f3d-49c1-90df-2d9121e76c2b,"Snowmobiling, passenger, light",2.0,False,True,{other},2025-10-05T19:08:24
+68556177-153a-4e28-8b46-b9cb2f8d7410,"Snowshoveling, byhand, moderateeffort",5.3,False,True,{other},2025-10-05T19:08:24
+25b6504c-5d98-4df0-bb73-4c959de397e0,"Snowshoveling, byhand, vigorouseffort",7.5,False,True,{other},2025-10-05T19:08:24
+617381ff-3517-4a4a-9c33-46a9d2190fe1,"Snowblower, walkingandpushing",2.5,False,True,{cardio},2025-10-05T19:08:24
+3c3f9326-5412-405f-aa53-f03ec0e86357,"Skiing, roller, eliteracers",12.5,False,True,{cardio},2025-10-05T19:08:24
+f0fdea1e-9a78-4ddf-b162-eefc81eea6d6,"Rollerskiing, 10-12.9km/h, noincline",5.5,False,True,{cardio},2025-10-05T19:08:24
+0d5e9b88-35c7-49e3-82a5-f6e6c9b15810,"Rollerskiing, 13-16.9km/h, noincline",6.8,False,True,{cardio},2025-10-05T19:08:24
+049f9d09-0db0-4936-b23d-e999a3b3531d,"Rollerskiing, 17-19.9km/h, noincline",8.3,False,True,{cardio},2025-10-05T19:08:24
+2a1f645a-a87b-4a9a-8c9c-f82a1295b681,"Rollerskiing, 20-23.9km/h, noincline",10.5,False,True,{cardio},2025-10-05T19:08:24
+1894ea15-1617-4403-8520-aba16d8de1db,"Rollerskiing, 24-27.9km/h, noincline",15.0,False,True,{cardio},2025-10-05T19:08:24
+6a29e38c-b1f3-4058-8b76-f17c08ebf2f5,"Rollerskiing, 10-15km/h, 2-5degreeincline",12.5,False,True,{cardio},2025-10-05T19:08:24
+821e0865-b911-4f26-b5bb-1d2a825c3599,"Rollerskiing, 16-22km/h, 2-5degreeincline",14.3,False,True,{cardio},2025-10-05T19:08:24
+6fb75f14-a198-4257-b7bc-de9997ea0073,"Rollerskiing, 6-9km/h, 6-10degreeincline",12.3,False,True,{cardio},2025-10-05T19:08:24
+ed748874-0a82-4de1-8500-725486e65024,"Rollerskiing, >10km/h, 6-10degreeincline",16.0,False,True,{cardio},2025-10-05T19:08:24
+27472727-a533-4f4f-bcab-bb0b9060f70f,"Mountaineering, downhillclimbing, walkingdownwithrope",9.0,False,True,{cardio},2025-10-05T19:08:24
+3669ca88-9a56-4d8e-b79a-ca460474601e,"Mountaineering, downhillclimbing/cross-countryskiing",10.3,False,True,{cardio},2025-10-05T19:08:24
+a52525fb-8f58-49bd-95c2-1a7ad21e0344,"Sittinginchurch, inservice, attendingaceremony, sittingquietly",1.0,False,True,{other},2025-10-05T19:08:24
+e7e7ae1c-8d9a-48a7-b9e4-aaa8cbdda361,"Sitting, playinganinstrumentatchurch",2.0,False,True,{other},2025-10-05T19:08:24
+cf65a7e8-55f0-49a8-90e8-ac2b17860afe,"Sittinginchurch, talkingorsinging, attendingaceremony, sitting, activeparticipation",1.8,False,True,{other},2025-10-05T19:08:24
+4baad470-b1e0-4947-94ca-cbbeb66d8e98,"Sitting, readingreligiousmaterialsathome",1.5,False,True,{other},2025-10-05T19:08:24
+bf8d7a8b-8127-4af1-af6f-b7cd904503f7,"Standingquietlyinchurch, attendingaceremony",1.3,False,True,{other},2025-10-05T19:08:24
+d15a7d85-a027-4fc5-8c8b-8eb7ea4b7193,"Standing, singinginchurch, attendingaceremony, standing, activeparticipation",2.0,False,True,{other},2025-10-05T19:08:24
+460f3ecd-aa7e-4ef7-a9ca-48c79961662a,"Kneelinginchurchorathome, praying",1.3,False,True,{other},2025-10-05T19:08:24
+2cc59d5a-6d30-49ba-84b2-3cb64fb9f7ef,"Standing, talkinginchurch",1.3,False,True,{other},2025-10-05T19:08:24
+d53f703d-915d-4121-94a4-c6c795353d78,Walkinginchurch,2.0,False,True,{cardio},2025-10-05T19:08:24
+edaea0e3-7dcf-42e6-bab6-e86c443e23db,"Walking, lessthan2.0mph, veryslow",2.0,False,True,{cardio},2025-10-05T19:08:24
+c7537cb0-6dd4-4ef9-8132-089a78ce73db,"Walking, 2.8to3.4mph, moderatespeed, notcarryinganything",3.8,False,True,{cardio},2025-10-05T19:08:24
+7a364183-f331-439e-9775-47e0c08405b9,"Walking, 3.5to3.9mph, briskspeed, notcarryinganything",4.8,False,True,{cardio},2025-10-05T19:08:24
+d9defa53-7d26-46ac-b097-b74a882073da,"Walk/standcombinationforreligiouspurposes, usher",2.0,False,True,{cardio},2025-10-05T19:08:24
+b2e01eb2-fc63-40e8-a304-a4c433197298,"Praisewithdanceorrun, spiritualdancinginchurch",5.0,False,True,{cardio},2025-10-05T19:08:24
+0a9c17ff-eed9-4bf2-9341-bf971e04f7c1,Servingfoodatchurch,2.3,False,True,{other},2025-10-05T19:08:24
+f5cd642e-f48b-4fde-b522-3457bcd14bfa,Preparingfoodatchurch,2.0,False,True,{other},2025-10-05T19:08:24
+dc8bad57-9c87-4bd3-8a00-bd69dcf62527,"Washingdishes, cleaningkitchenatchurch",3.3,False,True,{household},2025-10-05T19:08:24
+d6ef9dd0-23da-4ae0-83d3-2cac4a4e557a,Eatingatchurch,1.5,False,True,{other},2025-10-05T19:08:24
+bf3a3cd6-f160-46de-92c6-fb3ce75d2189,"Eating/talkingatchurchorstandingeating, AmericanIndianFeastdays",2.0,False,True,{other},2025-10-05T19:08:24
+4f4a598d-d1d6-4f1f-bbde-dafa60a6c1df,Cleaningchurch,3.3,False,True,{household},2025-10-05T19:08:24
+a92b9c94-180b-40ed-a494-2ae8e8e0fb7b,Generalyardworkatchurch,4.0,False,True,{other},2025-10-05T19:08:24
+e38131c9-d871-4b6d-b5fc-b46c2de06de3,"Standing, moderateeffort(e.g., liftingheavyobjects, assemblingatfastrate)",3.8,False,True,{other},2025-10-05T19:08:24
+64cd9a1d-40b8-409f-9886-9b84ad02e36a,"Standing, moderate-to-heavyeffort, manuallabor, lifting≥50lbs, heavymaintenance",4.5,False,True,{other},2025-10-05T19:08:24
+7edf77f3-e481-47ea-9bc2-e18d0dd79cc9,"Typing, electric, manual, orcomputer",1.3,False,True,{other},2025-10-05T19:08:24
+5961286e-c003-4a0e-b7fa-8b5276d6421b,"Sitting, meeting, general, and/orwithtalkinginvolved",1.3,False,True,{other},2025-10-05T19:08:24
+d2162f18-3cdd-44f3-92d1-d244233e71a5,"Sitting, lightofficework, ingeneral",1.5,False,True,{other},2025-10-05T19:08:24
+5b87f5c5-98f9-4c40-a104-5348ca189676,"Sitting, moderatework",2.5,False,True,{other},2025-10-05T19:08:24
+db2c9db5-6c10-4d9d-919f-f3f51cd54df5,"Standing, lightwork(filing, talking, assembling)",1.8,False,True,{other},2025-10-05T19:08:24
+89a4e3f2-9ca0-4084-bfb0-4c743d4513fe,"Sitting, childcare, onlyactiveperiods",2.0,False,True,{other},2025-10-05T19:08:24
+daa8f050-9e75-43ac-bbf1-2b351a14233e,"Standing, childcare, onlyactiveperiods",3.5,False,True,{other},2025-10-05T19:08:24
+3bc475b7-2107-4f5a-ac31-a7cd2bd0a51b,"Walk/runplaywithchildren, moderate, onlyactiveperiods",3.5,False,True,{cardio},2025-10-05T19:08:24
+1563322b-0ab6-498f-85d6-6946629d5653,"Walk/runplaywithchildren, vigorous, onlyactiveperiods",5.8,False,True,{cardio},2025-10-05T19:08:24
+a5fb8b05-4ac5-4c38-a012-e34aff643f58,"Standing, light/moderatework(e.g., packboxes, assemble/repair, setupchairs/furniture)",3.3,False,True,{other},2025-10-05T19:08:24
+4e5ed6d3-20de-4567-9ef3-b08dfeb2676d,"Standing, moderate(e.g., lifting50lbs., assemblingatfastrate)",3.5,False,True,{other},2025-10-05T19:08:24
+0dda8de2-c748-4061-a801-93c4e497fec8,"Standing, moderate/heavywork",4.5,False,True,{other},2025-10-05T19:08:24
+15113e26-5474-4171-9250-c7c53eb5234b,"Typing, electric, manual, orcomputer",1.3,False,True,{other},2025-10-05T19:08:24
+ccd621de-a838-4e5e-a5f1-0d245f3e0319,"Walking, lessthan2.0mph, veryslow",2.3,False,True,{cardio},2025-10-05T19:08:24
+025ad3fd-74fc-48c2-aed3-9dfdc8a585ea,"Walking, 2.8to3.4mph, moderatespeed, notcarryinganything",3.8,False,True,{cardio},2025-10-05T19:08:24
+e8366c44-f95a-4e9a-882c-eb9e5475a284,"Walking, 3.5to3.9mph, briskspeed, notcarryinganything",4.8,False,True,{cardio},2025-10-05T19:08:24
+b854946e-89f5-4589-b7ca-f6abcec01d82,"Walking, 2.5mphslowlyandcarryingobjectslessthan25pounds",3.5,False,True,{cardio},2025-10-05T19:08:24
+b82f5048-9cb2-4ae5-9a60-491d45be32bb,"Walking, 3.0mphmoderatelyandcarryingobjectslessthan25pounds, pushingsomething",4.5,False,True,{cardio},2025-10-05T19:08:24
+252c1e5f-058c-4726-bcbc-d247ff7ecad4,"Walking, 3.5mph, brisklyandcarryingobjectslessthan25pounds",4.5,False,True,{cardio},2025-10-05T19:08:24
+15744e7d-ae84-40f7-b308-41dc5793c52f,"Walk/standcombination, forvolunteerpurposes",3.0,False,True,{cardio},2025-10-05T19:08:24
+b621c048-2041-4de4-bb1b-d6eeff2d10dd,"Seated, videogame, handheldcontroller(inactive)",1.3,False,True,{other},2025-10-05T19:08:24
+7be31223-9d1d-403d-a98f-eab36f2ff235,"Videogame, handheldcontroller(lighteffort)",1.5,False,True,{other},2025-10-05T19:08:24
+948b2878-c911-44c0-8111-d2383c498db6,"Videogame, lighteffort(WiiFit, yoga, bowling, etc)",2.3,False,True,{flexibility},2025-10-05T19:08:24
+ab782e0a-f3bc-4b3e-99e3-ff2d1fb81dc2,"Activevideogame, motionsensinggame/usingupperbody(lighttomoderateeffort)",3.0,False,True,{other},2025-10-05T19:08:24
+3c504c38-da29-49c1-ac0b-96a0e154cf14,"Activevideogame, motionsensinggame/usingtotalbody(moderateeffort)",4.0,False,True,{other},2025-10-05T19:08:24
+51d16767-65f2-446e-9ab1-d0a0219a71eb,"Activevideogame, motionsensinggame/usingtotalbody(moderate-to-vigorouseffort)",5.0,False,True,{other},2025-10-05T19:08:24
+484a8231-c903-4094-9bf9-43486e743d32,"Activevideogame, motionsensinggame/usingtotalbody, exergames, workouts, dancing(vigorouseffort)",7.5,False,True,{other},2025-10-05T19:08:24
+97853fd7-97d9-4c19-948b-3daef45a93b5,"Conditioning/exercisevirtualrealityfitness, vigorousintensity",9.8,False,True,{other},2025-10-05T19:08:24

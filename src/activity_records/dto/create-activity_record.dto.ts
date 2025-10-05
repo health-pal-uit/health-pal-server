@@ -28,6 +28,23 @@ export class CreateActivityRecordDto {
   @IsNumber()
   kcal_burned?: number;
 
+  // new fields
+  @ApiProperty({ example: 50, description: 'Load in kilograms' })
+  @IsOptional()
+  @IsNumber()
+  load_kg?: number;
+
+  @ApiProperty({ example: 5, description: 'Distance in kilometers' })
+  @IsOptional()
+  @IsNumber()
+  distance_km?: number;
+
+  @ApiProperty({ example: 70, description: 'User weight in kilograms' })
+  @IsOptional()
+  @IsNumber()
+  user_weight_kg?: number;
+  // end new fields
+
   @ApiProperty({ example: 60, description: 'Resting heart rate' })
   @IsNumber()
   rhr: number;

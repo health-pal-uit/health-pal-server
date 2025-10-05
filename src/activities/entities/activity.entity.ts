@@ -12,14 +12,9 @@ import { ActivityType } from 'src/helpers/enums/activity-type.enum';
 
 @ApiSchema({ name: Activity.name, description: 'Activity entity' })
 @Check(`met_value >= 0`)
-@Check(`kcal_per_rep >= 0`)
-@Check(`kcal_per_hour >= 0`)
 @Entity('activities')
 @Check(
-  `(supports_rep = false AND kcal_per_rep IS NULL) OR (supports_rep = true AND kcal_per_rep IS NOT NULL)`,
-)
-@Check(
-  `(supports_hour = false AND kcal_per_hour IS NULL) OR (supports_hour = true AND kcal_per_hour IS NOT NULL)`,
+  `(supports_rep = false AND supports_hour = true) OR (supports_rep = true AND supports_hour = false)`,
 )
 export class Activity {
   @PrimaryGeneratedColumn('uuid')
@@ -30,12 +25,6 @@ export class Activity {
 
   @Column({ type: 'float' })
   met_value: number;
-
-  @Column({ type: 'float', nullable: true })
-  kcal_per_rep?: number;
-
-  @Column({ type: 'float', nullable: true })
-  kcal_per_hour?: number;
 
   @Column({ type: 'boolean', default: false })
   supports_rep: boolean;
@@ -56,3 +45,7 @@ export class Activity {
   @OneToMany(() => ActivityRecord, (activityRecord) => activityRecord.activity)
   activity_records: ActivityRecord[];
 }
+
+// kcal_burned = met_value × 3.5 × user_weight_kg / 200 × (hours × 60)
+// kcal_per_rep = (met_value × 3.5 × user_weight_kg / 200) × (1 / avg_reps_per_minute)
+// kcal_per_hour = (met_value × 3.5 × user_weight_kg / 200) * 60

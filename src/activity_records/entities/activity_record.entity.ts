@@ -43,6 +43,17 @@ export class ActivityRecord {
   @Column({ type: 'float', nullable: true })
   kcal_burned?: number;
 
+  // new fields
+  @Column({ type: 'float', nullable: true })
+  load_kg?: number;
+
+  @Column({ type: 'float', nullable: true })
+  distance_km?: number;
+
+  @Column({ type: 'float', nullable: true })
+  user_weight_kg?: number;
+
+  // end new fields
   @Column({ type: 'int', nullable: true })
   rhr: number;
 
