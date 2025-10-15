@@ -24,6 +24,14 @@ async function bootstrap() {
     .setDescription('The Health Pal API description')
     .setVersion('1.0')
     .addTag('health-pal')
+    .addBearerAuth({
+      type: 'http',
+      scheme: 'bearer',
+      bearerFormat: 'JWT',
+      name: 'Authenticate',
+      description: 'Enter JWT token',
+      in: 'header',
+    })
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);

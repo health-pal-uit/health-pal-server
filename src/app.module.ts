@@ -37,12 +37,22 @@ import { RolesModule } from './roles/roles.module';
 import { AuthModule } from './auth/auth.module';
 import { ContributionsModule } from './contributions/contributions.module';
 import { SupabaseAdminModule } from './supabase/supabase-admin.module';
+import configuration from './config/configuration';
+import * as joi from 'joi';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: '.env', // Load environment variables from .env file
+      load: [configuration],
+      validationSchema: joi.object({
+        DB_DATABASE: joi.string().required(),
+        DB_USERNAME: joi.string().required(),
+        DB_PORT: joi.number().default(5432),
+        DB_PASSWORD: joi.string().required(),
+        DB_HOST: joi.string().required(),
+      }),
     }),
     TypeOrmModule.forRootAsync(typeOrmConfig),
     UsersModule,
