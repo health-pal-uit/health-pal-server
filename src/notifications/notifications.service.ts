@@ -1,26 +1,41 @@
 import { Injectable } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
+import { Notification } from './entities/notification.entity';
 
 @Injectable()
 export class NotificationsService {
-  create(createNotificationDto: CreateNotificationDto) {
-    return 'This action adds a new notification';
-  }
+  constructor(
+    @InjectRepository(Notification) private notificationRepository: Repository<Notification>,
+    @InjectRepository(User) private userRepository: Repository<User>,
+  ) {}
 
+  sendToUser(createNotificationDto: CreateNotificationDto) {
+    throw new Error('Method not implemented.');
+  }
+  sendToAllUsers(body: { title: string; message: string }) {
+    throw new Error('Method not implemented.');
+  }
   findAll() {
-    return `This action returns all notifications`;
+    throw new Error('Method not implemented.');
   }
-
-  findOne(id: number) {
-    return `This action returns a #${id} notification`;
+  getUserNotifications(id: string) {
+    throw new Error('Method not implemented.');
   }
-
-  update(id: number, updateNotificationDto: UpdateNotificationDto) {
-    return `This action updates a #${id} notification`;
+  getUserUnreadNotifications(id: string) {
+    throw new Error('Method not implemented.');
   }
-
-  remove(id: number) {
+  markAsRead(id: string) {
+    throw new Error('Method not implemented.');
+  }
+  remove(id: string) {
+    // soft delete
     return `This action removes a #${id} notification`;
+  }
+  adminRemove(id: string) {
+    throw new Error('Method not implemented.');
   }
 }

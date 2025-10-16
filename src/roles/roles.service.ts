@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { Role } from './entities/role.entity';
-import { Repository } from 'typeorm';
+import { DeleteResult, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { UpdateResult } from 'typeorm';
 
 @Injectable()
 export class RolesService {
@@ -25,11 +26,11 @@ export class RolesService {
     return await this.roleRepository.findOneBy({ id });
   }
 
-  async update(id: string, updateRoleDto: UpdateRoleDto): Promise<void> {
-    await this.roleRepository.update(id, updateRoleDto);
+  async update(id: string, updateRoleDto: UpdateRoleDto): Promise<UpdateResult> {
+    return await this.roleRepository.update(id, updateRoleDto);
   }
 
-  async remove(id: string): Promise<void> {
-    await this.roleRepository.delete(id);
+  async remove(id: string): Promise<DeleteResult> {
+    return await this.roleRepository.delete(id);
   }
 }

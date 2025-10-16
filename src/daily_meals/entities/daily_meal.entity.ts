@@ -28,6 +28,9 @@ export class DailyMeal {
   @Column({ type: 'float' })
   quantity_kg: number;
 
+  @Column({ type: 'int' })
+  serving: number;
+
   @Column({ type: 'float' })
   total_kcal: number;
 
