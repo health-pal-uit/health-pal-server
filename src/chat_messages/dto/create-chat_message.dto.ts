@@ -39,7 +39,7 @@ export class CreateChatMessageDto {
   chat_session_id!: string;
 
   @ApiProperty({ description: 'ID of the user sending the message' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsUUID('4')
-  user_id!: string;
+  user_id?: string; // will use current user id from auth token if not provided
 }

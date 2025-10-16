@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
+  IsArray,
   IsBoolean,
   IsDateString,
   IsEnum,
@@ -18,30 +19,35 @@ export class CreateMealDto {
   @IsString()
   name!: string;
 
+  @ApiProperty({ example: 100, description: 'Serving size in grams' })
+  @IsOptional()
+  @IsNumber()
+  serving_gr?: number;
+
   @ApiProperty({ example: 250, description: 'Calories per 100g' })
   @IsOptional()
   @IsNumber()
-  kcal_per_100g?: number; // cal later
+  kcal_per_100gr?: number; // cal later
 
-  @ApiProperty({ example: 30, description: 'Protein per 100g' })
+  @ApiProperty({ example: 30, description: 'Protein per 100gr' })
   @IsOptional()
   @IsNumber()
-  protein_per_100g?: number;
+  protein_per_100gr?: number;
 
-  @ApiProperty({ example: 10, description: 'Fat per 100g' })
+  @ApiProperty({ example: 10, description: 'Fat per 100gr' })
   @IsOptional()
   @IsNumber()
-  fat_per_100g?: number;
+  fat_per_100gr?: number;
 
-  @ApiProperty({ example: 40, description: 'Carbohydrates per 100g' })
+  @ApiProperty({ example: 40, description: 'Carbohydrates per 100gr' })
   @IsOptional()
   @IsNumber()
-  carbs_per_100g?: number;
+  carbs_per_100gr?: number;
 
-  @ApiProperty({ example: 5, description: 'Fiber per 100g' })
+  @ApiProperty({ example: 5, description: 'Fiber per 100gr' })
   @IsOptional()
   @IsNumber()
-  fiber_per_100g?: number;
+  fiber_per_100gr?: number;
 
   @ApiProperty({ example: 4.5, description: 'Rating of the meal' })
   @IsOptional()
@@ -73,4 +79,13 @@ export class CreateMealDto {
   @IsOptional()
   @IsUrl()
   image_url?: string | null;
+
+  @IsOptional()
+  @IsDateString()
+  @TransformToISODate()
+  deleted_at?: Date | null;
+
+  @IsOptional()
+  @IsBoolean()
+  made_from_ingredients?: boolean;
 }

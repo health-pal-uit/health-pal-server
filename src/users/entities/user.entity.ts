@@ -27,7 +27,8 @@ import { FavIngre } from 'src/fav_ingres/entities/fav_ingre.entity';
 import { FavMeal } from 'src/fav_meals/entities/fav_meal.entity';
 import { Role } from 'src/roles/entities/role.entity';
 import { PremiumPackage } from 'src/premium_packages/entities/premium_package.entity';
-import { Contribution } from 'src/contributions/entities/contribution.entity';
+import { ContributionIngre } from 'src/contribution_ingres/entities/contribution_ingre.entity';
+import { ContributionMeal } from 'src/contribution_meals/entities/contribution_meal.entity';
 
 @ApiSchema({ name: User.name, description: 'User entity' })
 @Entity('users')
@@ -142,9 +143,15 @@ export class User {
   @OneToMany(() => FavMeal, (favMeal) => favMeal.user)
   fav_meals: FavMeal[];
 
-  @OneToMany(() => Contribution, (contribution) => contribution.author)
-  contributionsAuthored: Contribution[];
+  @OneToMany(() => ContributionIngre, (contribution) => contribution.author)
+  contributionsIngresAuthored: ContributionIngre[];
 
-  @OneToMany(() => Contribution, (contribution) => contribution.reviewer)
-  contributionsReviewed: Contribution[];
+  @OneToMany(() => ContributionIngre, (contribution) => contribution.reviewer)
+  contributionsIngresReviewed: ContributionIngre[];
+
+  @OneToMany(() => ContributionMeal, (contribution) => contribution.author)
+  contributionsMealsAuthored: ContributionMeal[];
+
+  @OneToMany(() => ContributionMeal, (contribution) => contribution.reviewer)
+  contributionsMealsReviewed: ContributionMeal[];
 }

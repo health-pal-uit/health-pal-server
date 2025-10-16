@@ -2,12 +2,23 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsUUID } from 'class-validator';
 import { MealType } from 'src/helpers/enums/meal-type.enum';
 import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
+import { Check } from 'typeorm';
 // isdefined = string passes // whereas notempty = not null and not undefined and not ''
+
+@Check(
+  `total_kcal >= 0 AND total_protein_gr >= 0 AND total_fat_gr >= 0 AND total_carbs_gr >= 0 AND total_fiber_gr >= 0`,
+)
+@Check(`(quantity_kg IS NOT NULL AND quantity_kg > 0) OR (serving IS NOT NULL AND serving > 0)`)
 export class CreateDailyMealDto {
   @ApiProperty({ example: 1, description: 'Quantity in kg' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
-  quantity_kg!: number;
+  quantity_kg?: number;
+
+  @ApiProperty({ example: 1, description: 'Serving size' })
+  @IsOptional()
+  @IsNumber()
+  serving?: number;
 
   @ApiProperty({ example: 250, description: 'Total calories' })
   @IsOptional()
