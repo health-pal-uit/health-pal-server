@@ -1,6 +1,13 @@
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import {
+  Column,
+  DeleteDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 import { Money } from 'src/helpers/transformers/money.transformer';
 
 @ApiSchema({ name: PremiumPackage.name, description: 'PremiumPackage entity' })
@@ -20,6 +27,9 @@ export class PremiumPackage {
 
   @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   updated_at: Date;
+
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+  deleted_at?: Date | null;
 
   // relations
 

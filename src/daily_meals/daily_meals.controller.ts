@@ -1,34 +1,55 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { DailyMealsService } from './daily_meals.service';
 import { CreateDailyMealDto } from './dto/create-daily_meal.dto';
 import { UpdateDailyMealDto } from './dto/update-daily_meal.dto';
+import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
+import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 
 @Controller('daily-meals')
 export class DailyMealsController {
   constructor(private readonly dailyMealsService: DailyMealsService) {}
 
   @Post()
-  create(@Body() createDailyMealDto: CreateDailyMealDto) {
-    return this.dailyMealsService.create(createDailyMealDto);
+  @UseGuards(SupabaseGuard)
+  create(@Body() createDailyMealDto: CreateDailyMealDto, @CurrentUser() user: any) {
+    return this.dailyMealsService.create(createDailyMealDto, user.id);
+  }
+
+  @Post('many')
+  @UseGuards(SupabaseGuard)
+  createMany(@Body() createDailyMealDtos: CreateDailyMealDto[], @CurrentUser() user: any) {
+    return this.dailyMealsService.createMany(createDailyMealDtos, user.id);
   }
 
   @Get()
-  findAll() {
+  @UseGuards(SupabaseGuard)
+  findAll(@CurrentUser() user: any) {
+    const isAdmin = user.role === 'admin';
+    if (!isAdmin) {
+      return this.dailyMealsService.findAllByUser(user.id);
+    }
     return this.dailyMealsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.dailyMealsService.findOne(+id);
+  @UseGuards(SupabaseGuard)
+  findOne(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.dailyMealsService.findOneOwned(id, user.id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateDailyMealDto: UpdateDailyMealDto) {
-    return this.dailyMealsService.update(+id, updateDailyMealDto);
+  @UseGuards(SupabaseGuard)
+  update(
+    @Param('id') id: string,
+    @Body() updateDailyMealDto: UpdateDailyMealDto,
+    @CurrentUser() user: any,
+  ) {
+    return this.dailyMealsService.updateOneOwned(id, updateDailyMealDto, user.id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.dailyMealsService.remove(+id);
+  @UseGuards(SupabaseGuard)
+  remove(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.dailyMealsService.removeOwned(id, user.id);
   }
 }

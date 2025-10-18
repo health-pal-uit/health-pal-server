@@ -21,27 +21,27 @@ export class CreateIngredientDto {
   @ApiProperty({ example: 165, description: 'Calories per 100g' })
   @IsNotEmpty()
   @IsPositive()
-  kcal_per_100g!: number; // must be >= 0
+  kcal_per_100gr!: number; // must be >= 0
 
-  @ApiProperty({ example: 31, description: 'Protein per 100g' })
+  @ApiProperty({ example: 31, description: 'Protein per 100gr' })
   @IsOptional()
   @IsPositive()
-  protein_per_100g?: number; // calculate later
+  protein_per_100gr?: number; // calculate later
 
-  @ApiProperty({ example: 5, description: 'Fat per 100g' })
+  @ApiProperty({ example: 5, description: 'Fat per 100gr' })
   @IsOptional()
   @IsPositive()
-  fat_per_100g?: number;
+  fat_per_100gr?: number;
 
-  @ApiProperty({ example: 0, description: 'Carbohydrates per 100g' })
+  @ApiProperty({ example: 0, description: 'Carbohydrates per 100gr' })
   @IsOptional()
   @IsPositive()
-  carbs_per_100g?: number;
+  carbs_per_100gr?: number;
 
-  @ApiProperty({ example: 0, description: 'Fiber per 100g' })
+  @ApiProperty({ example: 0, description: 'Fiber per 100gr' })
   @IsOptional()
   @IsPositive()
-  fiber_per_100g?: number;
+  fiber_per_100gr?: number;
 
   @ApiProperty({
     example: 'Notes about the ingredient',

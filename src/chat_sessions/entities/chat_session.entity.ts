@@ -1,7 +1,14 @@
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { ChatMessage } from 'src/chat_messages/entities/chat_message.entity';
 import { ChatParticipant } from 'src/chat_participants/entities/chat_participant.entity';
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ChatSessionStatus } from 'src/helpers/enums/chat-session-status.enum';
 
 @ApiSchema({ name: ChatSession.name, description: 'Chat session entity' })
@@ -22,6 +29,9 @@ export class ChatSession {
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
+
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+  deleted_at: Date;
 
   // relations
 

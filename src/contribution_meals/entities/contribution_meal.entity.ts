@@ -1,58 +1,56 @@
-import { ApiProperty, ApiSchema } from '@nestjs/swagger';
+import { Delete } from '@nestjs/common';
+import { IsOptional } from 'class-validator';
+import { ContributionOptions } from 'src/helpers/enums/contribution-options';
+import { ContributionStatus } from 'src/helpers/enums/contribution-status.enum';
+import { ContributionType } from 'src/helpers/enums/contribution-type.enum';
+import { FoodType } from 'src/helpers/enums/food-type.enum';
+import { Meal } from 'src/meals/entities/meal.entity';
+import { User } from 'src/users/entities/user.entity';
 import {
   Check,
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   Index,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   RelationId,
   UpdateDateColumn,
 } from 'typeorm';
-import { FoodType } from '../../helpers/enums/food-type.enum';
-import { User } from 'src/users/entities/user.entity';
-import { ContributionStatus } from '../../helpers/enums/contribution-status.enum';
-import { ContributionType } from '../../helpers/enums/contribution-type.enum';
 
-@ApiSchema({
-  name: 'Contribution',
-  description: 'User-submitted ingredient/meal awaiting moderation',
-})
+@Entity('contribution_meals')
 @Check(`
-  kcal_per_100gr >= 0
+  COALESCE(kcal_per_100gr, 0) >= 0
   AND COALESCE(protein_per_100gr, 0) >= 0
   AND COALESCE(fat_per_100gr, 0) >= 0
   AND COALESCE(carbs_per_100gr, 0) >= 0
   AND COALESCE(fiber_per_100gr, 0) >= 0
 `)
-@Entity('contributions')
-@Index('contrib_status_idx', ['status'])
-@Index('contrib_type_idx', ['type'])
-export class Contribution {
+@Check(`COALESCE(serving_gr, 0) >= 0`)
+@Index('cm_status_meal_idx', ['status'])
+@Index('cm_opt_meal_idx', ['opt'])
+@Index('cm_user_meal_idx', ['author'])
+@Index('cm_created_meal_idx', ['created_at'])
+export class ContributionMeal {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'enum', enum: ContributionType })
-  type: ContributionType;
-
-  // Polymorphic target (ingredient OR meal) – keep as raw UUID in MVP
-  @Column({ type: 'uuid', nullable: true })
-  target_id?: string | null;
-
-  // --- Relations: Author & Reviewer (users) ---
-  @ManyToOne(() => User, (u) => u.contributionsAuthored, {
+  //author
+  @ManyToOne(() => User, (u) => u.contributionsMealsAuthored, {
     onDelete: 'CASCADE',
     eager: false,
   })
   @JoinColumn({ name: 'user_id' })
   author: User;
 
-  @RelationId((c: Contribution) => c.author)
+  @RelationId((c: ContributionMeal) => c.author)
   user_id: string; // convenience: read-only relation id
 
-  @ManyToOne(() => User, (u) => u.contributionsReviewed, {
+  // reviewer
+  @ManyToOne(() => User, (u) => u.contributionsMealsReviewed, {
     onDelete: 'SET NULL',
     nullable: true,
     eager: false,
@@ -60,12 +58,26 @@ export class Contribution {
   @JoinColumn({ name: 'reviewer_id' })
   reviewer?: User | null;
 
-  @RelationId((c: Contribution) => c.reviewer)
+  @RelationId((c: ContributionMeal) => c.reviewer)
   reviewer_id?: string | null;
+
+  @OneToOne(() => Meal, (m) => m.contribution_meal, {
+    onDelete: 'SET NULL',
+    nullable: true,
+    eager: false,
+  })
+  @JoinColumn({ name: 'meal_id' })
+  meal?: Meal | null; // the meal being edited/created/deleted, null if opt = NEW
+
+  @RelationId((c: ContributionMeal) => c.meal)
+  meal_id?: string | null;
 
   // --- Payload fields ---
   @Column({ type: 'text' })
   name: string;
+
+  @Column({ type: 'float', nullable: true })
+  serving_gr?: number | null;
 
   @Column({ type: 'float' })
   kcal_per_100gr: number;
@@ -95,6 +107,9 @@ export class Contribution {
   @Column({ type: 'enum', enum: ContributionStatus, default: ContributionStatus.PENDING })
   status: ContributionStatus;
 
+  @Column({ type: 'enum', enum: ContributionOptions, default: ContributionOptions.NEW })
+  opt: ContributionOptions;
+
   @Column({ type: 'timestamptz', nullable: true })
   reviewed_at?: Date | null;
 
@@ -107,4 +122,7 @@ export class Contribution {
 
   @UpdateDateColumn({ type: 'timestamptz', nullable: true })
   updated_at?: Date | null;
+
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+  deleted_at?: Date | null;
 }

@@ -1,26 +1,40 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Device } from './entities/device.entity';
+import { Repository } from 'typeorm';
+import { UpdateResult } from 'typeorm';
+import { DeleteResult } from 'typeorm';
+import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
 export class DevicesService {
-  create(createDeviceDto: CreateDeviceDto) {
-    return 'This action adds a new device';
+  constructor(
+    @InjectRepository(Device) private devicesRepository: Repository<Device>,
+    @InjectRepository(User) private usersRepository: Repository<User>,
+  ) {}
+
+  async create(createDeviceDto: CreateDeviceDto): Promise<Device> {
+    const device = await this.devicesRepository.create(createDeviceDto);
+    const user = await this.usersRepository.findOneBy({ id: createDeviceDto.user_id });
+    device.user = user!;
+    return await this.devicesRepository.save(device);
   }
 
-  findAll() {
-    return `This action returns all devices`;
+  async findAll(): Promise<Device[]> {
+    return this.devicesRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} device`;
+  async findOne(id: string): Promise<Device | null> {
+    return this.devicesRepository.findOneBy({ id });
   }
 
-  update(id: number, updateDeviceDto: UpdateDeviceDto) {
-    return `This action updates a #${id} device`;
+  async update(id: string, updateDeviceDto: UpdateDeviceDto): Promise<UpdateResult> {
+    return await this.devicesRepository.update(id, updateDeviceDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} device`;
+  async remove(id: string): Promise<DeleteResult> {
+    return await this.devicesRepository.delete(id);
   }
 }

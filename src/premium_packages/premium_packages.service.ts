@@ -1,26 +1,38 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePremiumPackageDto } from './dto/create-premium_package.dto';
 import { UpdatePremiumPackageDto } from './dto/update-premium_package.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PremiumPackage } from './entities/premium_package.entity';
+import { Repository } from 'typeorm';
+import { DeleteResult } from 'typeorm';
+import { UpdateResult } from 'typeorm';
 
 @Injectable()
 export class PremiumPackagesService {
-  create(createPremiumPackageDto: CreatePremiumPackageDto) {
-    return 'This action adds a new premiumPackage';
+  constructor(
+    @InjectRepository(PremiumPackage) private premiumPackageRepository: Repository<PremiumPackage>,
+  ) {}
+  async create(createPremiumPackageDto: CreatePremiumPackageDto): Promise<PremiumPackage> {
+    const premiumPackage = this.premiumPackageRepository.create(createPremiumPackageDto);
+    return this.premiumPackageRepository.save(premiumPackage);
   }
 
-  findAll() {
-    return `This action returns all premiumPackages`;
+  async findAll(): Promise<PremiumPackage[]> {
+    return this.premiumPackageRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} premiumPackage`;
+  async findOne(id: string): Promise<PremiumPackage | null> {
+    return await this.premiumPackageRepository.findOneBy({ id });
   }
 
-  update(id: number, updatePremiumPackageDto: UpdatePremiumPackageDto) {
-    return `This action updates a #${id} premiumPackage`;
+  async update(
+    id: string,
+    updatePremiumPackageDto: UpdatePremiumPackageDto,
+  ): Promise<UpdateResult> {
+    return await this.premiumPackageRepository.update(id, updatePremiumPackageDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} premiumPackage`;
+  async remove(id: string): Promise<DeleteResult> {
+    return await this.premiumPackageRepository.update(id, { deleted_at: new Date() });
   }
 }
