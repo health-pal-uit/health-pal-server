@@ -6,17 +6,22 @@ import {
   Check,
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { FoodType } from 'src/helpers/enums/food-type.enum';
+import { IsBoolean, IsNumber, IsOptional } from 'class-validator';
+import { ContributionMeal } from 'src/contribution_meals/entities/contribution_meal.entity';
 
 @ApiSchema({ name: Meal.name, description: 'Meal entity' })
 @Check(`rating >= 0 AND rating <= 5`)
 @Check(
-  `kcal_per_100g >= 0 AND protein_per_100g >= 0 AND fat_per_100g >= 0 AND carbs_per_100g >= 0 AND fiber_per_100g >= 0`,
+  `kcal_per_100gr >= 0 AND protein_per_100gr >= 0 AND fat_per_100gr >= 0 AND carbs_per_100gr >= 0 AND fiber_per_100gr >= 0`,
 )
+// @Check(`(made_from_ingredients IS TRUE AND ingre_meals IS NOT NULL) OR (made_from_ingredients IS FALSE AND ingre_meals IS NULL)`) // uhh maybe wrong?
 @Entity('meals')
 export class Meal {
   @PrimaryGeneratedColumn('uuid')
@@ -25,20 +30,25 @@ export class Meal {
   @Column({ type: 'varchar', nullable: false })
   name: string;
 
-  @Column({ type: 'float' })
-  kcal_per_100g: number;
+  @ApiProperty({ example: 100, description: 'Serving size in grams' })
+  @IsOptional()
+  @IsNumber()
+  serving_gr?: number;
 
   @Column({ type: 'float' })
-  protein_per_100g: number;
+  kcal_per_100gr: number;
 
   @Column({ type: 'float' })
-  fat_per_100g: number;
+  protein_per_100gr: number;
 
   @Column({ type: 'float' })
-  carbs_per_100g: number;
+  fat_per_100gr: number;
 
   @Column({ type: 'float' })
-  fiber_per_100g: number;
+  carbs_per_100gr: number;
+
+  @Column({ type: 'float' })
+  fiber_per_100gr: number;
 
   @Column({ type: 'float', default: 0 })
   rating: number;
@@ -58,6 +68,13 @@ export class Meal {
   @Column({ type: 'text', nullable: true })
   image_url?: string | null;
 
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+  deleted_at?: Date | null;
+
+  @IsBoolean()
+  @Column({ type: 'boolean', default: false })
+  made_from_ingredients: boolean;
+
   // relations => 0
 
   // reflects
@@ -69,4 +86,7 @@ export class Meal {
 
   @OneToMany(() => FavMeal, (favMeal) => favMeal.meal)
   fav_meals: FavMeal[];
+
+  @OneToOne(() => ContributionMeal, (contributionMeal) => contributionMeal.meal)
+  contribution_meal?: ContributionMeal;
 }

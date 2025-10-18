@@ -6,15 +6,18 @@ import {
   Check,
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { FoodType } from '../../helpers/enums/food-type.enum';
+import { ContributionIngre } from 'src/contribution_ingres/entities/contribution_ingre.entity';
 
 @ApiSchema({ name: Ingredient.name, description: 'Ingredient entity' })
 @Check(
-  `kcal_per_100g >= 0 AND protein_per_100g >= 0 AND fat_per_100g >= 0 AND carbs_per_100g >= 0 AND fiber_per_100g >= 0`,
+  `kcal_per_100gr >= 0 AND protein_per_100gr >= 0 AND fat_per_100gr >= 0 AND carbs_per_100gr >= 0 AND fiber_per_100gr >= 0`,
 )
 @Entity('ingredients')
 export class Ingredient {
@@ -25,19 +28,19 @@ export class Ingredient {
   name: string;
 
   @Column({ type: 'float' })
-  kcal_per_100g: number;
+  kcal_per_100gr: number;
 
   @Column({ type: 'float' })
-  protein_per_100g: number;
+  protein_per_100gr: number;
 
   @Column({ type: 'float' })
-  fat_per_100g: number;
+  fat_per_100gr: number;
 
   @Column({ type: 'float' })
-  carbs_per_100g: number;
+  carbs_per_100gr: number;
 
   @Column({ type: 'float' })
-  fiber_per_100g: number;
+  fiber_per_100gr: number;
 
   @Column({ type: 'text', nullable: true })
   notes: string;
@@ -54,6 +57,9 @@ export class Ingredient {
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+  deleted_at?: Date | null;
+
   // relations => 0
 
   // reflects
@@ -65,4 +71,8 @@ export class Ingredient {
 
   @OneToMany(() => FavIngre, (favIngre) => favIngre.ingredient)
   fav_ingres: FavIngre[];
+
+  // contributions => optional
+  @OneToOne(() => ContributionIngre, (contributionIngre) => contributionIngre.ingredient)
+  contribution_ingre?: ContributionIngre;
 }

@@ -35,8 +35,9 @@ import { typeOrmConfig } from '../database/data-sources';
 import { ConfigModule } from '@nestjs/config';
 import { RolesModule } from './roles/roles.module';
 import { AuthModule } from './auth/auth.module';
-import { ContributionsModule } from './contributions/contributions.module';
 import { SupabaseAdminModule } from './supabase/supabase-admin.module';
+import { ContributionMealsModule } from './contribution_meals/contribution_meals.module';
+import { ContributionIngresModule } from './contribution_ingres/contribution_ingres.module';
 import configuration from './config/configuration';
 import * as joi from 'joi';
 
@@ -86,8 +87,9 @@ import * as joi from 'joi';
     FavIngresModule,
     RolesModule,
     AuthModule,
-    ContributionsModule,
     SupabaseAdminModule,
+    ContributionMealsModule,
+    ContributionIngresModule,
   ],
   controllers: [AppController],
   providers: [AppService],
