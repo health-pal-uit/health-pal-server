@@ -3,7 +3,7 @@ import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Ingredient } from './entities/ingredient.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { DeleteResult } from 'typeorm';
 import { UpdateResult } from 'typeorm';
 import { ContributionIngresService } from 'src/contribution_ingres/contribution_ingres.service';
@@ -21,12 +21,14 @@ export class IngredientsService {
   }
   // admin find all
   async findAll() {
-    return await this.ingredientRepository.find();
+    return await this.ingredientRepository.find({ where: { deleted_at: IsNull() } });
   }
 
   // find all verified for user
   async findAllUser() {
-    return await this.ingredientRepository.find({ where: { is_verified: true } });
+    return await this.ingredientRepository.find({
+      where: { is_verified: true, deleted_at: IsNull() },
+    });
   }
   async findOne(id: string) {
     return await this.ingredientRepository.findOne({

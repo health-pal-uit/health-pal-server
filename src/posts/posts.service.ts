@@ -3,7 +3,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, IsNull, Repository, UpdateResult } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Challenge } from 'src/challenges/entities/challenge.entity';
 import { Medal } from 'src/medals/entities/medal.entity';
@@ -85,7 +85,7 @@ export class PostsService {
   }
 
   async findAll(): Promise<Post[]> {
-    return this.postsRepository.find({ relations: ['user'] });
+    return this.postsRepository.find({ relations: ['user'], where: { deleted_at: IsNull() } });
   }
 
   async findOne(id: string): Promise<Post | null> {
@@ -164,7 +164,8 @@ export class PostsService {
     if (!post) {
       throw new Error('Post not found');
     }
-    return post.comments;
+    const comments = post.comments.filter((c) => !c.deleted_at);
+    return comments;
   }
 
   async updateComment(
@@ -181,7 +182,7 @@ export class PostsService {
     if (!post) {
       throw new Error('Post not found');
     }
-    const comment = post.comments.find((c) => c.id === commentId);
+    const comment = post.comments.filter((c) => !c.deleted_at).find((c) => c.id === commentId);
     if (!comment) {
       throw new Error('Comment not found');
     }
@@ -248,7 +249,7 @@ export class PostsService {
     return await this.likesService.count(id, userId);
   }
 
-  hasUserLiked(id: string, userId: string): Promise<boolean> {
-    return this.likesService.count(id, userId).then((count) => count > 0);
+  async hasUserLiked(id: string, userId: string): Promise<boolean> {
+    return await this.likesService.count(id, userId).then((count) => count > 0);
   }
 }

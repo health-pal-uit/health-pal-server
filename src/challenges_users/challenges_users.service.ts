@@ -21,11 +21,14 @@ export class ChallengesUsersService {
   }
 
   async findAll(): Promise<ChallengesUser[]> {
-    return await this.challengesUsersRepository.find();
+    return await this.challengesUsersRepository.find({ relations: ['user', 'challenge'] });
   }
 
   async findOne(id: string): Promise<ChallengesUser | null> {
-    return await this.challengesUsersRepository.findOne({ where: { id } });
+    return await this.challengesUsersRepository.findOne({
+      where: { id },
+      relations: ['user', 'challenge'],
+    });
   }
 
   async update(

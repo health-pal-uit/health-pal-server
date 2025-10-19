@@ -3,7 +3,7 @@ import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { Challenge } from './entities/challenge.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
+import { IsNull, Repository, UpdateResult } from 'typeorm';
 import { ActivityRecordsService } from 'src/activity_records/activity_records.service';
 
 @Injectable()
@@ -29,7 +29,10 @@ export class ChallengesService {
   }
 
   async findAll(): Promise<Challenge[]> {
-    return await this.challengesRepository.find();
+    return await this.challengesRepository.find({
+      where: { deleted_at: IsNull() },
+      relations: ['activity_records'],
+    });
   }
 
   async findOne(id: string): Promise<Challenge | null> {

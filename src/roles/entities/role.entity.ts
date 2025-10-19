@@ -1,6 +1,14 @@
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @ApiSchema({ name: Role.name, description: 'Role entity' })
 @Entity('roles')
@@ -11,8 +19,11 @@ export class Role {
   @Column({ type: 'varchar', length: 255, unique: true })
   name!: string; // @IsString() in dto
 
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_at!: Date;
+
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+  deleted_at!: Date | null;
 
   // relations
 

@@ -3,7 +3,7 @@ import { CreateFitnessGoalDto } from './dto/create-fitness_goal.dto';
 import { UpdateFitnessGoalDto } from './dto/update-fitness_goal.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FitnessGoal } from './entities/fitness_goal.entity';
-import { Repository, UpdateResult } from 'typeorm';
+import { IsNull, Repository, UpdateResult } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 
 @Injectable()
@@ -24,7 +24,7 @@ export class FitnessGoalsService {
   }
 
   async findAll(): Promise<FitnessGoal[]> {
-    return await this.fitnessGoalRepository.find();
+    return await this.fitnessGoalRepository.find({ where: { deleted_at: IsNull() } });
   }
 
   async findOne(id: string, userId: string): Promise<FitnessGoal | null> {

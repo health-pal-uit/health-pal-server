@@ -3,7 +3,7 @@ import { CreateChatSessionDto } from './dto/create-chat_session.dto';
 import { UpdateChatSessionDto } from './dto/update-chat_session.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChatSession } from './entities/chat_session.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { UpdateResult } from 'typeorm';
 import { DeleteResult } from 'typeorm';
@@ -44,6 +44,7 @@ export class ChatSessionsService {
   async findAll(): Promise<ChatSession[]> {
     return await this.chatSessionRepository.find({
       relations: ['participants'],
+      where: { deleted_at: IsNull() },
     });
   }
 
@@ -57,6 +58,7 @@ export class ChatSessionsService {
       relations: ['participants', 'participants.user'],
       where: {
         participants: { user: { id: Equal(id) } },
+        deleted_at: IsNull(),
       },
     });
   }
@@ -72,10 +74,21 @@ export class ChatSessionsService {
     return this.chatSessionRepository.update(id, updateChatSessionDto);
   }
 
-  async remove(id: string): Promise<DeleteResult> {
-    return await this.chatSessionRepository.update(id, { deleted_at: new Date() }); //soft delete
+  async remove(id: string, user_id: string): Promise<DeleteResult> {
+    const chatSession = await this.chatSessionRepository.findOne({
+      where: { id },
+      relations: ['participants'],
+    });
+    if (!chatSession) {
+      throw new Error('Chat session not found');
+    }
+    const participant = chatSession.participants.find((p) => p.user.id === user_id);
+    if (!participant) {
+      throw new Error('User is not a participant of this chat session');
+    }
+    return await this.chatSessionRepository.softDelete(id);
   }
   async adminRemove(id: string): Promise<DeleteResult> {
-    return await this.chatSessionRepository.delete(id);
+    return await this.chatSessionRepository.softDelete(id);
   }
 }

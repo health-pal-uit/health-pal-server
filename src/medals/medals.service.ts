@@ -3,7 +3,7 @@ import { CreateMedalDto } from './dto/create-medal.dto';
 import { UpdateMedalDto } from './dto/update-medal.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Medal } from './entities/medal.entity';
-import { Repository, UpdateResult } from 'typeorm';
+import { IsNull, Repository, UpdateResult } from 'typeorm';
 import { Challenge } from 'src/challenges/entities/challenge.entity';
 import { ChallengesMedalsService } from 'src/challenges_medals/challenges_medals.service';
 
@@ -32,6 +32,7 @@ export class MedalsService {
   async findAll(): Promise<Medal[]> {
     return await this.medalsRepository.find({
       relations: { challenges_medals: { challenge: true } },
+      where: { deleted_at: IsNull() },
     });
   }
 
