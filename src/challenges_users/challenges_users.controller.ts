@@ -1,34 +1,48 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ChallengesUsersService } from './challenges_users.service';
 import { CreateChallengesUserDto } from './dto/create-challenges_user.dto';
 import { UpdateChallengesUserDto } from './dto/update-challenges_user.dto';
+import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
+import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 
 @Controller('challenges-users')
 export class ChallengesUsersController {
   constructor(private readonly challengesUsersService: ChallengesUsersService) {}
 
-  @Post()
-  create(@Body() createChallengesUserDto: CreateChallengesUserDto) {
-    return this.challengesUsersService.create(createChallengesUserDto);
+  @Get('finish')
+  @UseGuards(SupabaseGuard)
+  checkFinishedChallenges(@CurrentUser() user: any) {
+    return this.challengesUsersService.checkFinishedChallenges(user.id);
   }
 
-  @Get()
-  findAll() {
-    return this.challengesUsersService.findAll();
+  @Post(':id')
+  @UseGuards(SupabaseGuard)
+  finishChallenge(@Param('id') challengeId: string, @CurrentUser() user: any) {
+    return this.challengesUsersService.finishChallenge(challengeId, user.id);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.challengesUsersService.findOne(+id);
-  }
+  // @Post()
+  // create(@Body() createChallengesUserDto: CreateChallengesUserDto) {
+  //   return this.challengesUsersService.create(createChallengesUserDto);
+  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChallengesUserDto: UpdateChallengesUserDto) {
-    return this.challengesUsersService.update(+id, updateChallengesUserDto);
-  }
+  // @Get()
+  // findAll() {
+  //   return this.challengesUsersService.findAll();
+  // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.challengesUsersService.remove(+id);
-  }
+  // @Get(':id')
+  // findOne(@Param('id') id: string) {
+  //   return this.challengesUsersService.findOne(+id);
+  // }
+
+  // @Patch(':id')
+  // update(@Param('id') id: string, @Body() updateChallengesUserDto: UpdateChallengesUserDto) {
+  //   return this.challengesUsersService.update(+id, updateChallengesUserDto);
+  // }
+
+  // @Delete(':id')
+  // remove(@Param('id') id: string) {
+  //   return this.challengesUsersService.remove(+id);
+  // }
 }

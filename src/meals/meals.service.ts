@@ -158,6 +158,6 @@ export class MealsService {
   }
 
   async remove(id: string): Promise<UpdateResult> {
-    return await this.mealsRepository.update(id, { deleted_at: new Date() }); // soft delete
+    return await this.mealsRepository.softDelete(id);
   }
 }
