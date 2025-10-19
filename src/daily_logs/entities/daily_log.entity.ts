@@ -31,7 +31,13 @@ export class DailyLog {
   date: Date;
 
   @Column({ type: 'float', default: 0 })
-  total_kcal: number;
+  total_kcal_eaten: number;
+
+  @Column({ type: 'float', default: 0 })
+  total_kcal: number; // from food + exercise
+
+  @Column({ type: 'float', default: 0 })
+  total_kcal_burned: number;
 
   @Column({ type: 'float', default: 0 })
   total_protein_gr: number;

@@ -7,6 +7,7 @@ import {
   Check,
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   Index,
   JoinColumn,
@@ -14,6 +15,8 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { RecordType } from 'src/helpers/enums/record-type.enum';
+import { User } from 'src/users/entities/user.entity';
+import { ChallengesUser } from 'src/challenges_users/entities/challenges_user.entity';
 
 @ApiSchema({ name: ActivityRecord.name, description: 'ActivityRecord entity' })
 @Check(`reps IS NULL OR reps > 0`)
@@ -30,6 +33,7 @@ import { RecordType } from 'src/helpers/enums/record-type.enum';
 @Index('idx_ar_activity', ['activity'])
 @Index('idx_ar_created', ['created_at'])
 @Entity('activity_records')
+@Check(`(reps IS NULL) <> (hours IS NULL)`)
 export class ActivityRecord {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -53,6 +57,9 @@ export class ActivityRecord {
   @Column({ type: 'float', nullable: true })
   user_weight_kg?: number;
 
+  @Column({ type: 'boolean', nullable: false })
+  user_owned: boolean;
+
   // end new fields
   @Column({ type: 'int', nullable: true })
   rhr: number;
@@ -69,6 +76,9 @@ export class ActivityRecord {
   @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;
 
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+  deleted_at: Date | null;
+
   // relations => 2
 
   @ManyToOne(() => DailyLog, (dailyLog) => dailyLog.activity_records, { onDelete: 'CASCADE' })
@@ -78,6 +88,11 @@ export class ActivityRecord {
   @ManyToOne(() => Challenge, (challenge) => challenge.activity_records, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'challenge_id' })
   challenge: Challenge | null;
+
+  @ManyToOne(() => ChallengesUser, (challengesUser) => challengesUser.activity_records, {
+    onDelete: 'CASCADE',
+  })
+  challenge_user: ChallengesUser | null;
 
   // @ManyToOne(() => FitnessGoal, (fitnessGoal) => fitnessGoal.activity_records, {
   //   onDelete: 'CASCADE',

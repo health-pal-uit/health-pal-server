@@ -4,36 +4,21 @@ import { ActivityLevel } from 'src/helpers/enums/activity-level.enum';
 import { BFPCalculatingMethod } from 'src/helpers/enums/bfp-calculating-method.enum';
 import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
 
-export class CreateFitnessProfileDto {
-  @ApiProperty({ description: 'Weight in kilograms' })
-  @IsNotEmpty()
-  @IsNumber()
-  weight_kg!: number;
-
-  @ApiProperty({ description: 'Height in meters' })
-  @IsNotEmpty()
-  @IsNumber()
-  height_m!: number;
-
+export class BFFitnessProfileDto {
   @ApiProperty({ description: 'Waist circumference in centimeters' })
   @IsNotEmpty()
   @IsNumber()
-  waist_cm?: number;
+  waist_cm!: number;
 
   @ApiProperty({ description: 'Hip circumference in centimeters' })
   @IsNotEmpty()
   @IsNumber()
-  hip_cm?: number;
+  hip_cm!: number;
 
   @ApiProperty({ description: 'Neck circumference in centimeters' })
   @IsNotEmpty()
   @IsNumber()
-  neck_cm?: number;
-
-  @ApiProperty({ description: 'Activity level', enum: ActivityLevel })
-  @IsEnum(ActivityLevel)
-  @IsNotEmpty()
-  activity_level!: ActivityLevel;
+  neck_cm!: number;
 
   @ApiProperty({ description: 'Body fat percentage' })
   @IsNumber()
@@ -44,27 +29,6 @@ export class CreateFitnessProfileDto {
   @IsEnum(BFPCalculatingMethod)
   @IsOptional()
   body_fat_calculating_method?: BFPCalculatingMethod;
-
-  @ApiProperty({ description: 'Basal metabolic rate' })
-  @IsNumber()
-  @IsOptional()
-  bmr?: number;
-
-  @ApiProperty({ description: 'Body mass index' })
-  @IsNumber()
-  @IsOptional()
-  bmi?: number;
-
-  @ApiProperty({ description: 'Creation date' })
-  @IsOptional()
-  @IsDateString()
-  @TransformToISODate()
-  created_at?: Date;
-
-  @ApiProperty({ description: 'Total Daily Energy Expenditure' })
-  @IsNumber()
-  @IsOptional()
-  tdee_kcal?: number; // cal later
 
   // relations => 2
   @ApiProperty({ description: 'User ID' })

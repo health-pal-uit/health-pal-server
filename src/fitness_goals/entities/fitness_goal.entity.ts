@@ -1,7 +1,16 @@
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { ActivityRecord } from 'src/activity_records/entities/activity_record.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { FitnessGoalType } from 'src/helpers/enums/fitness-goal-type.enum';
 
 @ApiSchema({ name: FitnessGoal.name, description: 'FitnessGoal entity' })
@@ -31,8 +40,11 @@ export class FitnessGoal {
   @Column({ type: 'float' })
   water_drank_l: number;
 
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
+
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+  deleted_at?: Date;
 
   // relations => 1
   @ManyToOne(() => User, (user) => user.fitness_goals, { onDelete: 'CASCADE' })
