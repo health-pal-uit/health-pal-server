@@ -50,7 +50,7 @@ export class CreatePostDto {
   })
   @IsNotEmpty()
   @IsUUID('4')
-  user_id!: string;
+  user_id?: string;
 
   @ApiProperty({
     example: ['uuid1', 'uuid2'],
@@ -60,6 +60,14 @@ export class CreatePostDto {
   @IsOptional()
   @IsUUID('4', { each: true })
   reported_by_ids?: string[];
+
+  @ApiProperty({
+    example: 'uuid',
+    description: 'ID of the attached entity (challenge, medal, meal, or ingredient)',
+  })
+  @IsOptional()
+  @IsUUID('4')
+  attach_id?: string;
 
   // if attach_type === none => medias is optional
   @ApiProperty({

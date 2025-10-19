@@ -3,7 +3,7 @@ import { CreateContributionMealDto } from './dto/create-contribution_meal.dto';
 import { UpdateContributionMealDto } from './dto/update-contribution_meal.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Meal } from 'src/meals/entities/meal.entity';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, IsNull, Repository, UpdateResult } from 'typeorm';
 import { ContributionMeal } from './entities/contribution_meal.entity';
 import { ContributionStatus } from 'src/helpers/enums/contribution-status.enum';
 import { ContributionOptions } from 'src/helpers/enums/contribution-options';
@@ -24,7 +24,7 @@ export class ContributionMealsService {
 
   async findAllPending(): Promise<ContributionMeal[]> {
     return await this.contributionMealRepository.find({
-      where: { status: ContributionStatus.PENDING },
+      where: { status: ContributionStatus.PENDING, deleted_at: IsNull() },
     });
   }
 
@@ -160,7 +160,9 @@ export class ContributionMealsService {
   }
 
   async findAllUser(userId: any): Promise<ContributionMeal[]> {
-    return await this.contributionMealRepository.find({ where: { user_id: userId } });
+    return await this.contributionMealRepository.find({
+      where: { user_id: userId, deleted_at: IsNull() },
+    });
   }
 
   async create(createContributionMealDto: CreateContributionMealDto, userId: string) {
@@ -174,7 +176,7 @@ export class ContributionMealsService {
   }
 
   async findAll() {
-    return await this.contributionMealRepository.find();
+    return await this.contributionMealRepository.find({ where: { deleted_at: IsNull() } });
   }
 
   async findOne(id: string) {
@@ -182,6 +184,6 @@ export class ContributionMealsService {
   }
 
   async remove(id: string): Promise<UpdateResult> {
-    return await this.contributionMealRepository.update(id, { deleted_at: new Date() }); // soft delete
+    return await this.contributionMealRepository.softDelete(id);
   }
 }

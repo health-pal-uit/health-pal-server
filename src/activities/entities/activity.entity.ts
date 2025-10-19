@@ -4,6 +4,7 @@ import {
   Check,
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -13,9 +14,9 @@ import { ActivityType } from 'src/helpers/enums/activity-type.enum';
 @ApiSchema({ name: Activity.name, description: 'Activity entity' })
 @Check(`met_value >= 0`)
 @Entity('activities')
-@Check(
-  `(supports_rep = false AND supports_hour = true) OR (supports_rep = true AND supports_hour = false)`,
-)
+// @Check(
+//   `(supports_rep = false AND supports_hour = true) OR (supports_rep = true AND supports_hour = false)`,
+// )
 export class Activity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -26,17 +27,14 @@ export class Activity {
   @Column({ type: 'float' })
   met_value: number;
 
-  @Column({ type: 'boolean', default: false })
-  supports_rep: boolean;
-
-  @Column({ type: 'boolean', default: false })
-  supports_hour: boolean;
-
   @Column({ type: 'enum', enum: ActivityType, array: true })
   categories: ActivityType[];
 
   @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;
+
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+  deleted_at: Date | null;
 
   // relations => 0
 

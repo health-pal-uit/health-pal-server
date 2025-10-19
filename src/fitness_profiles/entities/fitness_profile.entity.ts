@@ -4,6 +4,7 @@ import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -38,10 +39,15 @@ export class FitnessProfile {
   @Column({ type: 'enum', enum: ActivityLevel })
   activity_level: ActivityLevel;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   body_fat_percentages: number;
 
-  @Column({ type: 'enum', enum: BFPCalculatingMethod, default: BFPCalculatingMethod.BMI })
+  @Column({
+    type: 'enum',
+    enum: BFPCalculatingMethod,
+    default: BFPCalculatingMethod.BMI,
+    nullable: true,
+  })
   body_fat_calculating_method: BFPCalculatingMethod;
 
   @Column({ type: 'float' })
@@ -55,6 +61,9 @@ export class FitnessProfile {
 
   @Column({ type: 'float' })
   tdee_kcal: number;
+
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+  deleted_at?: Date;
 
   // relations => 2
   @ManyToOne(() => User, (user) => user.fitness_profiles, { onDelete: 'CASCADE' })

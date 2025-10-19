@@ -1,8 +1,16 @@
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { ChallengesMedal } from 'src/challenges_medals/entities/challenges_medal.entity';
 import { MedalsUser } from 'src/medals_users/entities/medals_user.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { MedalTier } from 'src/helpers/enums/medal-tier.enum';
+import { Post } from 'src/posts/entities/post.entity';
 
 @ApiSchema({ name: Medal.name, description: 'Medal entity' })
 @Entity('medals')
@@ -22,8 +30,11 @@ export class Medal {
   @Column('text', { nullable: true })
   note?: string;
 
-  @Column('timestamptz', { default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
+
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+  deleted_at: Date | null;
 
   // relations => 0
 
@@ -33,4 +44,7 @@ export class Medal {
 
   @OneToMany(() => MedalsUser, (medalsUser) => medalsUser.medal)
   medals_users: MedalsUser[];
+
+  @OneToMany(() => Post, (post) => post.attach_medal)
+  posts: Post[];
 }

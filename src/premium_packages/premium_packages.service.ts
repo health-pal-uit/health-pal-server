@@ -3,7 +3,7 @@ import { CreatePremiumPackageDto } from './dto/create-premium_package.dto';
 import { UpdatePremiumPackageDto } from './dto/update-premium_package.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PremiumPackage } from './entities/premium_package.entity';
-import { Repository } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { DeleteResult } from 'typeorm';
 import { UpdateResult } from 'typeorm';
 
@@ -18,7 +18,7 @@ export class PremiumPackagesService {
   }
 
   async findAll(): Promise<PremiumPackage[]> {
-    return this.premiumPackageRepository.find();
+    return this.premiumPackageRepository.find({ where: { deleted_at: IsNull() } });
   }
 
   async findOne(id: string): Promise<PremiumPackage | null> {
@@ -33,6 +33,6 @@ export class PremiumPackagesService {
   }
 
   async remove(id: string): Promise<DeleteResult> {
-    return await this.premiumPackageRepository.update(id, { deleted_at: new Date() });
+    return await this.premiumPackageRepository.softDelete(id);
   }
 }

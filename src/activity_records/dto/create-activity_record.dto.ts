@@ -1,6 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
   IsArray,
+  IsBoolean,
   IsDateString,
   IsEnum,
   IsNotEmpty,
@@ -43,6 +44,10 @@ export class CreateActivityRecordDto {
   @IsOptional()
   @IsNumber()
   user_weight_kg?: number;
+
+  @ApiProperty({ example: true, description: 'Own by user?' })
+  @IsBoolean()
+  user_owned: boolean;
   // end new fields
 
   @ApiProperty({ example: 60, description: 'Resting heart rate' })
@@ -89,6 +94,15 @@ export class CreateActivityRecordDto {
 
   @IsUUID('4')
   @IsOptional()
-  @ApiProperty({ required: false, example: 'uuid', description: 'ID of the related fitness goal' })
-  goal_id: string | null;
+  @ApiProperty({
+    required: false,
+    example: 'uuid',
+    description: 'ID of the related challenge_user',
+  })
+  challenge_user_id: string | null;
+
+  // @IsUUID('4')
+  // @IsOptional()
+  // @ApiProperty({ required: false, example: 'uuid', description: 'ID of the related fitness goal' })
+  // goal_id: string | null;
 }
