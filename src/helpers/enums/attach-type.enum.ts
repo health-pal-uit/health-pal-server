@@ -1,4 +1,7 @@
 export enum AttachType {
   NONE = 'none',
-  IN_APP = 'in_app',
+  CHALLENGE = 'challenge',
+  MEDAL = 'medal',
+  MEAL = 'meal',
+  INGREDIENT = 'ingredient',
 }

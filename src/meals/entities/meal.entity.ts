@@ -15,6 +15,7 @@ import {
 import { FoodType } from 'src/helpers/enums/food-type.enum';
 import { IsBoolean, IsNumber, IsOptional } from 'class-validator';
 import { ContributionMeal } from 'src/contribution_meals/entities/contribution_meal.entity';
+import { Post } from 'src/posts/entities/post.entity';
 
 @ApiSchema({ name: Meal.name, description: 'Meal entity' })
 @Check(`rating >= 0 AND rating <= 5`)
@@ -89,4 +90,7 @@ export class Meal {
 
   @OneToOne(() => ContributionMeal, (contributionMeal) => contributionMeal.meal)
   contribution_meal?: ContributionMeal;
+
+  @OneToMany(() => Post, (post) => post.attach_meal)
+  posts: Post[];
 }
