@@ -165,6 +165,6 @@ export class ContributionIngresService {
   // }
 
   async remove(id: string): Promise<UpdateResult> {
-    return await this.contributionIngreRepository.update(id, { deleted_at: new Date() }); // soft delete
+    return await this.contributionIngreRepository.softDelete(id);
   }
 }

@@ -33,6 +33,6 @@ export class PremiumPackagesService {
   }
 
   async remove(id: string): Promise<DeleteResult> {
-    return await this.premiumPackageRepository.update(id, { deleted_at: new Date() });
+    return await this.premiumPackageRepository.softDelete(id);
   }
 }

@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ChallengesMedalsService } from './challenges_medals.service';
 import { CreateChallengesMedalDto } from './dto/create-challenges_medal.dto';
 import { UpdateChallengesMedalDto } from './dto/update-challenges_medal.dto';
+import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
+import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 
 @Controller('challenges-medals')
 export class ChallengesMedalsController {
@@ -19,16 +21,16 @@ export class ChallengesMedalsController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.challengesMedalsService.findOne(+id);
+    return this.challengesMedalsService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateChallengesMedalDto: UpdateChallengesMedalDto) {
-    return this.challengesMedalsService.update(+id, updateChallengesMedalDto);
+    return this.challengesMedalsService.update(id, updateChallengesMedalDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.challengesMedalsService.remove(+id);
+    return this.challengesMedalsService.remove(id);
   }
 }

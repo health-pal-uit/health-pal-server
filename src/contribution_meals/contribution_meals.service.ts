@@ -182,6 +182,6 @@ export class ContributionMealsService {
   }
 
   async remove(id: string): Promise<UpdateResult> {
-    return await this.contributionMealRepository.update(id, { deleted_at: new Date() }); // soft delete
+    return await this.contributionMealRepository.softDelete(id);
   }
 }
