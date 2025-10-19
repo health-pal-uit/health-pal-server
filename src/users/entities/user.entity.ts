@@ -111,11 +111,6 @@ export class User {
   posts: Post[];
 
   @ManyToMany(() => Post, (post) => post.reported_by)
-  @JoinTable({
-    name: 'posts_reported_by',
-    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'post_id', referencedColumnName: 'id' },
-  })
   reported_posts: Post[];
 
   @OneToMany(() => Comment, (comment) => comment.user)

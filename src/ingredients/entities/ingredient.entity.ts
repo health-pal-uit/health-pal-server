@@ -14,6 +14,7 @@ import {
 } from 'typeorm';
 import { FoodType } from '../../helpers/enums/food-type.enum';
 import { ContributionIngre } from 'src/contribution_ingres/entities/contribution_ingre.entity';
+import { Post } from 'src/posts/entities/post.entity';
 
 @ApiSchema({ name: Ingredient.name, description: 'Ingredient entity' })
 @Check(
@@ -75,4 +76,7 @@ export class Ingredient {
   // contributions => optional
   @OneToOne(() => ContributionIngre, (contributionIngre) => contributionIngre.ingredient)
   contribution_ingre?: ContributionIngre;
+
+  @OneToMany(() => Post, (post) => post.attach_ingredient)
+  posts: Post[];
 }

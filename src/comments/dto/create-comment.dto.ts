@@ -22,10 +22,10 @@ export class CreateCommentDto {
   @ApiProperty({ example: 'uuid', description: 'Unique identifier for the user' })
   @IsUUID('4')
   @IsNotEmpty()
-  user_id!: string;
+  user_id?: string;
 
   @ApiProperty({ example: 'uuid', description: 'Unique identifier for the post' })
   @IsUUID('4')
   @IsNotEmpty()
-  post_id!: string;
+  post_id?: string;
 }

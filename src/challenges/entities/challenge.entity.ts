@@ -11,6 +11,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { ChallengeDifficulty } from 'src/helpers/enums/challenge-difficulty.enum';
+import { Post } from 'src/posts/entities/post.entity';
 
 @ApiSchema({ name: Challenge.name, description: 'Challenge entity' })
 @Entity('challenges')
@@ -47,4 +48,7 @@ export class Challenge {
 
   @OneToMany(() => ChallengesUser, (challengesUser) => challengesUser.challenge)
   challenges_users: ChallengesUser[];
+
+  @OneToMany(() => Post, (post) => post.attach_challenge)
+  posts: Post[];
 }

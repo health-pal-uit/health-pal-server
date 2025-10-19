@@ -10,6 +10,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { MedalTier } from 'src/helpers/enums/medal-tier.enum';
+import { Post } from 'src/posts/entities/post.entity';
 
 @ApiSchema({ name: Medal.name, description: 'Medal entity' })
 @Entity('medals')
@@ -43,4 +44,7 @@ export class Medal {
 
   @OneToMany(() => MedalsUser, (medalsUser) => medalsUser.medal)
   medals_users: MedalsUser[];
+
+  @OneToMany(() => Post, (post) => post.attach_medal)
+  posts: Post[];
 }
