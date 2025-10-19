@@ -2,6 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNotEmpty, IsOptional, IsString, IsUrl, IsUUID } from 'class-validator';
 import { ChallengeDifficulty } from 'src/helpers/enums/challenge-difficulty.enum';
 import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
+import { DeleteDateColumn } from 'typeorm';
 
 export class CreateChallengeDto {
   @ApiProperty({ example: 'New Challenge', description: 'Name of the challenge' })
@@ -32,12 +33,12 @@ export class CreateChallengeDto {
   @ApiProperty({ required: false, description: 'ActivityRecords IDs' })
   @IsOptional()
   @IsUUID('4', { each: true })
-  activity_records_id?: string[];
+  activity_records_ids?: string[];
 
   @ApiProperty({ required: false, description: 'ChallengesMedals IDs' })
   @IsOptional()
   @IsUUID('4', { each: true })
-  challenges_medals_id?: string[];
+  challenges_medals_ids?: string[];
 
   // note: i dont think user would be necessary when creating challenge
 }

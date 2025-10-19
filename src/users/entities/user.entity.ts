@@ -29,6 +29,7 @@ import { Role } from 'src/roles/entities/role.entity';
 import { PremiumPackage } from 'src/premium_packages/entities/premium_package.entity';
 import { ContributionIngre } from 'src/contribution_ingres/entities/contribution_ingre.entity';
 import { ContributionMeal } from 'src/contribution_meals/entities/contribution_meal.entity';
+import { ActivityRecord } from 'src/activity_records/entities/activity_record.entity';
 
 @ApiSchema({ name: User.name, description: 'User entity' })
 @Entity('users')

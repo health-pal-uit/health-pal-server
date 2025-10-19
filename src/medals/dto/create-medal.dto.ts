@@ -32,4 +32,15 @@ export class CreateMedalDto {
   @IsDateString()
   @TransformToISODate()
   created_at?: Date;
+
+  // challenge IDs associated with the medal
+  @ApiProperty({
+    example: ['challenge-uuid-1', 'challenge-uuid-2'],
+    description: 'Array of Challenge IDs associated with the medal',
+    isArray: true,
+    required: false,
+  })
+  @IsOptional()
+  @IsString({ each: true })
+  challenge_ids?: string[];
 }

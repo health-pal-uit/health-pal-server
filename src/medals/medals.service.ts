@@ -1,26 +1,58 @@
 import { Injectable } from '@nestjs/common';
 import { CreateMedalDto } from './dto/create-medal.dto';
 import { UpdateMedalDto } from './dto/update-medal.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Medal } from './entities/medal.entity';
+import { Repository, UpdateResult } from 'typeorm';
+import { Challenge } from 'src/challenges/entities/challenge.entity';
+import { ChallengesMedalsService } from 'src/challenges_medals/challenges_medals.service';
 
 @Injectable()
 export class MedalsService {
-  create(createMedalDto: CreateMedalDto) {
-    return 'This action adds a new medal';
+  constructor(
+    @InjectRepository(Medal) private medalsRepository: Repository<Medal>,
+    @InjectRepository(Challenge) private challengesRepository: Repository<Challenge>,
+    private challengesMedalsService: ChallengesMedalsService,
+  ) {}
+
+  async create(createMedalDto: CreateMedalDto): Promise<Medal> {
+    const medal = this.medalsRepository.create(createMedalDto);
+    const challenges = await this.challengesRepository.findByIds(
+      createMedalDto.challenge_ids || [],
+    );
+    for (const challenge of challenges) {
+      await this.challengesMedalsService.create({
+        challenge_id: challenge.id,
+        medal_id: medal.id,
+      });
+    }
+    return await this.medalsRepository.save(medal);
   }
 
-  findAll() {
-    return `This action returns all medals`;
+  async findAll(): Promise<Medal[]> {
+    return await this.medalsRepository.find({
+      relations: { challenges_medals: { challenge: true } },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} medal`;
+  async findOne(id: string): Promise<Medal | null> {
+    return await this.medalsRepository.findOneBy({ id });
   }
 
-  update(id: number, updateMedalDto: UpdateMedalDto) {
-    return `This action updates a #${id} medal`;
+  async update(id: string, updateMedalDto: UpdateMedalDto): Promise<UpdateResult> {
+    const challenges = await this.challengesRepository.findByIds(
+      updateMedalDto.challenge_ids || [],
+    );
+    for (const challenge of challenges) {
+      await this.challengesMedalsService.update(id, {
+        challenge_id: challenge.id,
+        medal_id: id,
+      });
+    }
+    return await this.medalsRepository.update(id, updateMedalDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} medal`;
+  async remove(id: string): Promise<UpdateResult> {
+    return await this.medalsRepository.softDelete(id);
   }
 }

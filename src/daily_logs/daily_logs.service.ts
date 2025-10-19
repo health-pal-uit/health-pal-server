@@ -79,12 +79,31 @@ export class DailyLogsService {
       total_fiber_gr += meal.total_fiber_gr;
     }
 
-    dailyLog.total_kcal = total_kcal;
+    dailyLog.total_kcal_eaten = total_kcal;
     dailyLog.total_protein_gr = total_protein_gr;
     dailyLog.total_fat_gr = total_fat_gr;
     dailyLog.total_carbs_gr = total_carbs_gr;
     dailyLog.total_fiber_gr = total_fiber_gr;
 
+    // for now set burned kcal to 0
+
+    // implement activity records kcal later
+
     await this.dailyLogRepository.save(dailyLog);
+  }
+
+  async recalculateTotalKcal(dailyLogId: string): Promise<void> {
+    const dailyLog = await this.dailyLogRepository.findOne({
+      where: { id: dailyLogId },
+    });
+    if (!dailyLog) {
+      throw new Error('Daily log not found');
+    }
+    dailyLog.total_kcal = dailyLog.total_kcal_eaten - (dailyLog.total_kcal_burned || 0);
+    await this.dailyLogRepository.save(dailyLog);
+  }
+
+  async save(dailyLog: DailyLog): Promise<DailyLog> {
+    return await this.dailyLogRepository.save(dailyLog);
   }
 }
