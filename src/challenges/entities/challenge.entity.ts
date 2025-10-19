@@ -2,8 +2,16 @@ import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { ActivityRecord } from 'src/activity_records/entities/activity_record.entity';
 import { ChallengesMedal } from 'src/challenges_medals/entities/challenges_medal.entity';
 import { ChallengesUser } from 'src/challenges_users/entities/challenges_user.entity';
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { ChallengeDifficulty } from 'src/helpers/enums/challenge-difficulty.enum';
+import { Post } from 'src/posts/entities/post.entity';
 
 @ApiSchema({ name: Challenge.name, description: 'Challenge entity' })
 @Entity('challenges')
@@ -26,6 +34,9 @@ export class Challenge {
   @CreateDateColumn({ type: 'timestamptz' })
   created_at: Date;
 
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+  deleted_at?: Date | null;
+
   // relations
 
   // reflects
@@ -37,4 +48,7 @@ export class Challenge {
 
   @OneToMany(() => ChallengesUser, (challengesUser) => challengesUser.challenge)
   challenges_users: ChallengesUser[];
+
+  @OneToMany(() => Post, (post) => post.attach_challenge)
+  posts: Post[];
 }

@@ -1,26 +1,34 @@
 import { Injectable } from '@nestjs/common';
 import { CreatePostsMediaDto } from './dto/create-posts_media.dto';
 import { UpdatePostsMediaDto } from './dto/update-posts_media.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { PostsMedia } from './entities/posts_media.entity';
+import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 
 @Injectable()
 export class PostsMediasService {
-  create(createPostsMediaDto: CreatePostsMediaDto) {
-    return 'This action adds a new postsMedia';
+  constructor(
+    @InjectRepository(PostsMedia) private postsMediasRepository: Repository<PostsMedia>,
+  ) {}
+
+  async create(createPostsMediaDto: CreatePostsMediaDto): Promise<PostsMedia> {
+    const postsMedia = this.postsMediasRepository.create(createPostsMediaDto);
+    return this.postsMediasRepository.save(postsMedia);
   }
 
-  findAll() {
-    return `This action returns all postsMedias`;
+  async findAll(): Promise<PostsMedia[]> {
+    return this.postsMediasRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} postsMedia`;
+  async findOne(id: string): Promise<PostsMedia | null> {
+    return this.postsMediasRepository.findOne({ where: { id } });
   }
 
-  update(id: number, updatePostsMediaDto: UpdatePostsMediaDto) {
-    return `This action updates a #${id} postsMedia`;
+  async update(id: string, updatePostsMediaDto: UpdatePostsMediaDto): Promise<UpdateResult> {
+    return await this.postsMediasRepository.update(id, updatePostsMediaDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} postsMedia`;
+  async remove(id: string): Promise<DeleteResult> {
+    return await this.postsMediasRepository.delete(id);
   }
 }

@@ -46,6 +46,6 @@ export class ChatSessionsController {
     if (user.role === 'admin') {
       this.chatSessionsService.adminRemove(id);
     }
-    return this.chatSessionsService.remove(id);
+    return this.chatSessionsService.remove(id, user.id);
   }
 }
