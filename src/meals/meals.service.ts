@@ -3,7 +3,7 @@ import { CreateMealDto } from './dto/create-meal.dto';
 import { UpdateMealDto } from './dto/update-meal.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Meal } from './entities/meal.entity';
-import { Repository, UpdateResult } from 'typeorm';
+import { IsNull, Repository, UpdateResult } from 'typeorm';
 import { IngreMeal } from 'src/ingre_meals/entities/ingre_meal.entity';
 import { ContributionMealsService } from 'src/contribution_meals/contribution_meals.service';
 import { IngredientPayload } from './dto/ingredient-payload.type';
@@ -136,13 +136,14 @@ export class MealsService {
   async findAll(): Promise<Meal[]> {
     return await this.mealsRepository.find({
       relations: ['ingre_meals', 'ingre_meals.ingredient'],
+      where: { deleted_at: IsNull() },
     });
   }
 
   // only verified meals for user
   async findAllUser(): Promise<Meal[]> {
     return await this.mealsRepository.find({
-      where: { is_verified: true },
+      where: { is_verified: true, deleted_at: IsNull() },
       relations: ['ingre_meals', 'ingre_meals.ingredient'],
     });
   }

@@ -3,7 +3,7 @@ import { CreateActivityRecordDto } from './dto/create-activity_record.dto';
 import { UpdateActivityRecordDto } from './dto/update-activity_record.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ActivityRecord } from './entities/activity_record.entity';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, IsNull, Repository, UpdateResult } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { DailyLogsService } from 'src/daily_logs/daily_logs.service';
 import { Activity } from 'src/activities/entities/activity.entity';
@@ -89,7 +89,7 @@ export class ActivityRecordsService {
   // when user click on "recalculate progress" button in challenge detail page
   async recalculateProgressChallengesForUser(challengeId: string, userId: string): Promise<number> {
     const challengeActivityRecords = await this.activityRecordRepository.find({
-      where: { challenge: { id: challengeId }, user_owned: false },
+      where: { challenge: { id: challengeId }, user_owned: false, deleted_at: IsNull() },
       relations: { activity: true, challenge: true },
     });
 
@@ -117,26 +117,31 @@ export class ActivityRecordsService {
   }
 
   // controller !!
-  async findAllChallengesOfUser(challengeId: string, userId: string): Promise<ActivityRecord[]> {
-    return await this.activityRecordRepository.find({
-      where: {
-        challenge: { id: challengeId },
-        challenge_user: { user: { id: userId } },
-        user_owned: true,
-      },
-      relations: {
-        activity: true,
-        challenge: true,
-        challenge_user: { user: true },
-      },
-      order: { created_at: 'DESC' },
-    });
-  }
+  // async findAllChallengesOfUser(challengeId: string, userId: string): Promise<ActivityRecord[]> {
+  //   return await this.activityRecordRepository.find({
+  //     where: {
+  //       challenge: { id: challengeId },
+  //       challenge_user: { user: { id: userId } },
+  //       user_owned: true,
+  //       deleted_at: IsNull(),
+  //     },
+  //     relations: {
+  //       activity: true,
+  //       challenge: true,
+  //       challenge_user: { user: true },
+  //     },
+  //     order: { created_at: 'DESC' },
+  //   });
+  // }
 
   // controller !!
   async findAllDailyLogsOfUser(userId: string, dailyLogId: string): Promise<ActivityRecord[]> {
     return await this.activityRecordRepository.find({
-      where: { user_owned: true, daily_log: { user: { id: userId }, id: dailyLogId } },
+      where: {
+        user_owned: true,
+        daily_log: { user: { id: userId }, id: dailyLogId },
+        deleted_at: IsNull(),
+      },
       relations: { activity: true, daily_log: true },
     });
   }
@@ -144,7 +149,7 @@ export class ActivityRecordsService {
   // controller !!
   async findAllChallenges(challengeId: string): Promise<ActivityRecord[]> {
     return await this.activityRecordRepository.find({
-      where: { user_owned: false, challenge: { id: challengeId } },
+      where: { user_owned: false, challenge: { id: challengeId }, deleted_at: IsNull() },
       relations: { activity: true, challenge: true },
     });
   }
@@ -287,6 +292,7 @@ export class ActivityRecordsService {
         challenge_user: { user: { id: userId } },
         user_owned: true,
         activity: { name: activityRecord.activity.name },
+        deleted_at: IsNull(),
       },
       relations: { activity: true, challenge_user: true },
     });

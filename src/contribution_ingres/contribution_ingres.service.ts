@@ -4,7 +4,7 @@ import { UpdateContributionIngreDto } from './dto/update-contribution_ingre.dto'
 import { UpdateIngredientDto } from 'src/ingredients/dto/update-ingredient.dto';
 import { ContributionIngre } from './entities/contribution_ingre.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, IsNull, Repository, UpdateResult } from 'typeorm';
 import { ContributionStatus } from 'src/helpers/enums/contribution-status.enum';
 import { ContributionOptions } from 'src/helpers/enums/contribution-options';
 import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
@@ -153,7 +153,7 @@ export class ContributionIngresService {
   }
 
   async findAll(): Promise<ContributionIngre[]> {
-    return await this.contributionIngreRepository.find();
+    return await this.contributionIngreRepository.find({ where: { deleted_at: IsNull() } });
   }
 
   async findOne(id: string): Promise<ContributionIngre | null> {

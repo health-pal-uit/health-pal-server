@@ -3,7 +3,7 @@ import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Activity } from './entities/activity.entity';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository, UpdateResult, IsNull } from 'typeorm';
 
 @Injectable()
 export class ActivitiesService {
@@ -15,7 +15,7 @@ export class ActivitiesService {
   }
 
   async findAll(): Promise<Activity[]> {
-    return await this.activitiesRepository.find();
+    return await this.activitiesRepository.find({ where: { deleted_at: IsNull() } });
   }
 
   async findOne(id: string): Promise<Activity | null> {

@@ -96,8 +96,8 @@ export class ActivityRecordsController {
   // createChallengesForUser(@Body() createActivityRecordDto: CreateActivityRecordDto, @CurrentUser() user: any) {
   //   return this.activityRecordsService.createChallengesForUser(createActivityRecordDto, user.id);
   // }
-  @Get('challenges-users')
-  findAllChallengesOfUser(@CurrentUser() user: any, @Body() challengeId: string) {
-    return this.activityRecordsService.findAllChallengesOfUser(user.id, challengeId);
-  }
+  // @Get('challenges-users')
+  // findAllChallengesOfUser(@CurrentUser() user: any, @Body() challengeId: string) {
+  //   return this.activityRecordsService.findAllChallengesOfUser(user.id, challengeId);
+  // }
 }

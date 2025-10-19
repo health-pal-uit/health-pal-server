@@ -3,7 +3,7 @@ import { CreateFitnessProfileDto } from './dto/create-fitness_profile.dto';
 import { UpdateFitnessProfileDto } from './dto/update-fitness_profile.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FitnessProfile } from './entities/fitness_profile.entity';
-import { Repository, UpdateResult } from 'typeorm';
+import { IsNull, Repository, UpdateResult } from 'typeorm';
 import { ActivityLevel } from 'src/helpers/enums/activity-level.enum';
 import { User } from 'src/users/entities/user.entity';
 import { BFPCalculatingMethod } from 'src/helpers/enums/bfp-calculating-method.enum';
@@ -39,7 +39,10 @@ export class FitnessProfilesService {
   }
 
   async findAll(): Promise<FitnessProfile[]> {
-    return await this.fitnessProfileRepository.find();
+    return await this.fitnessProfileRepository.find({
+      where: { deleted_at: IsNull() },
+      relations: ['user'],
+    });
   }
 
   async findOne(id: string, userId: string): Promise<FitnessProfile | null> {
