@@ -4,6 +4,8 @@ import { SUPABASE_ADMIN } from 'src/supabase/supabase-admin.provider';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { UsersService } from 'src/users/users.service';
 import { LoginDto } from './dto/login.dto';
+import { User as UserEntity } from 'src/users/entities/user.entity';
+import * as crypto from 'crypto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -105,7 +107,69 @@ export class AuthService {
     return { message: 'User deleted successfully' };
   }
 
-  // async validateGoogleUser(googleUser: CreateUserDto): Promise<User> {
+  async validateGoogleUser(googleUser: CreateUserDto): Promise<UserEntity> {
+    googleUser.password = generateSecurePassword(googleUser.email + '@HealthPal');
+    googleUser.username = sanitizeName(googleUser.fullname);
 
-  // }
+    const { email } = googleUser;
+    const existingUser = await this.usersService.findOneByEmail(email);
+    if (existingUser) {
+      return existingUser;
+    }
+    // const { data, error } = await this.supabase.auth.admin.getUserByEmail(email);
+    // if (error) {
+    //   throw error;
+    // }
+    // if (!data.user) {
+    //   throw new Error('User not found');
+    // }
+    const { data: users, error: listError } = await this.supabase.auth.admin.listUsers();
+    if (listError) {
+      throw listError;
+    }
+    if (users.users.find((user) => user.email === googleUser.email)) {
+      throw new Error('User already exists');
+    }
+
+    const { data, error } = await this.supabase.auth.admin.createUser({
+      email: googleUser.email,
+      password: googleUser.password,
+      email_confirm: true,
+      user_metadata: {
+        username: googleUser.username,
+      },
+    });
+    if (error) {
+      throw error;
+    }
+
+    return this.usersService.createFromSupabase(
+      {
+        supabaseId: data.user.id,
+        email: data.user.email!,
+        isVerified: false,
+      },
+      googleUser,
+    );
+  }
+}
+
+function sanitizeName(name: string): string {
+  return (
+    name
+      .normalize('NFD') // Break characters into base + diacritics
+      .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+      // eslint-disable-next-line no-control-regex
+      .replace(/[^\x00-\x7F]/g, '') // Remove non-ASCII characters
+      .replace(/\s+/g, '') // Remove all spaces
+      .toLowerCase()
+  ); // Lowercase everything
+}
+
+function generateSecurePassword(googleEmail: string): string {
+  return crypto
+    .createHash('sha256')
+    .update(googleEmail + Date.now().toString())
+    .digest('hex')
+    .slice(0, 16);
 }

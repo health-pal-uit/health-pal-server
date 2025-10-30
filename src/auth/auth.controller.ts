@@ -77,7 +77,7 @@ export class AuthController {
     return res.redirect(`http://localhost:3001/auth/google`);
   }
 
-  @Get('callback/google')
+  @Get('google/callback')
   @UseGuards(GoogleGuard)
   async googleCallback(@Res() res: Response, @Query('redirectUrl') redirectUrl: string) {
     // Here you would typically handle the authenticated user information
