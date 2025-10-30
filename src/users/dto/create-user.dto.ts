@@ -29,23 +29,23 @@ export class CreateUserDto {
   @ApiProperty({ type: String, description: 'Phone' })
   @IsString()
   @IsNotEmpty()
-  phone!: string;
+  phone: string;
 
   @ApiProperty({ type: String, description: 'Full Name' })
   @IsString()
   @IsNotEmpty()
-  fullname!: string;
+  fullname: string;
 
   @ApiProperty({ type: Boolean, description: 'Gender' })
   @IsNotEmpty()
   @IsBoolean()
-  gender!: boolean;
+  gender: boolean;
 
   @ApiProperty({ type: Date, description: 'Birth Date' })
   @IsNotEmpty()
   @IsDateString()
   @TransformToISODate()
-  birth_date!: Date;
+  birth_date: Date;
 
   @ApiProperty({ type: String, nullable: true, description: 'Avatar URL' })
   @IsUrl()
@@ -66,8 +66,8 @@ export class CreateUserDto {
 
   @ApiProperty({ type: String, description: 'Role ID' })
   @IsUUID('4')
-  @IsNotEmpty()
-  role_id!: string;
+  @IsOptional()
+  role_id?: string;
 
   @ApiProperty({ type: String, description: 'Premium Package ID', nullable: true })
   @IsUUID('4')

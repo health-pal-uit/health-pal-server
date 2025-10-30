@@ -33,4 +33,8 @@ export class RolesService {
   async remove(id: string): Promise<UpdateResult> {
     return await this.roleRepository.softDelete(id);
   }
+
+  async findByName(name: string): Promise<Role | null> {
+    return await this.roleRepository.findOneBy({ name });
+  }
 }
