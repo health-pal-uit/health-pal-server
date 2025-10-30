@@ -5,6 +5,7 @@ import { SupabaseAdminModule } from 'src/supabase/supabase-admin.module';
 import { UsersModule } from 'src/users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { SupabaseStrategy } from './strategies/supabase-strategy';
+import { GoogleStrategy } from './strategies/google-strategy';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { SupabaseStrategy } from './strategies/supabase-strategy';
     PassportModule.register({ defaultStrategy: 'supabase' }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, SupabaseStrategy],
-  exports: [AuthService, PassportModule, SupabaseStrategy],
+  providers: [AuthService, SupabaseStrategy, GoogleStrategy],
+  exports: [AuthService, PassportModule, SupabaseStrategy, GoogleStrategy],
 })
 export class AuthModule {}
