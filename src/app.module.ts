@@ -45,7 +45,7 @@ import * as joi from 'joi';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: '.env', // Load environment variables from .env file
+      // envFilePath: '.env', // Commented out - use environment variables from Docker/system
       load: [configuration],
       validationSchema: joi.object({
         DB_DATABASE: joi.string().required(),
