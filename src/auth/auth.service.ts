@@ -35,7 +35,7 @@ export class AuthService {
       email: createUserDto.email,
       password: createUserDto.password,
       options: {
-        emailRedirectTo: 'http://localhost:3000/auth/callback',
+        emailRedirectTo: 'http://localhost:3001/auth/callback',
       },
     });
     if (error) {
