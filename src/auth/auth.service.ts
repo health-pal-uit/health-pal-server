@@ -104,4 +104,8 @@ export class AuthService {
     }
     return { message: 'User deleted successfully' };
   }
+
+  // async validateGoogleUser(googleUser: CreateUserDto): Promise<User> {
+
+  // }
 }

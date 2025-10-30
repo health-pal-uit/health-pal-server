@@ -4,6 +4,7 @@ import js from "@eslint/js";
 import globals from "globals";
 import tseslint from "typescript-eslint";
 import prettierPlugin from "eslint-plugin-prettier";
+import process from "node:process";
 
 export default defineConfig([
   // Base JS rules
@@ -21,6 +22,7 @@ export default defineConfig([
       // NestJS runs on Node
       globals: {
         ...globals.node,
+        process: "readonly",
       },
       parser: tseslint.parser,
       parserOptions: {
@@ -37,9 +39,9 @@ export default defineConfig([
     },
 
     // Make ESLint and Prettier play nice
-    // (Using flat config, so we “extend” Prettier behavior via rules)
+    // (Using flat config, so we "extend" Prettier behavior via rules)
     rules: {
-      "prettier/prettier": "error",
+      "prettier/prettier": "off",
 
       // Common TS tuning
       "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],

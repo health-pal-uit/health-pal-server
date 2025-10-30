@@ -1,8 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Res,
+  Query,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
 import { SupabaseGuard } from './guards/supabase/supabase.guard';
+import type { Response } from 'express';
+import { GoogleGuard } from './guards/google/google.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -53,4 +66,25 @@ export class AuthController {
   async logOut() {
     return this.authService.logOut();
   }
+
+  // @Get('google/login')
+  // async googleLogin() {
+  //   return "hello";
+  // }
+
+  @Get('google/login')
+  async googleLogin(@Res() res: Response, @Query('redirectUrl') redirectUrl: string) {
+    return res.redirect(`http://localhost:3001/auth/google`);
+  }
+
+  @Get('callback/google')
+  @UseGuards(GoogleGuard)
+  async googleCallback(@Res() res: Response, @Query('redirectUrl') redirectUrl: string) {
+    // Here you would typically handle the authenticated user information
+    return res.redirect(redirectUrl || 'http://localhost:3001');
+  }
+
+  @Get('google')
+  @UseGuards(GoogleGuard)
+  async googleAuth() {}
 }
