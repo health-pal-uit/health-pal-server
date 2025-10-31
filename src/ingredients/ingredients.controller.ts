@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { IngredientsService } from './ingredients.service';
 import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
@@ -6,6 +17,7 @@ import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guar
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUserId } from 'src/helpers/decorators/current-user-id.decorator';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('ingredients')
 export class IngredientsController {
@@ -13,8 +25,14 @@ export class IngredientsController {
 
   @UseGuards(AdminSupabaseGuard)
   @Post()
-  create(@Body() createIngredientDto: CreateIngredientDto) {
-    return this.ingredientsService.create(createIngredientDto);
+  @UseInterceptors(FileInterceptor('image'))
+  create(
+    @Body() createIngredientDto: CreateIngredientDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
+    return this.ingredientsService.create(createIngredientDto, imageBuffer, imageName);
   }
 
   // get all admin
@@ -40,16 +58,20 @@ export class IngredientsController {
   // update ingredient admin
   @Patch(':id')
   @UseGuards(SupabaseGuard)
+  @UseInterceptors(FileInterceptor('image'))
   update(
     @Param('id') id: string,
     @Body() updateIngredientDto: UpdateIngredientDto,
     @CurrentUser() user: any,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
       throw new Error('Go to contribution to update');
     }
-    return this.ingredientsService.update(id, updateIngredientDto);
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
+    return this.ingredientsService.update(id, updateIngredientDto, imageBuffer, imageName);
   }
 
   // admin delete

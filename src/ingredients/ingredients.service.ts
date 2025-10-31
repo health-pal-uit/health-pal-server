@@ -6,17 +6,34 @@ import { Ingredient } from './entities/ingredient.entity';
 import { IsNull, Repository } from 'typeorm';
 import { DeleteResult } from 'typeorm';
 import { UpdateResult } from 'typeorm';
-import { ContributionIngresService } from 'src/contribution_ingres/contribution_ingres.service';
+import { ConfigService } from '@nestjs/config';
+import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
 
 @Injectable()
 export class IngredientsService {
   constructor(
     @InjectRepository(Ingredient) private ingredientRepository: Repository<Ingredient>,
     //private contributionIngresService: ContributionIngresService,
+    private supabaseStorageService: SupabaseStorageService,
+    private configService: ConfigService,
   ) {}
   // admin create
-  async create(createIngredientDto: CreateIngredientDto) {
+  async create(
+    createIngredientDto: CreateIngredientDto,
+    imageBuffer?: Buffer,
+    imageName?: string,
+  ): Promise<Ingredient> {
     const ingredient = this.ingredientRepository.create(createIngredientDto);
+    if (imageBuffer && imageName) {
+      const bucketName =
+        this.configService.get<string>('INGREDIENT_IMG_BUCKET_NAME') || 'ingredient-imgs';
+      const imagePath = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        bucketName,
+      );
+      ingredient.image_url = imagePath;
+    }
     return await this.ingredientRepository.save(ingredient);
   }
   // admin find all
@@ -37,7 +54,22 @@ export class IngredientsService {
     });
   }
 
-  async update(id: string, updateIngredientDto: UpdateIngredientDto): Promise<UpdateResult> {
+  async update(
+    id: string,
+    updateIngredientDto: UpdateIngredientDto,
+    imageBuffer?: Buffer,
+    imageName?: string,
+  ): Promise<UpdateResult> {
+    if (imageBuffer && imageName) {
+      const bucketName =
+        this.configService.get<string>('INGREDIENT_IMG_BUCKET_NAME') || 'ingredient-imgs';
+      const imagePath = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        bucketName,
+      );
+      updateIngredientDto.image_url = imagePath;
+    }
     return await this.ingredientRepository.update(id, updateIngredientDto);
   }
 

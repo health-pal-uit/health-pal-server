@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { ChatMessagesService } from './chat_messages.service';
 import { CreateChatMessageDto } from './dto/create-chat_message.dto';
 import { UpdateChatMessageDto } from './dto/update-chat_message.dto';
@@ -6,6 +17,7 @@ import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { CurrentUserId } from 'src/helpers/decorators/current-user-id.decorator';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('chat-messages')
 export class ChatMessagesController {
@@ -13,9 +25,16 @@ export class ChatMessagesController {
 
   @Post()
   @UseGuards(SupabaseGuard)
-  create(@Body() createChatMessageDto: CreateChatMessageDto, @CurrentUserId() userId: string) {
+  @UseInterceptors(FileInterceptor('image'))
+  create(
+    @Body() createChatMessageDto: CreateChatMessageDto,
+    @CurrentUserId() userId: string,
+    @UploadedFile() image?: Express.Multer.File,
+  ) {
     createChatMessageDto.user_id = userId;
-    return this.chatMessagesService.create(createChatMessageDto);
+    const imageBuffer = image?.buffer;
+    const imageName = image?.originalname;
+    return this.chatMessagesService.create(createChatMessageDto, imageBuffer, imageName);
   }
 
   @Get()
@@ -36,8 +55,15 @@ export class ChatMessagesController {
 
   @Patch(':id')
   @UseGuards(SupabaseGuard)
-  update(@Param('id') id: string, @Body() updateChatMessageDto: UpdateChatMessageDto) {
-    return this.chatMessagesService.update(id, updateChatMessageDto);
+  @UseInterceptors(FileInterceptor('image'))
+  update(
+    @Param('id') id: string,
+    @Body() updateChatMessageDto: UpdateChatMessageDto,
+    @UploadedFile() image?: Express.Multer.File,
+  ) {
+    const imageBuffer = image?.buffer;
+    const imageName = image?.originalname;
+    return this.chatMessagesService.update(id, updateChatMessageDto, imageBuffer, imageName);
   }
 
   @Delete(':id')

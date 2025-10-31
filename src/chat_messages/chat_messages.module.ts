@@ -5,9 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ChatMessage } from './entities/chat_message.entity';
 import { ChatSession } from 'src/chat_sessions/entities/chat_session.entity';
 import { User } from 'src/users/entities/user.entity';
+import { SupabaseStorageModule } from 'src/supabase-storage/supabase-storage.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ChatMessage, ChatSession, User])],
+  imports: [TypeOrmModule.forFeature([ChatMessage, ChatSession, User]), SupabaseStorageModule],
   controllers: [ChatMessagesController],
   providers: [ChatMessagesService],
 })
