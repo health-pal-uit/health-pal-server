@@ -40,7 +40,7 @@ export class UsersService {
       fullname: createUserDto.fullname,
       phone: createUserDto.phone,
       gender: createUserDto.gender,
-      birth_date: new Date(createUserDto.birth_date), // nếu entity là Date
+      ...(createUserDto.birth_date && { birth_date: new Date(createUserDto.birth_date) }),
       ...(createUserDto.avatar_url !== undefined && { avatar_url: createUserDto.avatar_url }),
       ...(createUserDto.premium_package_id !== undefined && {
         premium_package_id: createUserDto.premium_package_id,

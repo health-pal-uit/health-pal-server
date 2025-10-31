@@ -28,24 +28,24 @@ export class CreateUserDto {
 
   @ApiProperty({ type: String, description: 'Phone' })
   @IsString()
-  @IsNotEmpty()
-  phone: string;
+  @IsOptional()
+  phone?: string;
 
   @ApiProperty({ type: String, description: 'Full Name' })
   @IsString()
-  @IsNotEmpty()
-  fullname: string;
+  @IsOptional()
+  fullname?: string;
 
   @ApiProperty({ type: Boolean, description: 'Gender' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
-  gender: boolean;
+  gender?: boolean;
 
   @ApiProperty({ type: Date, description: 'Birth Date' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsDateString()
   @TransformToISODate()
-  birth_date: Date;
+  birth_date?: Date;
 
   @ApiProperty({ type: String, nullable: true, description: 'Avatar URL' })
   @IsUrl()
