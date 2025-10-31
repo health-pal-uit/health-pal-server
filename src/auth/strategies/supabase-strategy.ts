@@ -53,6 +53,6 @@ export class SupabaseStrategy extends PassportStrategy(SupabaseAuthStrategy, 'su
     if (!user) return this.fail('User not found in database', 401);
     const roleName = user.role.name || 'user';
 
-    this.success({ id: data.user.id, email: data.user.email, role: roleName }, null);
+    this.success({ id: data.user.id, email: data.user.email, role: roleName }, null); // this is ReqUserType
   }
 }

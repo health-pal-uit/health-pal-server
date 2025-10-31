@@ -4,29 +4,43 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
+import { RolesService } from 'src/roles/roles.service';
+import { Role } from 'src/roles/entities/role.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    private readonly rolesService: RolesService,
   ) {}
 
   async createFromSupabase(
     payload: { supabaseId: string; email: string; isVerified: boolean },
     createUserDto: CreateUserDto,
   ) {
+    let role: Role | null;
+    if (!createUserDto.role_id) {
+      role = await this.rolesService.findByName('user');
+      if (!role) {
+        throw new Error('Default role not found');
+      }
+    }
+    role = await this.rolesService.findOne(createUserDto.role_id!);
+    if (!role) {
+      throw new Error('Role not found');
+    }
     const user = this.userRepository.create({
       id: payload.supabaseId,
       email: payload.email,
       isVerified: payload.isVerified,
-      role: { id: createUserDto.role_id }, // set the role relation
+      role: role, // set the role relation
       created_at: new Date(),
       username: createUserDto.username,
       fullname: createUserDto.fullname,
       phone: createUserDto.phone,
       gender: createUserDto.gender,
-      birth_date: new Date(createUserDto.birth_date), // nếu entity là Date
+      ...(createUserDto.birth_date && { birth_date: new Date(createUserDto.birth_date) }),
       ...(createUserDto.avatar_url !== undefined && { avatar_url: createUserDto.avatar_url }),
       ...(createUserDto.premium_package_id !== undefined && {
         premium_package_id: createUserDto.premium_package_id,
