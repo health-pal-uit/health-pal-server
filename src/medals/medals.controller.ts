@@ -1,9 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { MedalsService } from './medals.service';
 import { CreateMedalDto } from './dto/create-medal.dto';
 import { UpdateMedalDto } from './dto/update-medal.dto';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('medals')
 export class MedalsController {
@@ -11,8 +23,11 @@ export class MedalsController {
 
   @Post()
   @UseGuards(AdminSupabaseGuard)
-  create(@Body() createMedalDto: CreateMedalDto) {
-    return this.medalsService.create(createMedalDto);
+  @UseInterceptors(FileInterceptor('image'))
+  create(@Body() createMedalDto: CreateMedalDto, @UploadedFile() file?: Express.Multer.File) {
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
+    return this.medalsService.create(createMedalDto, imageBuffer, imageName);
   }
 
   @Get()
@@ -29,8 +44,15 @@ export class MedalsController {
 
   @Patch(':id')
   @UseGuards(AdminSupabaseGuard)
-  update(@Param('id') id: string, @Body() updateMedalDto: UpdateMedalDto) {
-    return this.medalsService.update(id, updateMedalDto);
+  @UseInterceptors(FileInterceptor('image'))
+  update(
+    @Param('id') id: string,
+    @Body() updateMedalDto: UpdateMedalDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
+    return this.medalsService.update(id, updateMedalDto, imageBuffer, imageName);
   }
 
   @Delete(':id')

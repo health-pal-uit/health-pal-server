@@ -5,14 +5,32 @@ import { Challenge } from './entities/challenge.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository, UpdateResult } from 'typeorm';
 import { ActivityRecordsService } from 'src/activity_records/activity_records.service';
+import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ChallengesService {
   constructor(
     @InjectRepository(Challenge) private challengesRepository: Repository<Challenge>,
     private activityRecordsService: ActivityRecordsService,
+    private supabaseStorageService: SupabaseStorageService,
+    private readonly configService: ConfigService,
   ) {}
-  async create(createChallengeDto: CreateChallengeDto): Promise<Challenge> {
+  async create(
+    createChallengeDto: CreateChallengeDto,
+    imageBuffer?: Buffer,
+    imageName?: string,
+  ): Promise<Challenge> {
+    if (imageBuffer && imageName) {
+      const challengeImgBucketName =
+        this.configService.get<string>('CHALLENGE_IMG_BUCKET_NAME') || 'challenge-imgs';
+      const imageUrl = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        challengeImgBucketName,
+      );
+      createChallengeDto.image_url = imageUrl || createChallengeDto.image_url;
+    }
     const challenge = this.challengesRepository.create(createChallengeDto);
     const savedChallenge = await this.challengesRepository.save(challenge);
     if (createChallengeDto.activity_records_ids) {
@@ -39,7 +57,22 @@ export class ChallengesService {
     return await this.challengesRepository.findOneBy({ id });
   }
 
-  async update(id: string, updateChallengeDto: UpdateChallengeDto): Promise<UpdateResult> {
+  async update(
+    id: string,
+    updateChallengeDto: UpdateChallengeDto,
+    imageBuffer?: Buffer,
+    imageName?: string,
+  ): Promise<UpdateResult> {
+    if (imageBuffer && imageName) {
+      const challengeImgBucketName =
+        this.configService.get<string>('CHALLENGE_IMG_BUCKET_NAME') || 'challenge-imgs';
+      const imageUrl = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        challengeImgBucketName,
+      );
+      updateChallengeDto.image_url = imageUrl || updateChallengeDto.image_url;
+    }
     return await this.challengesRepository.update(id, updateChallengeDto);
   }
 

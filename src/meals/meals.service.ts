@@ -5,10 +5,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Meal } from './entities/meal.entity';
 import { IsNull, Repository, UpdateResult } from 'typeorm';
 import { IngreMeal } from 'src/ingre_meals/entities/ingre_meal.entity';
-import { ContributionMealsService } from 'src/contribution_meals/contribution_meals.service';
 import { IngredientPayload } from './dto/ingredient-payload.type';
 import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
 import { calculateMacros } from 'src/helpers/functions/macro-calculator';
+import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MealsService {
@@ -16,6 +17,8 @@ export class MealsService {
     @InjectRepository(Meal) private mealsRepository: Repository<Meal>,
     @InjectRepository(IngreMeal) private ingreMealsRepository: Repository<IngreMeal>,
     @InjectRepository(Ingredient) private ingredientsRepository: Repository<Ingredient>,
+    private readonly supabaseStorageService: SupabaseStorageService,
+    private readonly configService: ConfigService,
   ) {}
 
   async updateFromIngredients(
@@ -80,7 +83,18 @@ export class MealsService {
   async createFromIngredients(
     meal: CreateMealDto,
     items: IngredientPayload[],
+    imageBuffer?: Buffer,
+    imageName?: string,
   ): Promise<Meal | null> {
+    if (imageBuffer && imageName) {
+      const bucketName = this.configService.get<string>('MEAL_IMG_BUCKET_NAME') || 'meal-imgs';
+      const imagePath = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        bucketName,
+      );
+      meal.image_url = imagePath;
+    }
     const createdMeal = await this.create({ ...meal, is_verified: true }); // create meal first
     const savedMeal = await this.mealsRepository.save(createdMeal);
     const ingreMeals = items.map((item) => {
