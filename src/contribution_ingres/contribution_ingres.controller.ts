@@ -1,10 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { ContributionIngresService } from './contribution_ingres.service';
 import { CreateContributionIngreDto } from './dto/create-contribution_ingre.dto';
 import { UpdateContributionIngreDto } from './dto/update-contribution_ingre.dto';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('contribution-ingres')
 export class ContributionIngresController {
@@ -12,12 +24,24 @@ export class ContributionIngresController {
 
   @Post() // user -> create new contribution
   @UseGuards(SupabaseGuard)
-  create(@Body() createContributionIngreDto: CreateContributionIngreDto, @CurrentUser() user: any) {
+  @UseInterceptors(FileInterceptor('image'))
+  create(
+    @Body() createContributionIngreDto: CreateContributionIngreDto,
+    @CurrentUser() user: any,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
     const isAdmin = user.role === 'admin';
     if (isAdmin) {
       throw new Error('Admins cannot create contributions');
     }
-    return this.contributionIngresService.create(createContributionIngreDto, user.id);
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
+    return this.contributionIngresService.create(
+      createContributionIngreDto,
+      user.id,
+      imageBuffer,
+      imageName,
+    );
   }
 
   @Get() // admin
@@ -42,20 +66,26 @@ export class ContributionIngresController {
 
   @Patch(':id') // user => create update contribution
   @UseGuards(SupabaseGuard)
+  @UseInterceptors(FileInterceptor('image'))
   update(
     @Param('id') id: string,
     @Body() updateContributionIngreDto: UpdateContributionIngreDto,
     @CurrentUser() user: any,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     // check if user or admin
     const isAdmin = user.role === 'admin';
     if (isAdmin) {
       throw new Error('Admins cannot create update contributions');
     }
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
     return this.contributionIngresService.createUpdateContribution(
       id,
       updateContributionIngreDto,
       user.id,
+      imageBuffer,
+      imageName,
     );
   }
 

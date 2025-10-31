@@ -8,6 +8,8 @@ import { ChatSession } from 'src/chat_sessions/entities/chat_session.entity';
 import { User } from 'src/users/entities/user.entity';
 import { UpdateResult } from 'typeorm';
 import { DeleteResult } from 'typeorm';
+import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ChatMessagesService {
@@ -15,9 +17,15 @@ export class ChatMessagesService {
     @InjectRepository(ChatMessage) private chatMessagesRepository: Repository<ChatMessage>,
     @InjectRepository(ChatSession) private chatSessionsRepository: Repository<ChatSession>,
     @InjectRepository(User) private usersRepository: Repository<User>,
+    private readonly supabaseStorageService: SupabaseStorageService,
+    private readonly configService: ConfigService,
   ) {}
 
-  async create(createChatMessageDto: CreateChatMessageDto) {
+  async create(
+    createChatMessageDto: CreateChatMessageDto,
+    fileBuffer?: Buffer,
+    fileName?: string,
+  ): Promise<ChatMessage> {
     const chatSession = await this.chatSessionsRepository.findOne({
       where: { id: createChatMessageDto.chat_session_id },
     });
@@ -33,6 +41,15 @@ export class ChatMessagesService {
     const chatMessage = this.chatMessagesRepository.create(createChatMessageDto);
     chatMessage.user = user!;
     chatMessage.chat_session = chatSession!;
+    const chatMessageBucket = this.configService.get<string>('CHAT_IMG_BUCKET_NAME') || 'chat-imgs';
+    if (fileBuffer && fileName) {
+      const imageUrl = await this.supabaseStorageService.uploadImageFromBuffer(
+        fileBuffer,
+        fileName,
+        chatMessageBucket,
+      );
+      chatMessage.media_url = imageUrl ?? undefined;
+    }
     return await this.chatMessagesRepository.save(chatMessage);
   }
 
@@ -48,8 +65,28 @@ export class ChatMessagesService {
     return await this.chatMessagesRepository.findOne({ where: { id } });
   }
 
-  async update(id: string, updateChatMessageDto: UpdateChatMessageDto): Promise<UpdateResult> {
-    return await this.chatMessagesRepository.update(id, updateChatMessageDto);
+  async update(
+    id: string,
+    updateChatMessageDto: UpdateChatMessageDto,
+    imageBuffer?: Buffer,
+    imageName?: string,
+  ): Promise<UpdateResult> {
+    const result = await this.chatMessagesRepository.update(id, updateChatMessageDto);
+    if (imageBuffer && imageName) {
+      const chatMessage = await this.chatMessagesRepository.findOne({ where: { id } });
+      if (chatMessage) {
+        const chatMessageBucket =
+          this.configService.get<string>('CHAT_IMG_BUCKET_NAME') || 'chat-imgs';
+        chatMessage.media_url =
+          (await this.supabaseStorageService.uploadImageFromBuffer(
+            imageBuffer,
+            imageName,
+            chatMessageBucket,
+          )) || chatMessage.media_url;
+        await this.chatMessagesRepository.save(chatMessage);
+      }
+    }
+    return result;
   }
 
   async remove(id: string): Promise<DeleteResult> {

@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { ContributionMealsService } from './contribution_meals.service';
 import { CreateContributionMealDto } from './dto/create-contribution_meal.dto';
 import { UpdateContributionMealDto } from './dto/update-contribution_meal.dto';
@@ -6,6 +17,7 @@ import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { IngredientPayload } from 'src/meals/dto/ingredient-payload.type';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('contribution-meals')
 export class ContributionMealsController {
@@ -13,12 +25,24 @@ export class ContributionMealsController {
 
   @Post() // user -> create new contribution
   @UseGuards(SupabaseGuard)
-  create(@Body() createContributionMealDto: CreateContributionMealDto, @CurrentUser() user: any) {
+  @UseInterceptors(FileInterceptor('image'))
+  create(
+    @Body() createContributionMealDto: CreateContributionMealDto,
+    @CurrentUser() user: any,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
     const isAdmin = user.role === 'admin';
     if (isAdmin) {
       throw new Error('Admins cannot create contributions');
     }
-    return this.contributionMealsService.create(createContributionMealDto, user.id);
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
+    return this.contributionMealsService.create(
+      createContributionMealDto,
+      user.id,
+      imageBuffer,
+      imageName,
+    );
   }
 
   @Post('ingredients')
@@ -26,7 +50,10 @@ export class ContributionMealsController {
   createFromIngredients(
     @Body() body: { meal: CreateContributionMealDto; ingredients: IngredientPayload[] },
     @CurrentUser() user: any,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
     return this.contributionMealsService.createFromIngredients(
       body.meal,
       body.ingredients,
@@ -56,20 +83,26 @@ export class ContributionMealsController {
 
   @Patch(':id') // user => create update contribution
   @UseGuards(SupabaseGuard)
+  @UseInterceptors(FileInterceptor('image'))
   update(
     @Param('id') id: string,
     @Body() updateContributionMealDto: UpdateContributionMealDto,
     @CurrentUser() user: any,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
     // check if user or admin
     const isAdmin = user.role === 'admin';
     if (isAdmin) {
       throw new Error('Admins cannot create update contributions');
     }
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
     return this.contributionMealsService.createUpdateContribution(
       id,
       updateContributionMealDto,
       user.id,
+      imageBuffer,
+      imageName,
     );
   }
 

@@ -6,9 +6,14 @@ import { ContributionMeal } from './entities/contribution_meal.entity';
 import { Meal } from 'src/meals/entities/meal.entity';
 import { IngreMeal } from 'src/ingre_meals/entities/ingre_meal.entity';
 import { MealsModule } from 'src/meals/meals.module';
+import { SupabaseStorageModule } from 'src/supabase-storage/supabase-storage.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ContributionMeal, Meal, IngreMeal]), MealsModule],
+  imports: [
+    TypeOrmModule.forFeature([ContributionMeal, Meal, IngreMeal]),
+    MealsModule,
+    SupabaseStorageModule,
+  ],
   controllers: [ContributionMealsController],
   providers: [ContributionMealsService],
   exports: [ContributionMealsService],

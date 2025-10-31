@@ -11,6 +11,8 @@ import { IngredientPayload } from 'src/meals/dto/ingredient-payload.type';
 import { IngreMeal } from 'src/ingre_meals/entities/ingre_meal.entity';
 import { CreateMealDto } from 'src/meals/dto/create-meal.dto';
 import { MealsService } from 'src/meals/meals.service';
+import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ContributionMealsService {
@@ -20,6 +22,8 @@ export class ContributionMealsService {
     @InjectRepository(Meal) private mealsRepository: Repository<Meal>,
     @InjectRepository(IngreMeal) private ingreMealRepository: Repository<IngreMeal>,
     private mealsService: MealsService,
+    private supabaseStorageService: SupabaseStorageService,
+    private readonly configService: ConfigService,
   ) {}
 
   async findAllPending(): Promise<ContributionMeal[]> {
@@ -32,7 +36,18 @@ export class ContributionMealsService {
     dto: CreateContributionMealDto,
     ingredients: IngredientPayload[],
     userId: string,
+    imageBuffer?: Buffer,
+    imageName?: string,
   ): Promise<ContributionMeal> {
+    if (imageBuffer && imageName) {
+      const bucketName = this.configService.get<string>('MEAL_IMG_BUCKET_NAME') || 'meal-imgs';
+      const storedImage = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        bucketName,
+      );
+      dto.image_url = storedImage;
+    }
     const createdContribution = await this.create(dto, userId); // create contribution meal first
     const createMealDto: CreateMealDto = {
       name: createdContribution.name,
@@ -113,7 +128,9 @@ export class ContributionMealsService {
     id: string,
     updateContributionMealDto: UpdateContributionMealDto,
     userId: any,
-  ) {
+    imageBuffer?: Buffer,
+    imageName?: string,
+  ): Promise<ContributionMeal> {
     const existingContribution = await this.contributionMealRepository.findOne({ where: { id } });
     if (!existingContribution) {
       throw new Error('Contribution not found');
@@ -127,6 +144,15 @@ export class ContributionMealsService {
     const updatedContribution = Object.assign(existingContribution, updateContributionMealDto); // copy existing to update but prioritize update
     updatedContribution.opt = ContributionOptions.EDIT;
     updatedContribution.status = ContributionStatus.PENDING;
+    if (imageBuffer && imageName) {
+      const bucketName = this.configService.get<string>('MEAL_IMG_BUCKET_NAME') || 'meal-imgs';
+      const storedImage = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        bucketName,
+      );
+      updatedContribution.image_url = storedImage;
+    }
     return await this.contributionMealRepository.save(updatedContribution);
   }
 
@@ -165,13 +191,29 @@ export class ContributionMealsService {
     });
   }
 
-  async create(createContributionMealDto: CreateContributionMealDto, userId: string) {
+  async create(
+    createContributionMealDto: CreateContributionMealDto,
+    userId: string,
+    imageBuffer?: Buffer,
+    imageName?: string,
+  ): Promise<ContributionMeal> {
     const contributionMeal = this.contributionMealRepository.create({
       ...createContributionMealDto,
       user_id: userId,
     });
     contributionMeal.status = ContributionStatus.PENDING;
     contributionMeal.opt = ContributionOptions.NEW;
+
+    if (imageBuffer && imageName) {
+      const bucketName = this.configService.get<string>('MEAL_IMG_BUCKET_NAME') || 'meal-imgs';
+      const storedImage = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        bucketName,
+      );
+      contributionMeal.image_url = storedImage;
+    }
+
     return await this.contributionMealRepository.save(contributionMeal);
   }
 

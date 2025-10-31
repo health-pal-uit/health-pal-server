@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -6,6 +6,8 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { RolesService } from 'src/roles/roles.service';
 import { Role } from 'src/roles/entities/role.entity';
+import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class UsersService {
@@ -13,6 +15,8 @@ export class UsersService {
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     private readonly rolesService: RolesService,
+    private readonly supabaseStorageService: SupabaseStorageService,
+    private readonly configService: ConfigService,
   ) {}
 
   async createFromSupabase(
@@ -75,8 +79,27 @@ export class UsersService {
     return await this.userRepository.findOne({ where: { id }, relations: ['role'] });
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    return await this.userRepository.update(id, updateUserDto);
+  async update(id: string, updateUserDto: UpdateUserDto, imageBuffer?: Buffer, imageName?: string) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    Object.assign(user, updateUserDto);
+    if (imageBuffer && imageName) {
+      const avatarBucketName =
+        this.configService.get<string>('SUPABASE_AVATAR_BUCKET_NAME') || 'avatars';
+      try {
+        const imageUrl = await this.supabaseStorageService.uploadImageFromBuffer(
+          imageBuffer,
+          imageName,
+          avatarBucketName,
+        );
+        user.avatar_url = imageUrl || user.avatar_url;
+      } catch (error) {
+        console.error('Error uploading image to Supabase:', error);
+      }
+    }
+    return await this.userRepository.save(user);
   }
 
   async remove(id: string) {

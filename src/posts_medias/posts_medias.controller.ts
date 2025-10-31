@@ -1,8 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { PostsMediasService } from './posts_medias.service';
 import { CreatePostsMediaDto } from './dto/create-posts_media.dto';
 import { UpdatePostsMediaDto } from './dto/update-posts_media.dto';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('posts-medias')
 @UseGuards(SupabaseGuard)
@@ -10,8 +22,15 @@ export class PostsMediasController {
   constructor(private readonly postsMediasService: PostsMediasService) {}
 
   @Post()
-  create(@Body() createPostsMediaDto: CreatePostsMediaDto) {
-    return this.postsMediasService.create(createPostsMediaDto);
+  @UseGuards(SupabaseGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  create(
+    @Body() createPostsMediaDto: CreatePostsMediaDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const fileBuffer = file?.buffer;
+    const fileName = file?.originalname;
+    return this.postsMediasService.create(createPostsMediaDto, fileBuffer, fileName);
   }
 
   @Get()
@@ -25,8 +44,16 @@ export class PostsMediasController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePostsMediaDto: UpdatePostsMediaDto) {
-    return this.postsMediasService.update(id, updatePostsMediaDto);
+  @UseGuards(SupabaseGuard)
+  @UseInterceptors(FileInterceptor('file'))
+  update(
+    @Param('id') id: string,
+    @Body() updatePostsMediaDto: UpdatePostsMediaDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const fileBuffer = file?.buffer;
+    const fileName = file?.originalname;
+    return this.postsMediasService.update(id, updatePostsMediaDto, fileBuffer, fileName);
   }
 
   @Delete(':id')

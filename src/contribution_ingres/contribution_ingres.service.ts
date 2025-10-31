@@ -8,6 +8,8 @@ import { DeleteResult, IsNull, Repository, UpdateResult } from 'typeorm';
 import { ContributionStatus } from 'src/helpers/enums/contribution-status.enum';
 import { ContributionOptions } from 'src/helpers/enums/contribution-options';
 import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
+import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ContributionIngresService {
@@ -15,6 +17,8 @@ export class ContributionIngresService {
     @InjectRepository(ContributionIngre)
     private contributionIngreRepository: Repository<ContributionIngre>,
     @InjectRepository(Ingredient) private ingredientRepository: Repository<Ingredient>,
+    private supabaseStorageService: SupabaseStorageService,
+    private configService: ConfigService,
   ) {}
 
   async findAllPending(): Promise<ContributionIngre[]> {
@@ -107,6 +111,8 @@ export class ContributionIngresService {
     id: string,
     updateContributionIngreDto: UpdateContributionIngreDto,
     userId: string,
+    imageBuffer?: Buffer,
+    imageName?: string,
   ): Promise<ContributionIngre> {
     const existingContribution = await this.contributionIngreRepository.findOne({ where: { id } });
     if (!existingContribution) {
@@ -121,6 +127,16 @@ export class ContributionIngresService {
     const updatedContribution = Object.assign(existingContribution, updateContributionIngreDto); // copy existing to update but prioritize update
     updatedContribution.opt = ContributionOptions.EDIT;
     updatedContribution.status = ContributionStatus.PENDING;
+    if (imageBuffer && imageName) {
+      const bucketName =
+        this.configService.get<string>('INGREDIENT_IMG_BUCKET_NAME') || 'ingredient-imgs';
+      const imagePath = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        bucketName,
+      );
+      updatedContribution.image_url = imagePath;
+    }
     return await this.contributionIngreRepository.save(updatedContribution);
   }
 
@@ -142,6 +158,8 @@ export class ContributionIngresService {
   async create(
     createContributionIngreDto: CreateContributionIngreDto,
     userId: string,
+    imageBuffer?: Buffer,
+    imageName?: string,
   ): Promise<ContributionIngre> {
     const contributionIngre = this.contributionIngreRepository.create({
       ...createContributionIngreDto,
@@ -149,6 +167,16 @@ export class ContributionIngresService {
     });
     contributionIngre.opt = ContributionOptions.NEW;
     contributionIngre.status = ContributionStatus.PENDING;
+    if (imageBuffer && imageName) {
+      const bucketName =
+        this.configService.get<string>('INGREDIENT_IMG_BUCKET_NAME') || 'ingredient-imgs';
+      const imagePath = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        bucketName,
+      );
+      contributionIngre.image_url = imagePath;
+    }
     return await this.contributionIngreRepository.save(contributionIngre);
   }
 

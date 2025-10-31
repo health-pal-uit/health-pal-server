@@ -4,9 +4,10 @@ import { ContributionIngresController } from './contribution_ingres.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ContributionIngre } from './entities/contribution_ingre.entity';
 import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
+import { SupabaseStorageModule } from 'src/supabase-storage/supabase-storage.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ContributionIngre, Ingredient])],
+  imports: [TypeOrmModule.forFeature([ContributionIngre, Ingredient]), SupabaseStorageModule],
   controllers: [ContributionIngresController],
   providers: [ContributionIngresService],
   exports: [ContributionIngresService],

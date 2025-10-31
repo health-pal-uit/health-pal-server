@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { MealsService } from './meals.service';
 import { CreateMealDto } from './dto/create-meal.dto';
 import { UpdateMealDto } from './dto/update-meal.dto';
@@ -6,6 +17,7 @@ import { IngredientPayload } from './dto/ingredient-payload.type';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('meals')
 export class MealsController {
@@ -20,9 +32,20 @@ export class MealsController {
 
   // create meal - from ingredients
   @Post('ingredients')
+  @UseInterceptors(FileInterceptor('image'))
   @UseGuards(AdminSupabaseGuard) // only admin
-  createFromIngredients(@Body() body: { meal: CreateMealDto; ingredients: IngredientPayload[] }) {
-    return this.mealsService.createFromIngredients(body.meal, body.ingredients);
+  createFromIngredients(
+    @Body() body: { meal: CreateMealDto; ingredients: IngredientPayload[] },
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
+    return this.mealsService.createFromIngredients(
+      body.meal,
+      body.ingredients,
+      imageBuffer,
+      imageName,
+    );
   }
 
   // admin find allx
