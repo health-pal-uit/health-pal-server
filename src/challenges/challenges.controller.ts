@@ -1,10 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { ChallengesService } from './challenges.service';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller('challenges')
 export class ChallengesController {
@@ -12,8 +24,14 @@ export class ChallengesController {
 
   @Post()
   @UseGuards(AdminSupabaseGuard)
-  create(@Body() createChallengeDto: CreateChallengeDto) {
-    return this.challengesService.create(createChallengeDto);
+  @UseInterceptors(FileInterceptor('image'))
+  create(
+    @Body() createChallengeDto: CreateChallengeDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
+    return this.challengesService.create(createChallengeDto, imageBuffer, imageName);
   }
 
   @Get()
@@ -30,8 +48,15 @@ export class ChallengesController {
 
   @Patch(':id')
   @UseGuards(AdminSupabaseGuard)
-  update(@Param('id') id: string, @Body() updateChallengeDto: UpdateChallengeDto) {
-    return this.challengesService.update(id, updateChallengeDto);
+  @UseInterceptors(FileInterceptor('image'))
+  update(
+    @Param('id') id: string,
+    @Body() updateChallengeDto: UpdateChallengeDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
+    return this.challengesService.update(id, updateChallengeDto, imageBuffer, imageName);
   }
 
   @Delete(':id')

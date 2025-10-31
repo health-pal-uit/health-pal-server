@@ -18,6 +18,7 @@ import { SupabaseGuard } from './guards/supabase/supabase.guard';
 import type { Response } from 'express';
 import { GoogleGuard } from './guards/google/google.guard';
 import { ReqUserType } from './types/req.type';
+import { responseHelper } from 'src/helpers/responses/response.helper';
 
 @Controller('auth')
 export class AuthController {
@@ -50,23 +51,43 @@ export class AuthController {
 
   @Post('signup')
   async signUp(@Body() createUserDto: CreateUserDto) {
-    return this.authService.signUp(createUserDto);
+    const result = await this.authService.signUp(createUserDto);
+    return responseHelper({
+      data: result,
+      message: 'User signed up successfully',
+      statusCode: 201,
+    });
   }
 
   @Get('check-verification/:email')
   async checkVerification(@Param('email') email: string) {
-    return this.authService.checkVerification(email);
+    const result = await this.authService.checkVerification(email);
+    return responseHelper({
+      data: result,
+      message: 'Verification status retrieved',
+      statusCode: 200,
+    });
   }
 
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
-    return this.authService.login(loginDto);
+    const result = await this.authService.login(loginDto);
+    return responseHelper({
+      data: result,
+      message: 'Login successful',
+      statusCode: 200,
+    });
   }
 
   @Get('logout')
   @UseGuards(SupabaseGuard)
   async logOut() {
-    return this.authService.logOut();
+    const result = await this.authService.logOut();
+    return responseHelper({
+      data: result,
+      message: 'Logout successful',
+      statusCode: 200,
+    });
   }
 
   // @Get('google/login')
@@ -83,6 +104,7 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(GoogleGuard)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async googleCallback(@Res() res: Response, @Req() req: any) {
     const user = req.user;
     // generate a JWT token for the user

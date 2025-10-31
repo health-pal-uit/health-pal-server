@@ -6,6 +6,8 @@ import { Medal } from './entities/medal.entity';
 import { IsNull, Repository, UpdateResult } from 'typeorm';
 import { Challenge } from 'src/challenges/entities/challenge.entity';
 import { ChallengesMedalsService } from 'src/challenges_medals/challenges_medals.service';
+import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class MedalsService {
@@ -13,9 +15,25 @@ export class MedalsService {
     @InjectRepository(Medal) private medalsRepository: Repository<Medal>,
     @InjectRepository(Challenge) private challengesRepository: Repository<Challenge>,
     private challengesMedalsService: ChallengesMedalsService,
+    private supabaseStorageService: SupabaseStorageService,
+    private readonly configService: ConfigService,
   ) {}
 
-  async create(createMedalDto: CreateMedalDto): Promise<Medal> {
+  async create(
+    createMedalDto: CreateMedalDto,
+    imageBuffer?: Buffer,
+    imageName?: string,
+  ): Promise<Medal> {
+    if (imageBuffer && imageName) {
+      const medalImgBucketName =
+        this.configService.get<string>('MEDAL_IMG_BUCKET_NAME') || 'medal-imgs';
+      const imageUrl = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        medalImgBucketName,
+      );
+      createMedalDto.image_url = imageUrl || createMedalDto.image_url;
+    }
     const medal = this.medalsRepository.create(createMedalDto);
     const challenges = await this.challengesRepository.findByIds(
       createMedalDto.challenge_ids || [],
@@ -40,7 +58,22 @@ export class MedalsService {
     return await this.medalsRepository.findOneBy({ id });
   }
 
-  async update(id: string, updateMedalDto: UpdateMedalDto): Promise<UpdateResult> {
+  async update(
+    id: string,
+    updateMedalDto: UpdateMedalDto,
+    imageBuffer?: Buffer,
+    imageName?: string,
+  ): Promise<UpdateResult> {
+    if (imageBuffer && imageName) {
+      const medalImgBucketName =
+        this.configService.get<string>('MEDAL_IMG_BUCKET_NAME') || 'medal-imgs';
+      const imageUrl = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        medalImgBucketName,
+      );
+      updateMedalDto.image_url = imageUrl || updateMedalDto.image_url;
+    }
     const challenges = await this.challengesRepository.findByIds(
       updateMedalDto.challenge_ids || [],
     );
