@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { SupabaseAdminModule } from 'src/supabase/supabase-admin.module';
@@ -7,6 +7,7 @@ import { PassportModule } from '@nestjs/passport';
 import { SupabaseStrategy } from './strategies/supabase-strategy';
 import { GoogleStrategy } from './strategies/google-strategy';
 
+@Global()
 @Module({
   imports: [
     SupabaseAdminModule,
