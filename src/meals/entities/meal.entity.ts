@@ -54,7 +54,7 @@ export class Meal {
   @Column({ type: 'float', default: 0 })
   rating: number;
 
-  @Column({ type: 'enum', enum: FoodType, array: true })
+  @Column({ type: 'enum', enum: FoodType, array: true, nullable: true })
   tags: FoodType[];
 
   @Column({ type: 'text', nullable: true })

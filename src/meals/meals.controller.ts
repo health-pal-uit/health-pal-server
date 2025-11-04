@@ -48,7 +48,7 @@ export class MealsController {
     );
   }
 
-  // admin find allx
+  // admin find all
   @Get('admin')
   @UseGuards(AdminSupabaseGuard)
   findAll() {
