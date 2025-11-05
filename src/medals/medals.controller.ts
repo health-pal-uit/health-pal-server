@@ -16,7 +16,9 @@ import { UpdateMedalDto } from './dto/update-medal.dto';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('medals')
 export class MedalsController {
   constructor(private readonly medalsService: MedalsService) {}

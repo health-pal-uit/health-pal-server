@@ -18,7 +18,9 @@ import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { IngredientPayload } from 'src/meals/dto/ingredient-payload.type';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('contribution-meals')
 export class ContributionMealsController {
   constructor(private readonly contributionMealsService: ContributionMealsService) {}

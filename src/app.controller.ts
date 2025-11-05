@@ -1,7 +1,9 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { AppService } from './app.service';
 import { AdminSupabaseGuard } from './auth/guards/supabase/admin-supabase.guard';
 
+@ApiBearerAuth()
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}

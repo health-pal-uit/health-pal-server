@@ -1,10 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { DietTypesService } from './diet_types.service';
 import { CreateDietTypeDto } from './dto/create-diet_type.dto';
 import { UpdateDietTypeDto } from './dto/update-diet_type.dto';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 
+@ApiBearerAuth()
 @Controller('diet-types')
 export class DietTypesController {
   constructor(private readonly dietTypesService: DietTypesService) {}

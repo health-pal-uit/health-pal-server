@@ -15,7 +15,9 @@ import { CreatePostsMediaDto } from './dto/create-posts_media.dto';
 import { UpdatePostsMediaDto } from './dto/update-posts_media.dto';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('posts-medias')
 @UseGuards(SupabaseGuard)
 export class PostsMediasController {

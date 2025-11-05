@@ -18,7 +18,9 @@ import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUserId } from 'src/helpers/decorators/current-user-id.decorator';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('ingredients')
 export class IngredientsController {
   constructor(private readonly ingredientsService: IngredientsService) {}

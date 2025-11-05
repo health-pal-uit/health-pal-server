@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { FitnessProfilesService } from './fitness_profiles.service';
 import { CreateFitnessProfileDto } from './dto/create-fitness_profile.dto';
 import { UpdateFitnessProfileDto } from './dto/update-fitness_profile.dto';
@@ -7,6 +8,7 @@ import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guar
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { BFFitnessProfileDto } from './dto/body-fat-fitness_profile.dto';
 
+@ApiBearerAuth()
 @Controller('fitness-profiles')
 export class FitnessProfilesController {
   constructor(private readonly fitnessProfilesService: FitnessProfilesService) {}

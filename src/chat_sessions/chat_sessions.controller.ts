@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { ChatSessionsService } from './chat_sessions.service';
 import { CreateChatSessionDto } from './dto/create-chat_session.dto';
 import { UpdateChatSessionDto } from './dto/update-chat_session.dto';
@@ -7,6 +8,7 @@ import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guar
 import { CurrentUserId } from 'src/helpers/decorators/current-user-id.decorator';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 
+@ApiBearerAuth()
 @Controller('chat-sessions')
 export class ChatSessionsController {
   constructor(private readonly chatSessionsService: ChatSessionsService) {}

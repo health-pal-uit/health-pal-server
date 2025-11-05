@@ -1,10 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { ChallengesMedalsService } from './challenges_medals.service';
 import { CreateChallengesMedalDto } from './dto/create-challenges_medal.dto';
 import { UpdateChallengesMedalDto } from './dto/update-challenges_medal.dto';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 
+@ApiBearerAuth()
 @Controller('challenges-medals')
 export class ChallengesMedalsController {
   constructor(private readonly challengesMedalsService: ChallengesMedalsService) {}

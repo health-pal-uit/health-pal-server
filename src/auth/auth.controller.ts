@@ -19,7 +19,9 @@ import type { Response } from 'express';
 import { GoogleGuard } from './guards/google/google.guard';
 import { ReqUserType } from './types/req.type';
 import { responseHelper } from 'src/helpers/responses/response.helper';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}

@@ -17,7 +17,9 @@ import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('contribution-ingres')
 export class ContributionIngresController {
   constructor(private readonly contributionIngresService: ContributionIngresService) {}

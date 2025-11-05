@@ -1,10 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { DevicesService } from './devices.service';
 import { CreateDeviceDto } from './dto/create-device.dto';
 import { UpdateDeviceDto } from './dto/update-device.dto';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 
+@ApiBearerAuth()
 @Controller('devices')
 export class DevicesController {
   constructor(private readonly devicesService: DevicesService) {}

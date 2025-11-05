@@ -14,7 +14,9 @@ import { CreateDailyLogDto } from './dto/create-daily_log.dto';
 import { UpdateDailyLogDto } from './dto/update-daily_log.dto';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('daily-logs')
 @UseGuards(SupabaseGuard)
 export class DailyLogsController {
