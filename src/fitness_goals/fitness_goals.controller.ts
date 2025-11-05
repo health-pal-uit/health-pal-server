@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { FitnessGoalsService } from './fitness_goals.service';
 import { CreateFitnessGoalDto } from './dto/create-fitness_goal.dto';
 import { UpdateFitnessGoalDto } from './dto/update-fitness_goal.dto';
@@ -6,6 +7,7 @@ import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 
+@ApiBearerAuth()
 @Controller('fitness-goals')
 @UseGuards(SupabaseGuard)
 export class FitnessGoalsController {

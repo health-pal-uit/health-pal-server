@@ -4,7 +4,9 @@ import { CreatePremiumPackageDto } from './dto/create-premium_package.dto';
 import { UpdatePremiumPackageDto } from './dto/update-premium_package.dto';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
+@ApiBearerAuth()
 @Controller('premium-packages')
 export class PremiumPackagesController {
   constructor(private readonly premiumPackagesService: PremiumPackagesService) {}

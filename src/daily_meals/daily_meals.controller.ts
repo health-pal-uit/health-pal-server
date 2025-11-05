@@ -1,10 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { DailyMealsService } from './daily_meals.service';
 import { CreateDailyMealDto } from './dto/create-daily_meal.dto';
 import { UpdateDailyMealDto } from './dto/update-daily_meal.dto';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 
+@ApiBearerAuth()
 @Controller('daily-meals')
 export class DailyMealsController {
   constructor(private readonly dailyMealsService: DailyMealsService) {}

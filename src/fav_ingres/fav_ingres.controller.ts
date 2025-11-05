@@ -1,10 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { FavIngresService } from './fav_ingres.service';
 import { CreateFavIngreDto } from './dto/create-fav_ingre.dto';
 import { UpdateFavIngreDto } from './dto/update-fav_ingre.dto';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUserId } from 'src/helpers/decorators/current-user-id.decorator';
 
+@ApiBearerAuth()
 @Controller('fav-ingres')
 export class FavIngresController {
   constructor(private readonly favIngresService: FavIngresService) {}

@@ -1,10 +1,12 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { DailyIngresService } from './daily_ingres.service';
 import { CreateDailyIngreDto } from './dto/create-daily_ingre.dto';
 import { UpdateDailyIngreDto } from './dto/update-daily_ingre.dto';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 
+@ApiBearerAuth()
 @Controller('daily-ingres')
 export class DailyIngresController {
   constructor(private readonly dailyIngresService: DailyIngresService) {}
