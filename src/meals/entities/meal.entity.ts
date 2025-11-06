@@ -39,16 +39,16 @@ export class Meal {
   @Column({ type: 'float' })
   kcal_per_100gr: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   protein_per_100gr: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   fat_per_100gr: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   carbs_per_100gr: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   fiber_per_100gr: number;
 
   @Column({ type: 'float', default: 0 })

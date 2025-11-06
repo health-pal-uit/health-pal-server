@@ -19,7 +19,7 @@ export class PremiumPackage {
   @Column({ type: 'varchar', length: 255, unique: true })
   name: string;
 
-  @Column({ type: 'numeric', precision: 12, scale: 2, transformer: Money })
+  @Column({ type: 'numeric', precision: 12, scale: 2, transformer: Money, nullable: true })
   expert_fee: number;
 
   @Column({ type: 'numeric', precision: 12, scale: 2, transformer: Money })

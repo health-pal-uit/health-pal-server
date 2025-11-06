@@ -39,6 +39,7 @@ import { SupabaseAdminModule } from './supabase/supabase-admin.module';
 import { ContributionMealsModule } from './contribution_meals/contribution_meals.module';
 import { ContributionIngresModule } from './contribution_ingres/contribution_ingres.module';
 import { SupabaseStorageModule } from './supabase-storage/supabase-storage.module';
+import { SeedModule } from './seed/seed.module';
 import configuration from './config/configuration';
 import * as joi from 'joi';
 
@@ -92,6 +93,7 @@ import * as joi from 'joi';
     ContributionMealsModule,
     ContributionIngresModule,
     SupabaseStorageModule,
+    SeedModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -4,6 +4,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { ResponseInterceptor } from './helpers/interceptors/response.interceptor';
+import { SeedService } from './seed/seed.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -16,6 +17,11 @@ async function bootstrap() {
       transform: true,
     }),
   );
+  // seed
+  const seedService = app.get(SeedService);
+  await seedService.seed();
+
+  // cors
   app.enableCors({
     origin: ['http://localhost:3000', 'http://localhost:8081'], // web and mobile
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
