@@ -27,13 +27,13 @@ export class FitnessProfile {
   @Column({ type: 'float' })
   height_m: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   waist_cm: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   hip_cm: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   neck_cm: number;
 
   @Column({ type: 'enum', enum: ActivityLevel })

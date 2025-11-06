@@ -1,3 +1,4 @@
+import { de } from '@faker-js/faker';
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import { ActivityRecord } from 'src/activity_records/entities/activity_record.entity';
 import { Challenge } from 'src/challenges/entities/challenge.entity';
@@ -19,7 +20,7 @@ export class ChallengesUser {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column('timestamptz')
+  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   achieved_at: Date;
 
   @Column({ type: 'float', nullable: true })

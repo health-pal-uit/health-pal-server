@@ -25,10 +25,10 @@ export class DailyMeal {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   quantity_kg: number;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'int', nullable: true })
   serving: number;
 
   @Column({ type: 'float' })

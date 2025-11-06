@@ -85,7 +85,6 @@ function parseCSVLine(line: string): string[] {
   return result;
 }
 
-// Remove duplicate imports below
 import { ChallengeDifficulty } from 'src/helpers/enums/challenge-difficulty.enum';
 import { MedalTier } from 'src/helpers/enums/medal-tier.enum';
 import { FitnessProfile } from 'src/fitness_profiles/entities/fitness_profile.entity';
@@ -108,6 +107,7 @@ import { FavIngre } from 'src/fav_ingres/entities/fav_ingre.entity';
 import { FavMeal } from 'src/fav_meals/entities/fav_meal.entity';
 import { ChallengesUser } from 'src/challenges_users/entities/challenges_user.entity';
 import { MedalsUser } from 'src/medals_users/entities/medals_user.entity';
+import { MealType } from 'src/helpers/enums/meal-type.enum';
 
 export async function seedData(manager: EntityManager) {
   faker.seed(40);
@@ -172,8 +172,8 @@ async function seedRoles(manager: EntityManager) {
 
 async function seedDietTypes(manager: EntityManager) {
   const data = [
-    { name: 'Balanced', protein_percentage: 0.3, fat_percentage: 0.25, carbs_percentage: 0.45 },
-    { name: 'High-Protein', protein_percentage: 0.4, fat_percentage: 0.25, carbs_percentage: 0.35 },
+    { name: 'Balanced', protein_percentages: 30, fat_percentages: 25, carbs_percentages: 45 },
+    { name: 'High-Protein', protein_percentages: 40, fat_percentages: 25, carbs_percentages: 35 },
   ];
 
   await manager.getRepository(DietType).upsert(data, ['name']);
@@ -181,9 +181,9 @@ async function seedDietTypes(manager: EntityManager) {
 }
 async function seedPremiumPackages(manager: EntityManager) {
   const data = [
-    { name: 'Free', price: 0 },
-    { name: 'Lite', price: 4.99 },
-    { name: 'Pro', price: 9.99 },
+    { name: 'Free', expert_fee: 0, price: 0 },
+    { name: 'Lite', expert_fee: 2.99, price: 4.99 },
+    { name: 'Pro', expert_fee: 5.99, price: 9.99 },
   ];
   await manager.getRepository(PremiumPackage).upsert(data, ['name']);
   return await manager.getRepository(PremiumPackage).find();
@@ -200,21 +200,39 @@ async function seedPremiumPackages(manager: EntityManager) {
 
 async function seedActivities(manager: EntityManager) {
   // Load activities from CSV file
-  const csvPath = path.join(__dirname, '..', 'data', 'activities', 'activities_dataset.csv');
+  // In production: /usr/src/app/dist/database/seeds -> go to /usr/src/app/database/data
+  const csvPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    'database',
+    'data',
+    'activities',
+    'activities_dataset.csv',
+  );
   const csvData = parseCSV(csvPath);
 
   // Map CSV data to Activity entity format
-  const data = csvData.map((row) => ({
+  const allData = csvData.map((row) => ({
     id: row.id || undefined, // UUID from CSV or let DB generate
     name: row.name,
-    met_values: row.met_values,
-    supports_rep: row.supports_rep || false,
-    supports_hour: row.supports_hour || false,
-    category: row.category || [],
+    met_value: row.met_values, // CSV has 'met_values', entity expects 'met_value'
+    categories: row.category || [], // CSV has 'category', entity expects 'categories'
   }));
 
-  // Use upsert to avoid duplicates
-  await manager.getRepository(Activity).upsert(data, ['id']);
+  // Deduplicate by name - keep first occurrence
+  const seenNames = new Set<string>();
+  const data = allData.filter((item) => {
+    if (seenNames.has(item.name)) {
+      return false;
+    }
+    seenNames.add(item.name);
+    return true;
+  });
+
+  // Use upsert to avoid duplicates - use 'name' as conflict target since it has unique constraint
+  await manager.getRepository(Activity).upsert(data, ['name']);
   return await manager.getRepository(Activity).find();
 }
 
@@ -242,7 +260,7 @@ async function seedChallengesAndMedals(manager: EntityManager) {
         challenge: challenge,
         medal: medal,
       },
-      ['challenges_id', 'medal_id'],
+      ['challenge', 'medal'],
     );
   }
   return { challenges, medals };
@@ -293,32 +311,26 @@ async function seedFitnessProfilesAndGoals(
         faker.number.int({ min: 0, max: Object.values(FitnessGoalType).length - 1 })
       ];
 
-    await manager.getRepository(FitnessProfile).upsert(
-      {
-        user: u,
-        weight_kg: weight,
-        height_m: heightM,
-        activity_level,
-        diet_type: faker.helpers.arrayElement(opts.diet_types),
-        bmi,
-        bmr,
-        tdee_kcal: tdee,
-      },
-      ['user'],
-    );
-    await manager.getRepository(FitnessGoal).upsert(
-      {
-        user: u,
-        target_kcal: tdee - 300,
-        target_protein_gr: Math.round(weight * 1.6),
-        target_fat_gr: 60,
-        target_carbs_gr: 220,
-        target_fiber_gr: 25,
-        goal_type,
-        water_drank_l: 0,
-      },
-      ['user'],
-    );
+    await manager.getRepository(FitnessProfile).save({
+      user: u,
+      weight_kg: weight,
+      height_m: heightM,
+      activity_level,
+      diet_type: faker.helpers.arrayElement(opts.diet_types),
+      bmi,
+      bmr,
+      tdee_kcal: tdee,
+    });
+    await manager.getRepository(FitnessGoal).save({
+      user: u,
+      target_kcal: tdee - 300,
+      target_protein_gr: Math.round(weight * 1.6),
+      target_fat_gr: 60,
+      target_carbs_gr: 220,
+      target_fiber_gr: 25,
+      goal_type,
+      water_drank_l: 0,
+    });
   }
 }
 
@@ -354,7 +366,16 @@ async function seedNutritionContents(manager: EntityManager, opts: { users: User
     Object.values(FoodType)[faker.number.int({ min: 0, max: Object.values(FoodType).length - 1 })];
 
   // Load ingredients from CSV
-  const ingredientsPath = path.join(__dirname, '..', 'data', 'food', 'ingredients_dataset.csv');
+  const ingredientsPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    'database',
+    'data',
+    'food',
+    'ingredients_dataset.csv',
+  );
   const ingredientsCSV = parseCSV(ingredientsPath);
 
   // Map CSV data to Ingredient entities (take first 100 for reasonable seed size)
@@ -375,7 +396,16 @@ async function seedNutritionContents(manager: EntityManager, opts: { users: User
   const ingredients = await manager.getRepository(Ingredient).save(ingredientsData);
 
   // Load meals from CSV
-  const mealsPath = path.join(__dirname, '..', 'data', 'food', 'meals_dataset.csv');
+  const mealsPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    'database',
+    'data',
+    'food',
+    'meals_dataset.csv',
+  );
   const mealsCSV = parseCSV(mealsPath);
 
   // Map CSV data to Meal entities (take first 100 for reasonable seed size)
@@ -436,14 +466,11 @@ async function seedIngreMeals(manager: EntityManager) {
   for (const meal of savedMeals) {
     const parts = faker.helpers.arrayElements(ingredients, faker.number.int({ min: 1, max: 5 }));
     for (const ingre of parts) {
-      await manager.getRepository(IngreMeal).upsert(
-        {
-          meal: meal,
-          ingredient: ingre,
-          quantity_kg: faker.number.float({ min: 0.1, max: 1, multipleOf: 0.1 }),
-        },
-        ['meal', 'ingredient'],
-      );
+      await manager.getRepository(IngreMeal).save({
+        meal: meal,
+        ingredient: ingre,
+        quantity_kg: faker.number.float({ min: 0.1, max: 1, multipleOf: 0.1 }),
+      });
     }
   }
 }
@@ -464,6 +491,11 @@ async function seedDailyLogs(
       opts.ingredients,
       faker.number.int({ min: 1, max: 4 }),
     );
+
+    const ingreMealType =
+      Object.values(MealType)[
+        faker.number.int({ min: 0, max: Object.values(MealType).length - 1 })
+      ];
     for (const ing of ingrs) {
       const qty = faker.number.float({ min: 0.05, max: 0.25, multipleOf: 0.01 });
       await manager.getRepository(DailyIngre).save({
@@ -475,10 +507,14 @@ async function seedDailyLogs(
         total_fat_gr: +((ing.fat_per_100gr ?? 0) * qty).toFixed(1),
         total_fiber_gr: +((ing.fiber_per_100gr ?? 0) * qty).toFixed(1),
         total_carbs_gr: +((ing.carbs_per_100gr ?? 0) * qty).toFixed(1),
-        meal_types: faker.helpers.arrayElement(['breakfast', 'lunch', 'dinner', 'snack']),
+        meal_type: ingreMealType,
         logged_at: new Date(),
       });
     }
+    const mealMealType =
+      Object.values(MealType)[
+        faker.number.int({ min: 0, max: Object.values(MealType).length - 1 })
+      ];
 
     // daily_meals
     const meals = faker.helpers.arrayElements(opts.meals, faker.number.int({ min: 0, max: 2 }));
@@ -493,7 +529,7 @@ async function seedDailyLogs(
         total_fat_gr: +((m.fat_per_100gr ?? 0) * qty).toFixed(1),
         total_fiber_gr: +((m.fiber_per_100gr ?? 0) * qty).toFixed(1),
         total_carbs_gr: +((m.carbs_per_100gr ?? 0) * qty).toFixed(1),
-        meal_types: faker.helpers.arrayElement(['breakfast', 'lunch', 'dinner', 'snack']),
+        meal_type: mealMealType,
         logged_at: new Date(),
       });
     }
