@@ -479,10 +479,31 @@ async function seedDailyLogs(
   manager: EntityManager,
   opts: { users: User[]; ingredients: Ingredient[]; meals: Meal[]; activities: Activity[] },
 ) {
-  for (const u of opts.users) {
-    const log = await manager.getRepository(DailyLog).save({
+  const dailyLogsRepo = manager.getRepository(DailyLog);
+
+  for (let userIndex = 0; userIndex < opts.users.length; userIndex++) {
+    const u = opts.users[userIndex];
+
+    // Generate unique date for each user by going back userIndex days
+    const date = new Date();
+    date.setDate(date.getDate() - userIndex);
+    date.setHours(0, 0, 0, 0); // Normalize to start of day
+
+    // Check if a log already exists for this user and date
+    const existingLog = await dailyLogsRepo.findOne({
+      where: { user: { id: u.id }, date },
+    });
+
+    if (existingLog) {
+      console.log(
+        `Daily log already exists for user ${u.id} on ${date.toISOString().split('T')[0]}, skipping...`,
+      );
+      continue;
+    }
+
+    const log = await dailyLogsRepo.save({
       user: u,
-      date: faker.date.recent({ days: 5 }),
+      date,
       updated_at: new Date(),
     });
 
