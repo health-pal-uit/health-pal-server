@@ -3,6 +3,7 @@ import { User } from 'src/users/entities/user.entity';
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   Index,
   JoinColumn,
@@ -12,6 +13,8 @@ import {
 
 @ApiSchema({ name: Notification.name, description: 'Notification entity' })
 @Entity('notifications')
+@Index(['user', 'is_read']) // For unread queries
+@Index(['user', 'created_at']) // For user notifications ordered by date
 export class Notification {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -27,6 +30,9 @@ export class Notification {
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
+
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
+  deleted_at?: Date;
 
   // relations => 1
   @ManyToOne(() => User, (user) => user.notifications, {
