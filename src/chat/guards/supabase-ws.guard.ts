@@ -56,6 +56,10 @@ export class SupabaseWsGuard implements CanActivate {
     if (!user) {
       return false;
     }
+
+    // Attach user to socket for later use
+    (client as any).user = user;
+
     return true;
   }
 }

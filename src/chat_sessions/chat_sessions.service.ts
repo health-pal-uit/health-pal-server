@@ -20,16 +20,39 @@ export class ChatSessionsService {
   ) {}
 
   async create(createChatSessionDto: CreateChatSessionDto, user_id: string): Promise<ChatSession> {
+    const participantIds = new Set([user_id, ...(createChatSessionDto.participant_ids || [])]);
+    const allParticipantIds = Array.from(participantIds);
+
     if (createChatSessionDto.is_group === false) {
-      const otherUserId = createChatSessionDto.participant_ids?.find((id) => id !== user_id);
-      if (!otherUserId) {
-        throw new Error('Invalid participant IDs');
+      const otherUserId = allParticipantIds.find((id) => id !== user_id);
+      if (otherUserId) {
+        const otherUser = await this.userRepository.findOneBy({ id: otherUserId });
+        createChatSessionDto.title = otherUser ? otherUser.fullname : 'Unknown User';
       }
-      const otherUser = await this.userRepository.findOneBy({ id: otherUserId });
-      createChatSessionDto.title = otherUser ? otherUser.fullname : 'Unknown User';
     }
+
+    // Create chat session
     const chatSession = this.chatSessionRepository.create(createChatSessionDto);
-    return this.chatSessionRepository.save(chatSession);
+    const savedSession = await this.chatSessionRepository.save(chatSession);
+
+    // Create participant records for all users
+    for (const participantId of allParticipantIds) {
+      const user = await this.userRepository.findOneBy({ id: participantId });
+      if (user) {
+        const participant = this.chatParticipantRepository.create({
+          user: user,
+          chat_session: savedSession,
+          joined_at: new Date(),
+        });
+        await this.chatParticipantRepository.save(participant);
+      }
+    }
+
+    // Return session with participants
+    return this.chatSessionRepository.findOne({
+      where: { id: savedSession.id },
+      relations: ['participants', 'participants.user'],
+    }) as Promise<ChatSession>;
   }
 
   // create(createChatSessionDto: CreateChatSessionDto) {

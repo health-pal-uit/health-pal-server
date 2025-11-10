@@ -36,10 +36,15 @@ export class CreateChatSessionDto {
   // relations
 
   // reflects
-  @ApiProperty({ type: [String], description: 'IDs of participants in the chat session' })
+  @ApiProperty({
+    type: [String],
+    description: 'IDs of other participants to add (current user is added automatically)',
+    required: false,
+  })
   @IsUUID('4', { each: true })
   @IsNotEmpty({ each: true })
-  participant_ids!: string[];
+  @IsOptional()
+  participant_ids?: string[];
 
   // messages: string[]; when creating no need to preknow messages?
 }
