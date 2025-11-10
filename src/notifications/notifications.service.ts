@@ -1,41 +1,154 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DeleteResult, IsNull, Not, Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Notification } from './entities/notification.entity';
+import { Device } from 'src/devices/entities/device.entity';
+import * as admin from 'firebase-admin';
 
 @Injectable()
 export class NotificationsService {
   constructor(
     @InjectRepository(Notification) private notificationRepository: Repository<Notification>,
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(Device) private deviceRepository: Repository<Device>,
+    @Inject('FIREBASE_ADMIN') private firebaseAdmin: admin.app.App,
   ) {}
 
-  sendToUser(createNotificationDto: CreateNotificationDto) {
-    throw new Error('Method not implemented.');
+  async sendPushNotificationToDevice(push_tokens: string[], title: string, message: string) {
+    if (push_tokens.length === 0) {
+      console.log('No push tokens available to send notification.');
+      return;
+    }
+
+    try {
+      const res = await this.firebaseAdmin.messaging().sendEachForMulticast({
+        tokens: push_tokens,
+        notification: {
+          title: title,
+          body: message,
+        },
+      });
+
+      if (res.failureCount > 0) {
+        res.responses.forEach((resp, idx) => {
+          if (!resp.success) {
+            console.error(`Failed to send notification to ${push_tokens[idx]}: ${resp.error}`);
+          }
+        });
+      }
+      return res;
+    } catch (error) {
+      console.error('Error sending push notification:', error);
+    }
   }
-  sendToAllUsers(body: { title: string; message: string }) {
-    throw new Error('Method not implemented.');
+
+  async sendToUser(createNotificationDto: CreateNotificationDto) {
+    const user = await this.userRepository.findOne({
+      where: { id: createNotificationDto.user_id },
+      relations: ['devices'],
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const tokens = user.devices
+      .filter((device) => device.last_active_at !== null && device.push_token)
+      .map((device) => device.push_token);
+
+    const notification = this.notificationRepository.create({
+      user: user,
+      title: createNotificationDto.title,
+      content: createNotificationDto.content,
+    });
+    await this.notificationRepository.save(notification);
+    if (tokens.length > 0) {
+      await this.sendPushNotificationToDevice(
+        tokens,
+        createNotificationDto.title,
+        createNotificationDto.content,
+      );
+    }
   }
-  findAll() {
-    throw new Error('Method not implemented.');
+
+  async sendToAllUsers(body: { title: string; message: string }) {
+    const users = await this.userRepository.find();
+
+    const notifications = users.map((user) =>
+      this.notificationRepository.create({
+        user,
+        title: body.title,
+        content: body.message,
+      }),
+    );
+    await this.notificationRepository.save(notifications);
+
+    const devices = await this.deviceRepository.find({
+      where: { last_active_at: Not(IsNull()) },
+      select: ['push_token'],
+    });
+
+    const tokens = devices.map((d) => d.push_token).filter(Boolean);
+
+    if (tokens.length > 0) {
+      await this.sendPushNotificationToDevice(tokens, body.title, body.message);
+    }
   }
-  getUserNotifications(id: string) {
-    throw new Error('Method not implemented.');
+
+  async findAll() {
+    const notifications = await this.notificationRepository.find({ relations: ['user'] });
+    return notifications;
   }
-  getUserUnreadNotifications(id: string) {
-    throw new Error('Method not implemented.');
+
+  async getUserNotifications(id: string) {
+    const notifications = await this.notificationRepository.find({
+      where: { user: { id: id } },
+      order: { created_at: 'DESC' },
+    });
+    return notifications;
   }
-  markAsRead(id: string) {
-    throw new Error('Method not implemented.');
+
+  async getUserUnreadNotifications(id: string) {
+    const notifications = await this.notificationRepository.find({
+      where: { user: { id: id }, is_read: false },
+      relations: ['user'],
+    });
+    return notifications;
   }
-  remove(id: string) {
-    // soft delete
-    return `This action removes a #${id} notification`;
+
+  async markAsRead(id: string, userId: string) {
+    const notification = await this.notificationRepository.findOne({
+      where: { id: id, user: { id: userId } },
+    });
+    if (!notification) {
+      throw new NotFoundException('Notification not found');
+    }
+    notification.is_read = true;
+    await this.notificationRepository.save(notification);
   }
-  adminRemove(id: string) {
-    throw new Error('Method not implemented.');
+
+  async markAllAsRead(userId: string) {
+    const notifications = await this.notificationRepository.find({
+      where: { user: { id: userId }, is_read: false },
+    });
+    for (const notification of notifications) {
+      notification.is_read = true;
+    }
+    await this.notificationRepository.save(notifications);
+  }
+
+  async remove(id: string, userId: string): Promise<DeleteResult> {
+    const notification = await this.notificationRepository.findOne({
+      where: { id, user: { id: userId } },
+    });
+    if (!notification) {
+      throw new NotFoundException('Notification not found');
+    }
+    return this.notificationRepository.softDelete(id);
+  }
+  async adminRemove(id: string): Promise<DeleteResult> {
+    return this.notificationRepository.delete(id);
   }
 }
