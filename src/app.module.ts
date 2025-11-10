@@ -40,6 +40,7 @@ import { ContributionMealsModule } from './contribution_meals/contribution_meals
 import { ContributionIngresModule } from './contribution_ingres/contribution_ingres.module';
 import { SupabaseStorageModule } from './supabase-storage/supabase-storage.module';
 import { SeedModule } from './seed/seed.module';
+import { ChatModule } from './chat/chat.module';
 import configuration from './config/configuration';
 import * as joi from 'joi';
 
@@ -94,6 +95,7 @@ import * as joi from 'joi';
     ContributionIngresModule,
     SupabaseStorageModule,
     SeedModule,
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [AppService],
