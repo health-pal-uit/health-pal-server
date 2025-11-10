@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>WebSocket Chat Test Client</title>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+      }
+      .section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+      }
+      input,
+      button {
+        padding: 8px 12px;
+        margin: 5px;
+        font-size: 14px;
+      }
+      input {
+        width: 300px;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+      }
+      #messages {
+        height: 300px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 10px;
+        background-color: #f9f9f9;
+      }
+      .message {
+        margin: 5px 0;
+        padding: 5px;
+        background-color: white;
+        border-left: 3px solid #4caf50;
+      }
+      .error {
+        color: red;
+        border-left-color: red;
+      }
+      .success {
+        color: green;
+        border-left-color: green;
+      }
+      .status {
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 5px;
+      }
+      .connected {
+        background-color: #d4edda;
+        color: #155724;
+      }
+      .disconnected {
+        background-color: #f8d7da;
+        color: #721c24;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🔌 WebSocket Chat Test Client</h1>
+
+    <div id="status" class="status disconnected">Status: Disconnected</div>
+
+    <div class="section">
+      <h3>1. Connect to Server</h3>
+      <input type="text" id="token" placeholder="Enter JWT Token (Bearer token)" />
+      <br />
+      <button onclick="connect()">Connect</button>
+      <button onclick="disconnect()">Disconnect</button>
+    </div>
+
+    <div class="section">
+      <h3>2. Join Session</h3>
+      <input type="text" id="sessionId" placeholder="Enter Session ID" />
+      <button onclick="joinSession()" id="joinBtn" disabled>Join Session</button>
+    </div>
+
+    <div class="section">
+      <h3>3. Send Message</h3>
+      <input type="text" id="messageInput" placeholder="Enter message" />
+      <button onclick="sendMessage()" id="sendBtn" disabled>Send Message</button>
+    </div>
+
+    <div class="section">
+      <h3>Messages & Events</h3>
+      <div id="messages"></div>
+    </div>
+
+    <script>
+      let socket = null;
+
+      function addMessage(msg, type = 'message') {
+        const messagesDiv = document.getElementById('messages');
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${type}`;
+        msgDiv.innerHTML = `<strong>${new Date().toLocaleTimeString()}</strong>: ${msg}`;
+        messagesDiv.appendChild(msgDiv);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      }
+
+      function updateStatus(connected) {
+        const statusDiv = document.getElementById('status');
+        if (connected) {
+          statusDiv.className = 'status connected';
+          statusDiv.textContent = 'Status: Connected ✓';
+          document.getElementById('joinBtn').disabled = false;
+          document.getElementById('sendBtn').disabled = false;
+        } else {
+          statusDiv.className = 'status disconnected';
+          statusDiv.textContent = 'Status: Disconnected ✗';
+          document.getElementById('joinBtn').disabled = true;
+          document.getElementById('sendBtn').disabled = true;
+        }
+      }
+
+      function connect() {
+        const token = document.getElementById('token').value.trim();
+
+        if (!token) {
+          addMessage('Please enter a JWT token', 'error');
+          return;
+        }
+
+        if (socket) {
+          addMessage('Already connected. Disconnect first.', 'error');
+          return;
+        }
+
+        addMessage('Connecting to ws://localhost:3001/chat...', 'success');
+
+        socket = io('http://localhost:3001/chat', {
+          transports: ['websocket'],
+          auth: {
+            token: token,
+          },
+          extraHeaders: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        socket.on('connect', () => {
+          addMessage('✅ Connected! Socket ID: ' + socket.id, 'success');
+          updateStatus(true);
+        });
+
+        socket.on('disconnect', () => {
+          addMessage('❌ Disconnected', 'error');
+          updateStatus(false);
+          socket = null;
+        });
+
+        socket.on('connect_error', (error) => {
+          addMessage('Connection Error: ' + error.message, 'error');
+          updateStatus(false);
+        });
+
+        socket.on('error', (data) => {
+          addMessage('❌ Error: ' + JSON.stringify(data), 'error');
+        });
+
+        socket.on('chatHistory', (data) => {
+          addMessage('📜 Received chat history: ' + data.messages.length + ' messages', 'success');
+          data.messages.forEach((msg, index) => {
+            addMessage(`[${index + 1}] ${msg.sender?.username || 'Unknown'}: ${msg.content}`);
+          });
+        });
+
+        socket.on('joinedSession', (data) => {
+          addMessage('✅ ' + data.message, 'success');
+        });
+
+        socket.on('message', (data) => {
+          addMessage('📨 Message: ' + JSON.stringify(data));
+        });
+
+        socket.on('newMessage', (data) => {
+          addMessage('💬 New Message: ' + JSON.stringify(data), 'success');
+        });
+      }
+
+      function disconnect() {
+        if (socket) {
+          socket.disconnect();
+          socket = null;
+          addMessage('Disconnected manually', 'error');
+          updateStatus(false);
+        }
+      }
+
+      function joinSession() {
+        const sessionId = document.getElementById('sessionId').value.trim();
+
+        if (!sessionId) {
+          addMessage('Please enter a session ID', 'error');
+          return;
+        }
+
+        if (!socket || !socket.connected) {
+          addMessage('Not connected to server', 'error');
+          return;
+        }
+
+        addMessage('Joining session: ' + sessionId, 'success');
+        socket.emit('joinSession', { sessionId: sessionId, content: '' });
+      }
+
+      function sendMessage() {
+        const message = document.getElementById('messageInput').value.trim();
+
+        if (!message) {
+          addMessage('Please enter a message', 'error');
+          return;
+        }
+
+        if (!socket || !socket.connected) {
+          addMessage('Not connected to server', 'error');
+          return;
+        }
+
+        socket.emit('message', { text: message });
+        addMessage('Sent: ' + message, 'success');
+        document.getElementById('messageInput').value = '';
+      }
+
+      // Allow Enter key to send message
+      document.getElementById('messageInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          sendMessage();
+        }
+      });
+    </script>
+  </body>
+</html>

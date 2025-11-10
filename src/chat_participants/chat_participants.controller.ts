@@ -15,7 +15,8 @@ export class ChatParticipantsController {
 
   @Post()
   @UseGuards(SupabaseGuard)
-  create(@Body() createChatParticipantDto: CreateChatParticipantDto) {
+  create(@Body() createChatParticipantDto: CreateChatParticipantDto, @CurrentUser() user: any) {
+    createChatParticipantDto.user_id = user.id;
     return this.chatParticipantsService.create(createChatParticipantDto);
   }
 
