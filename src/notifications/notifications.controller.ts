@@ -45,8 +45,14 @@ export class NotificationsController {
 
   @Patch('markAsRead/:id') // notification id
   @UseGuards(SupabaseGuard)
-  markAsRead(@Param('id') id: string) {
-    return this.notificationsService.markAsRead(id);
+  markAsRead(@Param('id') id: string, @CurrentUser() user: any) {
+    return this.notificationsService.markAsRead(id, user.id);
+  }
+
+  @Patch('markAllAsRead')
+  @UseGuards(SupabaseGuard)
+  markAllAsRead(@CurrentUser() user: any) {
+    return this.notificationsService.markAllAsRead(user.id);
   }
 
   @Delete(':id')
@@ -56,6 +62,6 @@ export class NotificationsController {
     if (isAdmin) {
       return this.notificationsService.adminRemove(id);
     }
-    return this.notificationsService.remove(id);
+    return this.notificationsService.remove(id, user.id);
   }
 }

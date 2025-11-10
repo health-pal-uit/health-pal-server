@@ -14,19 +14,19 @@ export class CreateNotificationDto {
   @IsString()
   title: string;
 
-  @ApiProperty({ example: false, description: 'Indicates if the notification is read' })
-  @IsOptional()
-  @IsBoolean()
-  is_read?: boolean;
+  // @ApiProperty({ example: false, description: 'Indicates if the notification is read' })
+  // @IsOptional()
+  // @IsBoolean()
+  // is_read?: boolean;
 
-  @ApiProperty({
-    example: '2023-01-01T00:00:00Z',
-    description: 'Creation date of the notification',
-  })
-  @IsOptional()
-  @IsDateString()
-  @TransformToISODate()
-  created_at?: Date;
+  // @ApiProperty({
+  //   example: '2023-01-01T00:00:00Z',
+  //   description: 'Creation date of the notification',
+  // })
+  // @IsOptional()
+  // @IsDateString()
+  // @TransformToISODate()
+  // created_at?: Date;
 
   // relations => 1
   @IsUUID('4')
