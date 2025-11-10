@@ -20,7 +20,7 @@ export class CreateChatParticipantDto {
   chat_session_id!: string;
 
   @ApiProperty({ description: 'user id' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsUUID('4')
-  user_id!: string;
+  user_id?: string;
 }
