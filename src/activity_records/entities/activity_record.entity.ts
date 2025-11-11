@@ -16,7 +16,6 @@ import {
 } from 'typeorm';
 import { RecordType } from 'src/helpers/enums/record-type.enum';
 import { User } from 'src/users/entities/user.entity';
-import { ChallengesUser } from 'src/challenges_users/entities/challenges_user.entity';
 
 @ApiSchema({ name: ActivityRecord.name, description: 'ActivityRecord entity' })
 @Check(`reps IS NULL OR reps > 0`)
@@ -89,16 +88,9 @@ export class ActivityRecord {
   @JoinColumn({ name: 'challenge_id' })
   challenge: Challenge | null;
 
-  @ManyToOne(() => ChallengesUser, (challengesUser) => challengesUser.activity_records, {
-    onDelete: 'CASCADE',
-  })
-  challenge_user: ChallengesUser | null;
-
-  // @ManyToOne(() => FitnessGoal, (fitnessGoal) => fitnessGoal.activity_records, {
-  //   onDelete: 'CASCADE',
-  // })
-  // @JoinColumn({ name: 'goal_id' })
-  // goal: FitnessGoal | null;
+  // Note: We don't link to ChallengesUser here. Challenge progress is calculated by querying
+  // ActivityRecords with matching challenge_id, not by direct relation to user challenge entries.
+  // The progress calculation in ActivityRecordsService.calculateProgressPercent() handles this.
 
   @ManyToOne(() => Activity, (activity) => activity.activity_records, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'activity_id' })

@@ -100,7 +100,7 @@ export class ChallengesUsersService {
       challenge_user = this.challengesUsersRepository.create({
         user,
         challenge,
-        achieved_at: new Date(0),
+        achieved_at: new Date(),
         progress_percent: 0,
       });
       challenge_user = await this.challengesUsersRepository.save(challenge_user);
