@@ -45,14 +45,24 @@ export class AuthService {
       throw error;
     }
 
-    await this.usersService.createFromSupabase(
-      {
-        supabaseId: data.user!.id,
-        email: data.user!.email!,
-        isVerified: false,
-      },
-      createUserDto,
-    );
+    try {
+      await this.usersService.createFromSupabase(
+        {
+          supabaseId: data.user!.id,
+          email: data.user!.email!,
+          isVerified: false,
+        },
+        createUserDto,
+      );
+    } catch (dbError) {
+      // Rollback: Delete the user from Supabase Auth if DB creation fails
+      try {
+        await this.supabase.auth.admin.deleteUser(data.user!.id);
+      } catch (rollbackError) {
+        console.error('Error rolling back user creation:', rollbackError);
+      }
+      throw dbError;
+    }
 
     return { user: data.user };
   }

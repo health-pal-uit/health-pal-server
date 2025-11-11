@@ -3,15 +3,15 @@ import { CreateActivityRecordDto } from './dto/create-activity_record.dto';
 import { UpdateActivityRecordDto } from './dto/update-activity_record.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ActivityRecord } from './entities/activity_record.entity';
-import { DeleteResult, IsNull, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, IsNull, MoreThanOrEqual, Repository, UpdateResult } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { DailyLogsService } from 'src/daily_logs/daily_logs.service';
 import { Activity } from 'src/activities/entities/activity.entity';
 import { Challenge } from 'src/challenges/entities/challenge.entity';
 import { calcKcalSimple } from 'src/helpers/functions/kcal-burned-cal';
 import { makeProgressAccumulator } from 'src/helpers/functions/progress-calculator';
-import { ChallengesUser } from 'src/challenges_users/entities/challenges_user.entity';
 import { ChallengesUsersService } from 'src/challenges_users/challenges_users.service';
+import { RecordType } from 'src/helpers/enums/record-type.enum';
 
 @Injectable()
 export class ActivityRecordsService {
@@ -31,20 +31,39 @@ export class ActivityRecordsService {
     if (!activity) {
       throw new Error('Activity not found');
     }
+
+    if (!createActivityRecordDto.challenge_id) {
+      throw new Error('Challenge ID is required for challenge activity records');
+    }
+
+    const challenge = await this.challengesRepository.findOneBy({
+      id: createActivityRecordDto.challenge_id,
+    });
+    if (!challenge) {
+      throw new Error('Challenge not found');
+    }
+
     createActivityRecordDto.user_owned = false;
-    // const challenge = await this.challengesRepository.findOneBy({id: challengeId});
-    // if (!challenge) throw new Error('Challenge not found');
-    const activityRecord = this.activityRecordRepository.create();
-    // activityRecord.challenge = challenge;
-    activityRecord.activity = activity;
-    return await this.activityRecordRepository.save({ ...createActivityRecordDto, activityRecord });
+    createActivityRecordDto.type = RecordType.CHALLENGE;
+
+    const activityRecord = this.activityRecordRepository.create({
+      ...createActivityRecordDto,
+      activity,
+      challenge,
+    });
+
+    return await this.activityRecordRepository.save(activityRecord);
   }
   async assignToChallenge(id: string, challengeId: string): Promise<ActivityRecord> {
     const activityRecord = await this.activityRecordRepository.findOneBy({ id: id });
     if (!activityRecord) throw new Error('Not found Activity Record');
     const challenge = await this.challengesRepository.findOneBy({ id: challengeId });
     if (!challenge) throw new Error('Challenge not found');
+
     activityRecord.challenge = challenge;
+    activityRecord.type = RecordType.CHALLENGE; // Set type when assigning to challenge
+    activityRecord.daily_log = null; // Clear daily_log if it was set (mutual exclusion)
+
     const savedActivityRecord = await this.activityRecordRepository.save(activityRecord);
     return savedActivityRecord;
   }
@@ -69,19 +88,21 @@ export class ActivityRecordsService {
     }
 
     createActivityRecordDto.user_owned = true;
-    const activityRecord = this.activityRecordRepository.create();
-    activityRecord.activity = activity;
-    activityRecord.daily_log = dailyLog;
+    createActivityRecordDto.type = RecordType.DAILY;
 
-    const { kcal, method, notes } = calcKcalSimple(activityRecord, activity);
+    const activityRecord = this.activityRecordRepository.create({
+      ...createActivityRecordDto,
+      activity,
+      daily_log: dailyLog,
+    });
+
+    const { kcal } = calcKcalSimple(activityRecord, activity);
     activityRecord.kcal_burned = kcal;
+
     dailyLog.total_kcal_burned += kcal;
     await this.dailyLogsService.save(dailyLog);
 
-    const savedAC = await this.activityRecordRepository.save({
-      ...createActivityRecordDto,
-      activityRecord,
-    });
+    const savedAC = await this.activityRecordRepository.save(activityRecord);
     await this.dailyLogsService.recalculateTotalKcal(dailyLog.id);
     return savedAC;
   }
@@ -117,24 +138,6 @@ export class ActivityRecordsService {
   }
 
   // controller !!
-  // async findAllChallengesOfUser(challengeId: string, userId: string): Promise<ActivityRecord[]> {
-  //   return await this.activityRecordRepository.find({
-  //     where: {
-  //       challenge: { id: challengeId },
-  //       challenge_user: { user: { id: userId } },
-  //       user_owned: true,
-  //       deleted_at: IsNull(),
-  //     },
-  //     relations: {
-  //       activity: true,
-  //       challenge: true,
-  //       challenge_user: { user: true },
-  //     },
-  //     order: { created_at: 'DESC' },
-  //   });
-  // }
-
-  // controller !!
   async findAllDailyLogsOfUser(userId: string, dailyLogId: string): Promise<ActivityRecord[]> {
     return await this.activityRecordRepository.find({
       where: {
@@ -162,15 +165,13 @@ export class ActivityRecordsService {
     }
     const activityRecord = await this.activityRecordRepository.findOne({
       where: { id },
-      relations: { activity: true, daily_log: true, challenge: true },
+      relations: { activity: true, daily_log: { user: true } },
     });
     if (!activityRecord) {
       throw new Error('Activity record not found');
     }
-    if (
-      activityRecord.daily_log?.user.id !== userId ||
-      activityRecord.challenge_user?.user.id !== userId
-    ) {
+    // Only daily logs have user ownership (challenges are templates)
+    if (activityRecord.daily_log && activityRecord.daily_log.user.id !== userId) {
       throw new UnauthorizedException('User not authorized to access this activity record');
     }
     return activityRecord;
@@ -197,37 +198,27 @@ export class ActivityRecordsService {
     if (!dailyLog || !activity) {
       throw new Error('Related daily log or activity not found');
     }
+
+    // subtract old calories from daily log
     dailyLog.total_kcal_burned -= activityRecord.kcal_burned || 0;
     await this.dailyLogsService.save(dailyLog);
 
-    const { kcal, method, notes } = calcKcalSimple(activityRecord, activity);
+    // apply updates from DTO to the entity
+    Object.assign(activityRecord, updateActivityRecordDto);
+
+    // recalculate calories with updated values
+    const { kcal } = calcKcalSimple(activityRecord, activity);
     activityRecord.kcal_burned = kcal;
 
+    // add new calories to daily log
     dailyLog.total_kcal_burned += kcal;
     await this.dailyLogsService.save(dailyLog);
 
-    const updatedAC = await this.activityRecordRepository.update(id, {
-      ...updateActivityRecordDto,
-      ...activityRecord,
-    });
+    await this.activityRecordRepository.save(activityRecord);
     await this.dailyLogsService.recalculateTotalKcal(dailyLog.id);
-    return updatedAC;
-  }
 
-  // either delete it but cannot change related challenge or activity
-  // async updateChallengesOfUser(id: string, updateActivityRecordDto: UpdateActivityRecordDto, userId: string) : Promise<UpdateResult> {
-  //   const activityRecord = await this.activityRecordRepository.findOne({ where: { id }, relations: { challenge_user: { user: true }, activity: true } });
-  //   if (!activityRecord) {
-  //     throw new Error('Activity record not found');
-  //   }
-  //   if (activityRecord.challenge_user?.user.id !== userId) {
-  //     throw new UnauthorizedException('User not authorized to update this activity record');
-  //   }
-  //   const challenge_user = activityRecord.challenge_user;
-  //   challenge_user.progress_percent = await this.calculateProgressPercent(activityRecord.id, userId);
-  //   await this.challengesUsersService.save(challenge_user);
-  //   return await this.activityRecordRepository.update(id, updateActivityRecordDto);
-  // }
+    return { affected: 1, raw: [], generatedMaps: [] };
+  }
 
   async updateChallenges(
     id: string,
@@ -248,22 +239,16 @@ export class ActivityRecordsService {
       throw new UnauthorizedException('User not authorized to delete this activity record');
     }
 
+    const dailyLog = activityRecord.daily_log;
+
+    if (dailyLog && activityRecord.kcal_burned) {
+      dailyLog.total_kcal_burned -= activityRecord.kcal_burned;
+      await this.dailyLogsService.save(dailyLog);
+      await this.dailyLogsService.recalculateTotalKcal(dailyLog.id);
+    }
+
     return await this.activityRecordRepository.delete(id);
   }
-
-  // async removeChallengesOfUser(id: string, userId: string) : Promise<DeleteResult> {
-  //   const activityRecord = await this.activityRecordRepository.findOne({ where: { id }, relations: { challenge_user: { user: true } } });
-  //   if (!activityRecord) {
-  //     throw new Error('Activity record not found');
-  //   }
-  //   if (activityRecord.challenge_user?.user.id !== userId) {
-  //     throw new UnauthorizedException('User not authorized to delete this activity record');
-  //   }
-  //   const challenge_user = activityRecord.challenge_user;
-  //   challenge_user.progress_percent = await this.calculateProgressPercent(activityRecord.id, userId);
-  //   await this.challengesUsersService.save(challenge_user);
-  //   return await this.activityRecordRepository.delete(id);
-  // }
 
   // admin guard
   async removeChallenges(id: string): Promise<DeleteResult> {
@@ -287,22 +272,35 @@ export class ActivityRecordsService {
     if (!activityRecord.challenge) {
       throw new Error('Activity record is not associated with a challenge');
     }
-    const userActivityRecords = await this.activityRecordRepository.find({
+
+    // Get when user joined this challenge (to prevent counting historical data)
+    const challengeUser = await this.challengesUsersService.getOrCreateChallengesUser(
+      userId,
+      activityRecord.challenge.id,
+    );
+    const joinDate = challengeUser.achieved_at; // This is set when user first joins
+
+    // Note: We don't have challenge-specific ActivityRecords anymore (challenge_user relation removed).
+    // Progress is calculated ONLY from daily ActivityRecords created after user joined the challenge.
+
+    const dailyActivityRecords = await this.activityRecordRepository.find({
       where: {
-        challenge_user: { user: { id: userId } },
-        user_owned: true,
+        daily_log: { user: { id: userId } },
+        type: RecordType.DAILY,
         activity: { name: activityRecord.activity.name },
+        created_at: MoreThanOrEqual(joinDate),
         deleted_at: IsNull(),
       },
-      relations: { activity: true, challenge_user: true },
+      relations: { activity: true, daily_log: true },
     });
+
     const acc = makeProgressAccumulator(activityRecord);
 
-    for (const ar of userActivityRecords) {
-      if (ar.activity.name === activityRecord.activity.name) {
-        acc.add(ar);
-      }
+    // Add all daily activities created after user joined the challenge
+    for (const ar of dailyActivityRecords) {
+      acc.add(ar);
     }
+
     return acc.percent();
   }
 }

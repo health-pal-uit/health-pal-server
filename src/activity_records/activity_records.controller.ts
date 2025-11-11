@@ -42,13 +42,13 @@ export class ActivityRecordsController {
     return this.activityRecordsService.createDailyLogs(createActivityRecordDto, user.id);
   }
 
-  @Get('challenges')
-  findAllChallenges(@Body() challengeId: string) {
+  @Get('challenges/:challengeId')
+  findAllChallenges(@Param('challengeId') challengeId: string) {
     return this.activityRecordsService.findAllChallenges(challengeId);
   }
 
-  @Get('daily-logs')
-  findAllDailyLogs(@CurrentUser() user: any, @Body() dailyLogId: string) {
+  @Get('daily-logs/:dailyLogId')
+  findAllDailyLogs(@CurrentUser() user: any, @Param('dailyLogId') dailyLogId: string) {
     return this.activityRecordsService.findAllDailyLogsOfUser(user.id, dailyLogId);
   }
   @Get(':id')
