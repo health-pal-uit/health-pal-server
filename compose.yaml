@@ -42,6 +42,7 @@ services:
       PROJECT_ID: ${PROJECT_ID}
       PRIVATE_KEY: ${PRIVATE_KEY}
       CLIENT_EMAIL: ${CLIENT_EMAIL}
+      GOOGLE_FIT_CALLBACK_URL: ${GOOGLE_FIT_CALLBACK_URL}
     ports:
       - '3001:3001'
     depends_on:

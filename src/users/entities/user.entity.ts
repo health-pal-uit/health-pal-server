@@ -1,6 +1,8 @@
 import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 import {
   Column,
+  CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   JoinTable,
@@ -63,14 +65,29 @@ export class User {
   @Column({ type: 'text', nullable: true })
   avatar_url?: string;
 
-  @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 
-  @Column({ type: 'timestamptz', nullable: true })
+  @DeleteDateColumn({ type: 'timestamptz', nullable: true })
   deactivated_at?: Date;
 
   @Column({ type: 'boolean', default: false })
   isVerified: boolean; // email verified
+
+  @Column({ type: 'timestamptz', nullable: true })
+  google_fit_connected_at: Date | null;
+
+  @Column({ type: 'text', nullable: true })
+  google_fit_refresh_token: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  google_fit_access_token: string | null;
+
+  @Column({ type: 'timestamptz', nullable: true })
+  google_fit_token_expires_at: Date | null;
+
+  @Column({ type: 'text', nullable: true })
+  google_fit_email: string | null;
 
   // relations
 
