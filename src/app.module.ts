@@ -41,6 +41,7 @@ import { ContributionIngresModule } from './contribution_ingres/contribution_ing
 import { SupabaseStorageModule } from './supabase-storage/supabase-storage.module';
 import { SeedModule } from './seed/seed.module';
 import { ChatModule } from './chat/chat.module';
+import { GoogleFitModule } from './google-fit/google-fit.module';
 import configuration from './config/configuration';
 import * as joi from 'joi';
 
@@ -96,6 +97,7 @@ import * as joi from 'joi';
     SupabaseStorageModule,
     SeedModule,
     ChatModule,
+    GoogleFitModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import {
-  IsArray,
   IsBoolean,
   IsDateString,
   IsEnum,
@@ -11,7 +10,6 @@ import {
 } from 'class-validator';
 import { RecordType } from 'src/helpers/enums/record-type.enum';
 import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
-import { Check } from 'typeorm';
 
 export class CreateActivityRecordDto {
   @ApiProperty({ example: 10, description: 'Number of repetitions' })
@@ -46,27 +44,30 @@ export class CreateActivityRecordDto {
   user_weight_kg?: number;
 
   @ApiProperty({ example: true, description: 'Own by user?' })
+  @IsOptional()
   @IsBoolean()
-  user_owned: boolean;
+  user_owned?: boolean;
   // end new fields
 
   @ApiProperty({ example: 60, description: 'Resting heart rate' })
+  @IsOptional()
   @IsNumber()
-  rhr: number;
+  rhr?: number;
 
   @ApiProperty({ example: 70, description: 'Average heart rate' })
+  @IsOptional()
   @IsNumber()
-  ahr: number;
+  ahr?: number;
 
   @ApiProperty({ example: 'daily', description: 'Type of activity record', enum: RecordType })
-  @IsNotEmpty()
+  @IsOptional()
   @IsEnum(RecordType)
-  type: RecordType;
+  type?: RecordType;
 
   @ApiProperty({ example: 3, description: 'Intensity level from 1 to 5' })
-  @Check('intensity_level >= 1 AND intensity_level <= 5')
+  @IsOptional()
   @IsNumber()
-  intensity_level: number;
+  intensity_level?: number;
 
   @ApiProperty({ example: '2023-01-01', description: 'Creation date' })
   @TransformToISODate()
@@ -76,33 +77,18 @@ export class CreateActivityRecordDto {
 
   // relations => 2
 
-  @IsArray()
   @IsUUID('4')
   @IsNotEmpty()
-  @ApiProperty({ required: false, description: 'IDs of the related entities', example: ['uuid'] })
+  @ApiProperty({ description: 'ID of the related activity', example: 'uuid' })
   activity_id: string;
 
   @IsUUID('4')
   @IsOptional()
   @ApiProperty({ example: 'uuid', description: 'ID of the related daily log' })
-  daily_log_id: string | null;
+  daily_log_id?: string | null;
 
   @IsUUID('4')
   @IsOptional()
   @ApiProperty({ required: false, example: 'uuid', description: 'ID of the related challenge' })
-  challenge_id: string | null;
-
-  @IsUUID('4')
-  @IsOptional()
-  @ApiProperty({
-    required: false,
-    example: 'uuid',
-    description: 'ID of the related challenge_user',
-  })
-  challenge_user_id: string | null;
-
-  // @IsUUID('4')
-  // @IsOptional()
-  // @ApiProperty({ required: false, example: 'uuid', description: 'ID of the related fitness goal' })
-  // goal_id: string | null;
+  challenge_id?: string | null;
 }
