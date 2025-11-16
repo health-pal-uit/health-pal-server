@@ -35,6 +35,7 @@ export class GoogleFitService {
     const scopes = [
       'https://www.googleapis.com/auth/fitness.activity.read',
       'https://www.googleapis.com/auth/fitness.body.read',
+      'https://www.googleapis.com/auth/fitness.location.read',
       'https://www.googleapis.com/auth/fitness.nutrition.read',
       'https://www.googleapis.com/auth/userinfo.email',
     ];
@@ -148,13 +149,14 @@ export class GoogleFitService {
     const startMs = startDate.getTime();
     const endMs = endDate.getTime();
 
-    // Query Google Fit API
+    // Query Google Fit API for aggregated data
     const response = await axios.post(
       `${this.googleFitApiUrl}/users/me/dataset:aggregate`,
       {
         aggregateBy: [
           { dataTypeName: 'com.google.step_count.delta' },
           { dataTypeName: 'com.google.calories.expended' },
+          { dataTypeName: 'com.google.distance.delta' },
           { dataTypeName: 'com.google.active_minutes' },
           { dataTypeName: 'com.google.heart_minutes' },
         ],
@@ -169,7 +171,7 @@ export class GoogleFitService {
 
     const buckets = response.data.bucket;
 
-    // Process and store the data
+    // Process and store the aggregated data
     const savedRecords: ActivityRecord[] = [];
 
     for (const bucket of buckets) {
@@ -183,6 +185,14 @@ export class GoogleFitService {
       }
     }
 
+    // Also fetch workout sessions (includes strength training with reps/weight)
+    try {
+      const sessionRecords = await this.syncGoogleFitSessions(userId, startMs, endMs, accessToken);
+      savedRecords.push(...sessionRecords);
+    } catch (error) {
+      Logger.error(`Error syncing Google Fit sessions: ${error.message}`, error.stack);
+    }
+
     Logger.log(
       `Synchronized ${savedRecords.length} activity records from ${buckets.length} buckets for user ${userId}`,
     );
@@ -190,16 +200,274 @@ export class GoogleFitService {
     return savedRecords;
   }
 
+  private async syncGoogleFitSessions(
+    userId: string,
+    startMs: number,
+    endMs: number,
+    accessToken: string,
+  ): Promise<ActivityRecord[]> {
+    // query Google Fit Sessions API for detailed workout data
+    const sessionsResponse = await axios.get(`${this.googleFitApiUrl}/users/me/sessions`, {
+      params: {
+        startTime: new Date(startMs).toISOString(),
+        endTime: new Date(endMs).toISOString(),
+      },
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+
+    const sessions = sessionsResponse.data.session || [];
+    const savedRecords: ActivityRecord[] = [];
+
+    for (const session of sessions) {
+      try {
+        // only process strength training sessions
+        if (this.isStrengthTrainingSession(session.activityType)) {
+          const records = await this.processStrengthTrainingSession(session, userId, accessToken);
+          savedRecords.push(...records);
+        }
+      } catch (error) {
+        Logger.error(`Error processing session ${session.id}: ${error.message}`, error.stack);
+      }
+    }
+
+    return savedRecords;
+  }
+
+  private isStrengthTrainingSession(activityType: number): boolean {
+    // Google Fit activity type codes for strength training
+    // Reference: https://developers.google.com/fit/rest/v1/reference/activity-types
+    const strengthActivityTypes = [
+      13, // Calisthenics (e.g., pushups, situps, pullups, jumping jacks)
+      48, // Circuit training
+      49, // Cross training
+      59, // Elliptical
+      97, // Strength training (weight lifting)
+      108, // Weight training (general)
+      113, // Kettlebell training
+      114, // Core strength training
+      115, // Functional strength training
+      125, // High intensity interval training (HIIT)
+      130, // Pilates
+    ];
+    return strengthActivityTypes.includes(activityType);
+  }
+
+  private async processStrengthTrainingSession(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    session: any,
+    userId: string,
+    accessToken: string,
+  ): Promise<ActivityRecord[]> {
+    const records: ActivityRecord[] = [];
+
+    // Fetch detailed data for this session
+    // Google Fit stores resistance training data in activity segments
+    const sessionStartMs = parseInt(session.startTimeMillis);
+    const sessionEndMs = parseInt(session.endTimeMillis);
+
+    try {
+      // Query for resistance training data (weight and reps)
+      const dataResponse = await axios.post(
+        `${this.googleFitApiUrl}/users/me/dataset:aggregate`,
+        {
+          aggregateBy: [
+            { dataTypeName: 'com.google.activity.exercise' }, // Exercise details
+          ],
+          bucketBySession: {
+            minDurationMillis: 0,
+          },
+          startTimeMillis: sessionStartMs,
+          endTimeMillis: sessionEndMs,
+        },
+        {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        },
+      );
+
+      // Process exercise data points
+      const buckets = dataResponse.data.bucket || [];
+      for (const bucket of buckets) {
+        for (const dataset of bucket.dataset || []) {
+          for (const point of dataset.point || []) {
+            const record = await this.mapExercisePointToActivityRecord(point, session, userId);
+            if (record) {
+              records.push(record);
+            }
+          }
+        }
+      }
+
+      // if no detailed exercise data found, create a generic strength training record
+      if (records.length === 0) {
+        const genericRecord = await this.createGenericStrengthRecord(session, userId);
+        if (genericRecord) {
+          records.push(genericRecord);
+        }
+      }
+    } catch (error) {
+      Logger.warn(`Could not fetch detailed strength training data: ${error.message}`);
+      // fallback to generic record
+      const genericRecord = await this.createGenericStrengthRecord(session, userId);
+      if (genericRecord) {
+        records.push(genericRecord);
+      }
+    }
+
+    return records;
+  }
+
+  private async mapExercisePointToActivityRecord(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    point: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    session: any,
+    userId: string,
+  ): Promise<ActivityRecord | null> {
+    // Extract exercise data
+    // Google Fit exercise data structure:
+    // value[0] = exercise type
+    // value[1] = repetitions
+    // value[2] = resistance (in kg)
+    // value[3] = resistance type
+
+    const exerciseType = point.value[0]?.intVal;
+    const reps = point.value[1]?.intVal || 0;
+    const resistanceKg = point.value[2]?.fpVal || 0;
+
+    if (reps === 0) {
+      return null; // Skip if no reps recorded
+    }
+
+    // Map exercise type to activity in your database
+    const activityId = await this.mapGoogleFitExerciseTypeToActivity(exerciseType);
+    if (!activityId) {
+      Logger.warn(`Could not map Google Fit exercise type ${exerciseType} to activity`);
+      return null;
+    }
+
+    const activity = await this.activityRepo.findOne({ where: { id: activityId } });
+    if (!activity) {
+      return null;
+    }
+
+    // Get or create daily log
+    const sessionDate = new Date(parseInt(session.startTimeMillis));
+    const dailyLog = await this.dailyLogsService.getOrCreateDailyLog(userId, sessionDate);
+    if (!dailyLog) {
+      Logger.error('Could not create/find daily log for Google Fit strength training data');
+      return null;
+    }
+
+    // Create activity record with reps and weight
+    const activityRecord = this.activityRecordRepo.create();
+    activityRecord.user_owned = false;
+    activityRecord.type = RecordType.DAILY;
+    activityRecord.activity = activity;
+    activityRecord.daily_log = dailyLog;
+    activityRecord.reps = reps;
+    activityRecord.load_kg = resistanceKg > 0 ? resistanceKg : undefined;
+
+    // Calculate calories if available
+    const sessionCalories = session.calories || 0;
+    if (sessionCalories > 0) {
+      activityRecord.kcal_burned = sessionCalories;
+      dailyLog.total_kcal_burned += sessionCalories;
+      await this.dailyLogsService.save(dailyLog);
+    }
+
+    const savedRecord = await this.activityRecordRepo.save(activityRecord);
+
+    if (sessionCalories > 0) {
+      await this.dailyLogsService.recalculateTotalKcal(dailyLog.id);
+    }
+
+    Logger.log(
+      `Saved Google Fit strength training: ${activity.name}, ${reps} reps${resistanceKg > 0 ? `, ${resistanceKg.toFixed(1)} kg` : ''}`,
+    );
+
+    return savedRecord;
+  }
+
+  private async createGenericStrengthRecord(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    session: any,
+    userId: string,
+  ): Promise<ActivityRecord | null> {
+    // Find a generic strength training activity
+    const activity = await this.activityRepo.findOne({
+      where: { name: 'Weight lifting (body building exercise), vigorous effort' },
+    });
+
+    if (!activity) {
+      Logger.warn('Could not find generic strength training activity in database');
+      return null;
+    }
+
+    const sessionDate = new Date(parseInt(session.startTimeMillis));
+    const dailyLog = await this.dailyLogsService.getOrCreateDailyLog(userId, sessionDate);
+    if (!dailyLog) {
+      return null;
+    }
+
+    const durationMs = parseInt(session.endTimeMillis) - parseInt(session.startTimeMillis);
+    const hours = durationMs / (1000 * 60 * 60);
+
+    const activityRecord = this.activityRecordRepo.create();
+    activityRecord.user_owned = false;
+    activityRecord.type = RecordType.DAILY;
+    activityRecord.activity = activity;
+    activityRecord.daily_log = dailyLog;
+    activityRecord.hours = hours;
+
+    const sessionCalories = session.calories || 0;
+    if (sessionCalories > 0) {
+      activityRecord.kcal_burned = sessionCalories;
+      dailyLog.total_kcal_burned += sessionCalories;
+      await this.dailyLogsService.save(dailyLog);
+    }
+
+    const savedRecord = await this.activityRecordRepo.save(activityRecord);
+
+    if (sessionCalories > 0) {
+      await this.dailyLogsService.recalculateTotalKcal(dailyLog.id);
+    }
+
+    Logger.log(`Saved generic Google Fit strength training session: ${hours.toFixed(2)}h`);
+
+    return savedRecord;
+  }
+
+  private async mapGoogleFitExerciseTypeToActivity(exerciseType: number): Promise<string | null> {
+    // Map Google Fit exercise types to your activities
+    // This is a basic mapping - expand based on your needs
+    const exerciseMapping: Record<number, string> = {
+      // You'll need to map these to actual activity names in your database
+      1: 'Bench press',
+      2: 'Squat',
+      3: 'Deadlift',
+      // Add more mappings as needed
+    };
+
+    const activityName = exerciseMapping[exerciseType];
+    if (!activityName) {
+      return null;
+    }
+
+    const activity = await this.activityRepo.findOne({ where: { name: activityName } });
+    return activity?.id || null;
+  }
+
   private async mapGoogleFitBucketToActivityRecord(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     bucket: any,
     userId: string,
   ): Promise<ActivityRecord | null> {
-    // Extract data from bucket
+    // extract data from bucket
     let kcal_burned = 0;
     let distance_km = 0;
     let active_minutes = 0;
     let ahr = 0;
+    let step_count = 0;
 
     for (const dataset of bucket.dataset) {
       for (const point of dataset.point) {
@@ -212,6 +480,10 @@ export class GoogleFitService {
 
           case 'com.google.distance.delta':
             distance_km += (point.value[0].fpVal || 0) / 1000; // meters to km
+            break;
+
+          case 'com.google.step_count.delta':
+            step_count += point.value[0].intVal || 0;
             break;
 
           case 'com.google.active_minutes':
@@ -234,12 +506,32 @@ export class GoogleFitService {
       }
     }
 
-    // If no meaningful data, skip this bucket
+    // fallback
+    if (distance_km === 0 && step_count > 0) {
+      distance_km = (step_count * 0.762) / 1000; // convert to km
+      Logger.log(`Estimated distance from ${step_count} steps: ${distance_km.toFixed(2)} km`);
+    }
+
     if (kcal_burned === 0 && distance_km === 0 && active_minutes === 0) {
       return null;
     }
 
-    const hours = active_minutes / 60;
+    // calculate hours from active minutes, ensure it's > 0 or null
+    let hours: number | undefined = undefined;
+    if (active_minutes > 0) {
+      hours = active_minutes / 60;
+    } else if (distance_km > 0) {
+      // if we have distance but no active minutes, estimate based on average walking speed (3 mph = 4.8 km/h)
+      hours = distance_km / 4.8;
+    }
+
+    // if we still don't have hours, skip this record (violates constraint)
+    if (!hours || hours <= 0) {
+      Logger.warn(
+        `Skipping bucket: no valid hours (active_minutes: ${active_minutes}, distance: ${distance_km.toFixed(2)} km)`,
+      );
+      return null;
+    }
 
     // determine activity type - for simplicity, assume walking for now
     const activityId = await this.mapGoogleFitActivityToActivity('walking');
@@ -253,12 +545,30 @@ export class GoogleFitService {
       return null;
     }
 
-    // Get or create daily log for the bucket's date
+    // get or create daily log for the bucket's date
     const bucketDate = new Date(parseInt(bucket.startTimeMillis));
     const dailyLog = await this.dailyLogsService.getOrCreateDailyLog(userId, bucketDate);
     if (!dailyLog) {
       Logger.error('Could not create/find daily log for Google Fit data');
       return null;
+    }
+
+    // estimate calories based on activity if Google Fit calories seem unrealistic
+    // Google Fit often includes BMR in calories.expended, making values very high
+    let estimatedCalories = kcal_burned;
+    if (activity.met_value && hours) {
+      // formula: calories = MET × 3.5 × weight(kg) / 200 × time(minutes)
+      // assume average weight of 70kg if user weight not available
+      const timeMinutes = hours * 60;
+      const estimatedFromMET = ((activity.met_value * 3.5 * 70) / 200) * timeMinutes;
+
+      // if Google Fit calories are more than 3x the MET estimate, use MET estimate instead
+      if (kcal_burned > estimatedFromMET * 3) {
+        Logger.warn(
+          `Google Fit calories (${kcal_burned.toFixed(0)}) seem inflated. Using MET estimate (${estimatedFromMET.toFixed(0)}) instead.`,
+        );
+        estimatedCalories = estimatedFromMET;
+      }
     }
 
     // Create activity record
@@ -268,14 +578,14 @@ export class GoogleFitService {
     activityRecord.activity = activity;
     activityRecord.daily_log = dailyLog;
     activityRecord.hours = hours;
-    activityRecord.kcal_burned = kcal_burned;
+    activityRecord.kcal_burned = estimatedCalories;
     activityRecord.distance_km = distance_km;
     if (ahr > 0) {
       activityRecord.ahr = ahr;
     }
     // reps, load_kg, user_weight_kg, rhr, intensity_level remain undefined (Google Fit doesn't track these)
 
-    dailyLog.total_kcal_burned += kcal_burned;
+    dailyLog.total_kcal_burned += estimatedCalories;
     await this.dailyLogsService.save(dailyLog);
 
     const savedRecord = await this.activityRecordRepo.save(activityRecord);
@@ -284,7 +594,7 @@ export class GoogleFitService {
     await this.dailyLogsService.recalculateTotalKcal(dailyLog.id);
 
     Logger.log(
-      `Saved Google Fit activity: ${hours.toFixed(2)}h, ${kcal_burned.toFixed(0)} kcal, ${distance_km.toFixed(2)} km`,
+      `Saved Google Fit activity: ${hours.toFixed(2)}h, ${estimatedCalories.toFixed(0)} kcal${estimatedCalories !== kcal_burned ? ` (corrected from ${kcal_burned.toFixed(0)})` : ''}, ${distance_km.toFixed(2)} km`,
     );
 
     return savedRecord;
