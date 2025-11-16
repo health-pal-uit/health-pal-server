@@ -23,8 +23,8 @@ export class DailyLogsController {
   constructor(private readonly dailyLogsService: DailyLogsService) {}
 
   @Get()
-  findAll(@CurrentUser() user: any) {
-    return this.dailyLogsService.findAllByUser(user.id);
+  async findAll(@CurrentUser() user: any) {
+    return await this.dailyLogsService.findAllByUser(user.id);
   }
 
   @Get(':id')
@@ -38,7 +38,7 @@ export class DailyLogsController {
       }
       return dailyLog;
     }
-    return this.dailyLogsService.findOne(id);
+    return await this.dailyLogsService.findOne(id);
   }
 
   @Patch(':id')
@@ -55,6 +55,6 @@ export class DailyLogsController {
         throw new ForbiddenException('Access denied');
       }
     }
-    return this.dailyLogsService.update(id, updateDailyLogDto);
+    return await this.dailyLogsService.update(id, updateDailyLogDto);
   }
 }

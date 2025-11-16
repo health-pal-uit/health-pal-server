@@ -31,8 +31,15 @@ export class UsersController {
 
   @Get()
   @UseGuards(AdminSupabaseGuard)
-  findAll() {
-    const users = this.usersService.findAll();
+  async findAll() {
+    const users = await this.usersService.findAll();
+    if (!users) {
+      return responseHelper({
+        error: 'No users found',
+        message: 'No users found',
+        statusCode: 404,
+      });
+    }
     return responseHelper({
       data: users,
       message: 'Users retrieved successfully',
@@ -42,8 +49,8 @@ export class UsersController {
 
   @Get(':id')
   @UseGuards(AdminSupabaseGuard)
-  findOne(@Param('id') id: string) {
-    const user = this.usersService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const user = await this.usersService.findOne(id);
     if (!user) {
       return responseHelper({
         error: 'User not found',
@@ -61,12 +68,12 @@ export class UsersController {
   @Patch(':id')
   @UseGuards(SupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
     @UploadedFile() image?: Express.Multer.File,
   ) {
-    const user = this.usersService.findOne(id);
+    const user = await this.usersService.findOne(id);
     if (!user) {
       return responseHelper({
         error: 'User not found',
@@ -76,12 +83,12 @@ export class UsersController {
     }
     const imageBuffer = image?.buffer;
     const imageName = image?.originalname;
-    return this.usersService.update(id, updateUserDto, imageBuffer, imageName);
+    return await this.usersService.update(id, updateUserDto, imageBuffer, imageName);
   }
 
   @Delete(':id')
   @UseGuards(SupabaseGuard)
-  remove(@Param('id') id: string, @CurrentUser() currentUser: any) {
+  async remove(@Param('id') id: string, @CurrentUser() currentUser: any) {
     if (id !== currentUser.id || currentUser.role.name !== 'admin') {
       return responseHelper({
         error: 'Forbidden',
@@ -89,6 +96,6 @@ export class UsersController {
         statusCode: 403,
       });
     }
-    return this.usersService.remove(id);
+    return await this.usersService.remove(id);
   }
 }

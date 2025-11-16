@@ -14,32 +14,32 @@ export class FitnessGoalsController {
   constructor(private readonly fitnessGoalsService: FitnessGoalsService) {}
 
   @Post()
-  create(@Body() createFitnessGoalDto: CreateFitnessGoalDto, @CurrentUser() user: any) {
-    return this.fitnessGoalsService.create(createFitnessGoalDto, user.id);
+  async create(@Body() createFitnessGoalDto: CreateFitnessGoalDto, @CurrentUser() user: any) {
+    return await this.fitnessGoalsService.create(createFitnessGoalDto, user.id);
   }
 
   @Get()
   @UseGuards(AdminSupabaseGuard)
-  findAll() {
-    return this.fitnessGoalsService.findAll();
+  async findAll() {
+    return await this.fitnessGoalsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.fitnessGoalsService.findOne(id, user.id);
+  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.fitnessGoalsService.findOne(id, user.id);
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateFitnessGoalDto: UpdateFitnessGoalDto,
     @CurrentUser() user: any,
   ) {
-    return this.fitnessGoalsService.update(id, updateFitnessGoalDto, user.id);
+    return await this.fitnessGoalsService.update(id, updateFitnessGoalDto, user.id);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.fitnessGoalsService.remove(id, user.id);
+  async remove(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.fitnessGoalsService.remove(id, user.id);
   }
 }

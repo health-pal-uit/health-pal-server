@@ -38,10 +38,10 @@ export class SupabaseStrategy extends PassportStrategy(SupabaseAuthStrategy, 'su
   //     };
   // }
 
-  async validate(user: SupabaseUser): Promise<any> {
-    if (!user?.id) throw new UnauthorizedException('Invalid user');
-    return { id: user.id, email: user.email ?? '', role: 'user' };
-  }
+  // async validate(user: SupabaseUser): Promise<any> {
+  //   if (!user?.id) throw new UnauthorizedException('Invalid user');
+  //   return { id: user.id, email: user.email ?? '', role: 'user' };
+  // }
 
   async authenticate(req: Request) {
     const token = ExtractJwt.fromAuthHeaderAsBearerToken()(req);
@@ -49,9 +49,9 @@ export class SupabaseStrategy extends PassportStrategy(SupabaseAuthStrategy, 'su
 
     const { data, error } = await this.localSupabase.auth.getUser(token);
     if (error || !data?.user) return this.fail('Invalid token', 401);
-    const user = await this.usersService.findOneByEmail(data.user.email!);
-    if (!user) return this.fail('User not found in database', 401);
-    const roleName = user.role || 'user';
+    const userInDB = await this.usersService.findOneByEmail(data.user.email!);
+    if (!userInDB) return this.fail('User not found in database', 401);
+    const roleName = userInDB.role?.name || 'user';
 
     this.success({ id: data.user.id, email: data.user.email, role: roleName }, null); // this is ReqUserType
   }

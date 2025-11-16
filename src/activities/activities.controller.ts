@@ -14,31 +14,31 @@ export class ActivitiesController {
 
   @Post()
   @UseGuards(AdminSupabaseGuard)
-  create(@Body() createActivityDto: CreateActivityDto) {
-    return this.activitiesService.create(createActivityDto);
+  async create(@Body() createActivityDto: CreateActivityDto) {
+    return await this.activitiesService.create(createActivityDto);
   }
 
   @Get()
   @UseGuards(SupabaseGuard)
-  findAll() {
-    return this.activitiesService.findAll();
+  async findAll() {
+    return await this.activitiesService.findAll();
   }
 
   @Get(':id')
   @UseGuards(SupabaseGuard)
-  findOne(@Param('id') id: string) {
-    return this.activitiesService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.activitiesService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(AdminSupabaseGuard)
-  update(@Param('id') id: string, @Body() updateActivityDto: UpdateActivityDto) {
-    return this.activitiesService.update(id, updateActivityDto);
+  async update(@Param('id') id: string, @Body() updateActivityDto: UpdateActivityDto) {
+    return await this.activitiesService.update(id, updateActivityDto);
   }
 
   @Delete(':id')
   @UseGuards(AdminSupabaseGuard)
-  remove(@Param('id') id: string) {
-    return this.activitiesService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.activitiesService.remove(id);
   }
 }

@@ -108,6 +108,7 @@ import { FavMeal } from 'src/fav_meals/entities/fav_meal.entity';
 import { ChallengesUser } from 'src/challenges_users/entities/challenges_user.entity';
 import { MedalsUser } from 'src/medals_users/entities/medals_user.entity';
 import { MealType } from 'src/helpers/enums/meal-type.enum';
+import { calcKcalSimple } from 'src/helpers/functions/kcal-burned-cal';
 
 export async function seedData(manager: EntityManager) {
   faker.seed(40);
@@ -520,8 +521,8 @@ async function seedDailyLogs(
     for (const ing of ingrs) {
       const qty = faker.number.float({ min: 0.05, max: 0.25, multipleOf: 0.01 });
       await manager.getRepository(DailyIngre).save({
-        daily: log,
-        ingre: ing,
+        daily_log: log,
+        ingredient: ing,
         quantity_kg: qty,
         total_kcal: +(ing.kcal_per_100gr * (qty * 10)).toFixed(1),
         total_protein_gr: +((ing.protein_per_100gr ?? 0) * qty).toFixed(1),
@@ -542,7 +543,7 @@ async function seedDailyLogs(
     for (const m of meals) {
       const qty = faker.number.float({ min: 0.2, max: 0.6, multipleOf: 0.05 });
       await manager.getRepository(DailyMeal).save({
-        daily: log,
+        daily_log: log,
         meal: m,
         quantity_kg: qty,
         total_kcal: +(m.kcal_per_100gr * (qty * 10)).toFixed(1),
@@ -575,7 +576,57 @@ async function seedDailyLogs(
         type: RecordType.DAILY, // Use enum instead of string
         intensity_level: faker.number.int({ min: 1, max: 5 }),
       };
+
+      // Calculate kcal_burned using the same logic as the service
+      const { kcal } = calcKcalSimple(record as ActivityRecord, a);
+      record.kcal_burned = kcal;
+
       await manager.getRepository(ActivityRecord).save(record);
+
+      // Update daily log's total_kcal_burned
+      log.total_kcal_burned = (log.total_kcal_burned || 0) + kcal;
+    }
+
+    // Save the daily log with updated kcal_burned
+    await dailyLogsRepo.save(log);
+
+    // Recalculate daily log macros after all daily_ingres and daily_meals are created
+    const updatedLog = await dailyLogsRepo.findOne({
+      where: { id: log.id },
+      relations: { daily_ingres: true, daily_meals: true },
+    });
+
+    if (updatedLog) {
+      let total_kcal = 0;
+      let total_protein_gr = 0;
+      let total_fat_gr = 0;
+      let total_carbs_gr = 0;
+      let total_fiber_gr = 0;
+
+      for (const ingre of updatedLog.daily_ingres) {
+        total_kcal += ingre.total_kcal;
+        total_protein_gr += ingre.total_protein_gr;
+        total_fat_gr += ingre.total_fat_gr;
+        total_carbs_gr += ingre.total_carbs_gr;
+        total_fiber_gr += ingre.total_fiber_gr;
+      }
+
+      for (const meal of updatedLog.daily_meals) {
+        total_kcal += meal.total_kcal;
+        total_protein_gr += meal.total_protein_gr;
+        total_fat_gr += meal.total_fat_gr;
+        total_carbs_gr += meal.total_carbs_gr;
+        total_fiber_gr += meal.total_fiber_gr;
+      }
+
+      updatedLog.total_kcal_eaten = total_kcal;
+      updatedLog.total_protein_gr = total_protein_gr;
+      updatedLog.total_fat_gr = total_fat_gr;
+      updatedLog.total_carbs_gr = total_carbs_gr;
+      updatedLog.total_fiber_gr = total_fiber_gr;
+      updatedLog.total_kcal = total_kcal - (updatedLog.total_kcal_burned || 0);
+
+      await dailyLogsRepo.save(updatedLog);
     }
   }
 }

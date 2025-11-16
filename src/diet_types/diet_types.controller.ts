@@ -13,31 +13,31 @@ export class DietTypesController {
 
   @Post()
   @UseGuards(AdminSupabaseGuard)
-  create(@Body() createDietTypeDto: CreateDietTypeDto) {
-    return this.dietTypesService.create(createDietTypeDto);
+  async create(@Body() createDietTypeDto: CreateDietTypeDto) {
+    return await this.dietTypesService.create(createDietTypeDto);
   }
 
   @Get()
   @UseGuards(SupabaseGuard)
-  findAll() {
-    return this.dietTypesService.findAll();
+  async findAll() {
+    return await this.dietTypesService.findAll();
   }
 
   @Get(':id')
   @UseGuards(SupabaseGuard)
-  findOne(@Param('id') id: string) {
-    return this.dietTypesService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.dietTypesService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(AdminSupabaseGuard)
-  update(@Param('id') id: string, @Body() updateDietTypeDto: UpdateDietTypeDto) {
-    return this.dietTypesService.update(id, updateDietTypeDto);
+  async update(@Param('id') id: string, @Body() updateDietTypeDto: UpdateDietTypeDto) {
+    return await this.dietTypesService.update(id, updateDietTypeDto);
   }
 
   @Delete(':id')
   @UseGuards(AdminSupabaseGuard)
-  remove(@Param('id') id: string) {
-    return this.dietTypesService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.dietTypesService.remove(id);
   }
 }

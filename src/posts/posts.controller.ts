@@ -16,65 +16,69 @@ export class PostsController {
 
   @UseGuards(SupabaseGuard)
   @Get('has-user-liked/:id')
-  hasUserLiked(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.postsService.hasUserLiked(id, user.id);
+  async hasUserLiked(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.postsService.hasUserLiked(id, user.id);
   }
 
   @Get('report-amount/:id')
   @UseGuards(AdminSupabaseGuard)
-  getReportAmount(@Param('id') id: string) {
-    return this.postsService.getReportAmount(id);
+  async getReportAmount(@Param('id') id: string) {
+    return await this.postsService.getReportAmount(id);
   }
 
   @Get('report/:id')
   @UseGuards(SupabaseGuard)
-  report(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.postsService.report(id, user.id);
+  async report(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.postsService.report(id, user.id);
   }
 
   @Post()
   @UseGuards(SupabaseGuard)
-  create(@Body() createPostDto: CreatePostDto, @CurrentUser() user: any) {
-    return this.postsService.create(createPostDto, user.id);
+  async create(@Body() createPostDto: CreatePostDto, @CurrentUser() user: any) {
+    return await this.postsService.create(createPostDto, user.id);
   }
 
   @Get()
   @UseGuards(SupabaseGuard)
-  findAll() {
-    return this.postsService.findAll();
+  async findAll() {
+    return await this.postsService.findAll();
   }
 
   @Get(':id')
   @UseGuards(SupabaseGuard)
-  findOne(@Param('id') id: string) {
-    return this.postsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.postsService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(SupabaseGuard)
-  update(@Param('id') id: string, @Body() updatePostDto: UpdatePostDto, @CurrentUser() user: any) {
-    return this.postsService.update(id, updatePostDto, user.id);
+  async update(
+    @Param('id') id: string,
+    @Body() updatePostDto: UpdatePostDto,
+    @CurrentUser() user: any,
+  ) {
+    return await this.postsService.update(id, updatePostDto, user.id);
   }
 
   @Delete(':id')
   @UseGuards(SupabaseGuard)
-  remove(@Param('id') id: string, @CurrentUser() user: any) {
+  async remove(@Param('id') id: string, @CurrentUser() user: any) {
     const isAdmin = user.role === 'admin';
     if (isAdmin) {
-      return this.postsService.adminRemove(id);
+      return await this.postsService.adminRemove(id);
     }
-    return this.postsService.remove(id, user.id);
+    return await this.postsService.remove(id, user.id);
   }
 
   // comments
   @Post(':id/comments')
   @UseGuards(SupabaseGuard)
-  addComment(
+  async addComment(
     @Param('id') id: string,
     @Body() commentDto: CreateCommentDto,
     @CurrentUser() user: any,
   ) {
-    return this.postsService.addComment(id, commentDto, user.id);
+    return await this.postsService.addComment(id, commentDto, user.id);
   }
 
   // @Get(':id/comments/:commentId')
@@ -85,48 +89,48 @@ export class PostsController {
 
   @Get(':id/comments')
   @UseGuards(SupabaseGuard)
-  getComments(@Param('id') id: string) {
-    return this.postsService.getComments(id);
+  async getComments(@Param('id') id: string) {
+    return await this.postsService.getComments(id);
   }
 
   @Patch(':postId/comments/:commentId')
   @UseGuards(SupabaseGuard)
-  updateComment(
+  async updateComment(
     @Param('postId') postId: string,
     @Param('commentId') commentId: string,
     @Body() commentDto: UpdateCommentDto,
     @CurrentUser() user: any,
   ) {
-    return this.postsService.updateComment(postId, commentId, commentDto, user.id);
+    return await this.postsService.updateComment(postId, commentId, commentDto, user.id);
   }
 
   @Delete(':postId/comments/:commentId')
   @UseGuards(SupabaseGuard)
-  removeComment(
+  async removeComment(
     @Param('postId') postId: string,
     @Param('commentId') commentId: string,
     @CurrentUser() user: any,
   ) {
-    return this.postsService.removeComment(postId, commentId, user.id);
+    return await this.postsService.removeComment(postId, commentId, user.id);
   }
 
   // likes
 
   @Post(':id/like/count')
   @UseGuards(SupabaseGuard)
-  getLikePost(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.postsService.getLikePost(id, user.id);
+  async getLikePost(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.postsService.getLikePost(id, user.id);
   }
 
   @Post(':id/like')
   @UseGuards(SupabaseGuard)
-  likePost(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.postsService.likePost(id, user.id);
+  async likePost(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.postsService.likePost(id, user.id);
   }
 
   @Delete(':id/unlike')
   @UseGuards(SupabaseGuard)
-  unlikePost(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.postsService.unlikePost(id, user.id);
+  async unlikePost(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.postsService.unlikePost(id, user.id);
   }
 }

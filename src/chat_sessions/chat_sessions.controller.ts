@@ -15,39 +15,42 @@ export class ChatSessionsController {
 
   @Post()
   @UseGuards(SupabaseGuard)
-  create(@Body() createChatSessionDto: CreateChatSessionDto, @CurrentUserId() user_id: string) {
-    return this.chatSessionsService.create(createChatSessionDto, user_id);
+  async create(
+    @Body() createChatSessionDto: CreateChatSessionDto,
+    @CurrentUserId() user_id: string,
+  ) {
+    return await this.chatSessionsService.create(createChatSessionDto, user_id);
   }
 
   @Get()
   @UseGuards(SupabaseGuard)
-  findUserAll(@CurrentUser() user: any) {
+  async findUserAll(@CurrentUser() user: any) {
     // user id
     const isAdmin = user.role === 'admin';
     if (isAdmin) {
-      return this.chatSessionsService.findAll();
+      return await this.chatSessionsService.findAll();
     }
-    return this.chatSessionsService.findUserAll(user.id);
+    return await this.chatSessionsService.findUserAll(user.id);
   }
 
   @Get(':id')
   @UseGuards(SupabaseGuard)
-  findOne(@Param('id') id: string) {
-    return this.chatSessionsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.chatSessionsService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(SupabaseGuard)
-  update(@Param('id') id: string, @Body() updateChatSessionDto: UpdateChatSessionDto) {
-    return this.chatSessionsService.update(id, updateChatSessionDto);
+  async update(@Param('id') id: string, @Body() updateChatSessionDto: UpdateChatSessionDto) {
+    return await this.chatSessionsService.update(id, updateChatSessionDto);
   }
 
   @Delete(':id')
   @UseGuards(SupabaseGuard)
-  remove(@Param('id') id: string, @CurrentUser() user: any) {
+  async remove(@Param('id') id: string, @CurrentUser() user: any) {
     if (user.role === 'admin') {
-      this.chatSessionsService.adminRemove(id);
+      await this.chatSessionsService.adminRemove(id);
     }
-    return this.chatSessionsService.remove(id, user.id);
+    return await this.chatSessionsService.remove(id, user.id);
   }
 }

@@ -18,7 +18,7 @@ import {
 
 @ApiSchema({ name: DailyLog.name, description: 'DailyLog entity' })
 @Check(
-  `total_kcal >= 0 AND total_protein_gr >= 0 AND total_fat_gr >= 0 AND total_carbs_gr >= 0 AND total_fiber_gr >= 0 AND water_drank_l >= 0`,
+  `total_protein_gr >= 0 AND total_fat_gr >= 0 AND total_carbs_gr >= 0 AND total_fiber_gr >= 0 AND water_drank_l >= 0`,
 )
 @Unique('UQ_daily_logs_user_date', ['user', 'date'])
 @Index('idx_daily_logs_user_date', ['user', 'date'])

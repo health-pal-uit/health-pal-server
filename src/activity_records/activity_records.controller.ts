@@ -15,74 +15,81 @@ export class ActivityRecordsController {
 
   // trả về number và lưu vào challenge_user.progress_percent
   @Get('check-challenge-progress/:challengeId')
-  checkProgress(@Param('challengeId') challengeId: string, @CurrentUser() user: any) {
-    return this.activityRecordsService.recalculateProgressChallengesForUser(challengeId, user.id);
+  async checkProgress(@Param('challengeId') challengeId: string, @CurrentUser() user: any) {
+    return await this.activityRecordsService.recalculateProgressChallengesForUser(
+      challengeId,
+      user.id,
+    );
   }
 
   // chỉ trả về number
   @Get('check-activity-log-progress/:activityLogId')
-  checkActivityLogProgress(
+  async checkActivityLogProgress(
     @Param('activityLogId') activityLogId: string,
     @CurrentUser() user: any,
   ) {
-    return this.activityRecordsService.calculateProgressPercent(activityLogId, user.id);
+    return await this.activityRecordsService.calculateProgressPercent(activityLogId, user.id);
   }
 
   @Post('challenges')
   @UseGuards(AdminSupabaseGuard)
-  createChallenges(@Body() createActivityRecordDto: CreateActivityRecordDto) {
-    return this.activityRecordsService.createChallenges(createActivityRecordDto);
+  async createChallenges(@Body() createActivityRecordDto: CreateActivityRecordDto) {
+    return await this.activityRecordsService.createChallenges(createActivityRecordDto);
   }
 
   @Post('daily-logs')
-  createDailyLogs(
+  async createDailyLogs(
     @Body() createActivityRecordDto: CreateActivityRecordDto,
     @CurrentUser() user: any,
   ) {
-    return this.activityRecordsService.createDailyLogs(createActivityRecordDto, user.id);
+    return await this.activityRecordsService.createDailyLogs(createActivityRecordDto, user.id);
   }
 
   @Get('challenges/:challengeId')
-  findAllChallenges(@Param('challengeId') challengeId: string) {
-    return this.activityRecordsService.findAllChallenges(challengeId);
+  async findAllChallenges(@Param('challengeId') challengeId: string) {
+    return await this.activityRecordsService.findAllChallenges(challengeId);
   }
 
   @Get('daily-logs/:dailyLogId')
-  findAllDailyLogs(@CurrentUser() user: any, @Param('dailyLogId') dailyLogId: string) {
-    return this.activityRecordsService.findAllDailyLogsOfUser(user.id, dailyLogId);
+  async findAllDailyLogs(@CurrentUser() user: any, @Param('dailyLogId') dailyLogId: string) {
+    return await this.activityRecordsService.findAllDailyLogsOfUser(user.id, dailyLogId);
   }
   @Get(':id')
-  findOne(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.activityRecordsService.findOne(id, user.id);
+  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.activityRecordsService.findOne(id, user.id);
   }
 
   @Patch('challenges/:id')
   @UseGuards(AdminSupabaseGuard)
-  updateChallenges(
+  async updateChallenges(
     @Param('id') id: string,
     @Body() updateActivityRecordDto: UpdateActivityRecordDto,
   ) {
-    return this.activityRecordsService.updateChallenges(id, updateActivityRecordDto);
+    return await this.activityRecordsService.updateChallenges(id, updateActivityRecordDto);
   }
 
   @Delete('challenges/:id')
   @UseGuards(AdminSupabaseGuard)
-  removeChallenges(@Param('id') id: string) {
-    return this.activityRecordsService.removeChallenges(id);
+  async removeChallenges(@Param('id') id: string) {
+    return await this.activityRecordsService.removeChallenges(id);
   }
 
   @Patch('daily-logs/:id')
-  updateDailyLogs(
+  async updateDailyLogs(
     @Param('id') id: string,
     @Body() updateActivityRecordDto: UpdateActivityRecordDto,
     @CurrentUser() user: any,
   ) {
-    return this.activityRecordsService.updateDailyLogsOfUser(id, updateActivityRecordDto, user.id);
+    return await this.activityRecordsService.updateDailyLogsOfUser(
+      id,
+      updateActivityRecordDto,
+      user.id,
+    );
   }
 
   @Delete('daily-logs/:id')
-  removeDailyLogs(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.activityRecordsService.removeDailyLogsOfUser(id, user.id);
+  async removeDailyLogs(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.activityRecordsService.removeDailyLogsOfUser(id, user.id);
   }
   // @Delete('challenges/:id')
   // removeChallengesOfUser(@Param('id') id: string, @CurrentUser() user: any) {

@@ -13,45 +13,45 @@ export class DailyMealsController {
 
   @Post()
   @UseGuards(SupabaseGuard)
-  create(@Body() createDailyMealDto: CreateDailyMealDto, @CurrentUser() user: any) {
-    return this.dailyMealsService.create(createDailyMealDto, user.id);
+  async create(@Body() createDailyMealDto: CreateDailyMealDto, @CurrentUser() user: any) {
+    return await this.dailyMealsService.create(createDailyMealDto, user.id);
   }
 
   @Post('many')
   @UseGuards(SupabaseGuard)
-  createMany(@Body() createDailyMealDtos: CreateDailyMealDto[], @CurrentUser() user: any) {
-    return this.dailyMealsService.createMany(createDailyMealDtos, user.id);
+  async createMany(@Body() createDailyMealDtos: CreateDailyMealDto[], @CurrentUser() user: any) {
+    return await this.dailyMealsService.createMany(createDailyMealDtos, user.id);
   }
 
   @Get()
   @UseGuards(SupabaseGuard)
-  findAll(@CurrentUser() user: any) {
+  async findAll(@CurrentUser() user: any) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
-      return this.dailyMealsService.findAllByUser(user.id);
+      return await this.dailyMealsService.findAllByUser(user.id);
     }
-    return this.dailyMealsService.findAll();
+    return await this.dailyMealsService.findAll();
   }
 
   @Get(':id')
   @UseGuards(SupabaseGuard)
-  findOne(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.dailyMealsService.findOneOwned(id, user.id);
+  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.dailyMealsService.findOneOwned(id, user.id);
   }
 
   @Patch(':id')
   @UseGuards(SupabaseGuard)
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateDailyMealDto: UpdateDailyMealDto,
     @CurrentUser() user: any,
   ) {
-    return this.dailyMealsService.updateOneOwned(id, updateDailyMealDto, user.id);
+    return await this.dailyMealsService.updateOneOwned(id, updateDailyMealDto, user.id);
   }
 
   @Delete(':id')
   @UseGuards(SupabaseGuard)
-  remove(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.dailyMealsService.removeOwned(id, user.id);
+  async remove(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.dailyMealsService.removeOwned(id, user.id);
   }
 }

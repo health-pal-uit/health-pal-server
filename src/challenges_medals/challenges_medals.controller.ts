@@ -12,27 +12,30 @@ export class ChallengesMedalsController {
   constructor(private readonly challengesMedalsService: ChallengesMedalsService) {}
 
   @Post()
-  create(@Body() createChallengesMedalDto: CreateChallengesMedalDto) {
-    return this.challengesMedalsService.create(createChallengesMedalDto);
+  async create(@Body() createChallengesMedalDto: CreateChallengesMedalDto) {
+    return await this.challengesMedalsService.create(createChallengesMedalDto);
   }
 
   @Get()
-  findAll() {
-    return this.challengesMedalsService.findAll();
+  async findAll() {
+    return await this.challengesMedalsService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.challengesMedalsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.challengesMedalsService.findOne(id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChallengesMedalDto: UpdateChallengesMedalDto) {
-    return this.challengesMedalsService.update(id, updateChallengesMedalDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateChallengesMedalDto: UpdateChallengesMedalDto,
+  ) {
+    return await this.challengesMedalsService.update(id, updateChallengesMedalDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.challengesMedalsService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.challengesMedalsService.remove(id);
   }
 }

@@ -14,50 +14,50 @@ export class DailyIngresController {
   // add new daily ingredient
   @Post()
   @UseGuards(SupabaseGuard)
-  create(@Body() createDailyIngreDto: CreateDailyIngreDto, @CurrentUser() user: any) {
-    return this.dailyIngresService.create(createDailyIngreDto, user.id);
+  async create(@Body() createDailyIngreDto: CreateDailyIngreDto, @CurrentUser() user: any) {
+    return await this.dailyIngresService.create(createDailyIngreDto, user.id);
   }
 
   // and many daily ingredients
   @Post('many')
   @UseGuards(SupabaseGuard)
-  createMany(@Body() createDailyIngreDtos: CreateDailyIngreDto[], @CurrentUser() user: any) {
-    return this.dailyIngresService.createMany(createDailyIngreDtos, user.id);
+  async createMany(@Body() createDailyIngreDtos: CreateDailyIngreDto[], @CurrentUser() user: any) {
+    return await this.dailyIngresService.createMany(createDailyIngreDtos, user.id);
   }
 
   // get all daily ingredients, user => get all daily ingredients of the user
   @Get()
   @UseGuards(SupabaseGuard)
-  findAll(@CurrentUser() user: any) {
+  async findAll(@CurrentUser() user: any) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
-      return this.dailyIngresService.findAllByUser(user.id);
+      return await this.dailyIngresService.findAllByUser(user.id);
     }
-    return this.dailyIngresService.findAll();
+    return await this.dailyIngresService.findAll();
   }
 
   // get daily ingredient by id
   @Get(':id')
   @UseGuards(SupabaseGuard)
-  findOne(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.dailyIngresService.findOneOwned(id, user.id);
+  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.dailyIngresService.findOneOwned(id, user.id);
   }
 
   // update daily ingredient by id
   @Patch(':id')
   @UseGuards(SupabaseGuard)
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateDailyIngreDto: UpdateDailyIngreDto,
     @CurrentUser() user: any,
   ) {
-    return this.dailyIngresService.updateOneOwned(id, updateDailyIngreDto, user.id);
+    return await this.dailyIngresService.updateOneOwned(id, updateDailyIngreDto, user.id);
   }
 
   // delete daily ingredient by id
   @Delete(':id')
   @UseGuards(SupabaseGuard)
-  remove(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.dailyIngresService.removeOwned(id, user.id);
+  async remove(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.dailyIngresService.removeOwned(id, user.id);
   }
 }

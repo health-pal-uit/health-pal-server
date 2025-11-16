@@ -27,43 +27,43 @@ export class ChallengesController {
   @Post()
   @UseGuards(AdminSupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
-  create(
+  async create(
     @Body() createChallengeDto: CreateChallengeDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
-    return this.challengesService.create(createChallengeDto, imageBuffer, imageName);
+    return await this.challengesService.create(createChallengeDto, imageBuffer, imageName);
   }
 
   @Get()
   @UseGuards(SupabaseGuard)
-  findAll() {
-    return this.challengesService.findAll();
+  async findAll() {
+    return await this.challengesService.findAll();
   }
 
   @Get(':id')
   @UseGuards(SupabaseGuard)
-  findOne(@Param('id') id: string) {
-    return this.challengesService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.challengesService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(AdminSupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateChallengeDto: UpdateChallengeDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
-    return this.challengesService.update(id, updateChallengeDto, imageBuffer, imageName);
+    return await this.challengesService.update(id, updateChallengeDto, imageBuffer, imageName);
   }
 
   @Delete(':id')
   @UseGuards(AdminSupabaseGuard)
-  remove(@Param('id') id: string) {
-    return this.challengesService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.challengesService.remove(id);
   }
 }

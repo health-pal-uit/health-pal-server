@@ -53,7 +53,7 @@ export class CreateDailyIngreDto {
   ingredient_id!: string;
 
   @ApiProperty({ example: 'uuid-of-daily-log', description: 'Daily Log ID' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsUUID('4')
-  daily_log_id!: string;
+  daily_log_id?: string;
 }

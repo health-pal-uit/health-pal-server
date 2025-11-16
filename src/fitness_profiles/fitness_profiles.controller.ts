@@ -15,41 +15,41 @@ export class FitnessProfilesController {
 
   @UseGuards(SupabaseGuard)
   @Post()
-  create(@Body() createFitnessProfileDto: CreateFitnessProfileDto, @CurrentUser() user: any) {
-    return this.fitnessProfilesService.create(createFitnessProfileDto, user.id);
+  async create(@Body() createFitnessProfileDto: CreateFitnessProfileDto, @CurrentUser() user: any) {
+    return await this.fitnessProfilesService.create(createFitnessProfileDto, user.id);
   }
 
   @UseGuards(AdminSupabaseGuard)
   @Get()
-  findAll() {
-    return this.fitnessProfilesService.findAll();
+  async findAll() {
+    return await this.fitnessProfilesService.findAll();
   }
 
   @Get(':id')
   @UseGuards(SupabaseGuard)
-  findOne(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.fitnessProfilesService.findOne(id, user.id);
+  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.fitnessProfilesService.findOne(id, user.id);
   }
 
   @Patch(':id')
   @UseGuards(SupabaseGuard)
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateFitnessProfileDto: UpdateFitnessProfileDto,
     @CurrentUser() user: any,
   ) {
-    return this.fitnessProfilesService.update(id, updateFitnessProfileDto, user.id);
+    return await this.fitnessProfilesService.update(id, updateFitnessProfileDto, user.id);
   }
 
   @Patch('calculate-bfp')
   @UseGuards(SupabaseGuard)
-  calculateBFP(@CurrentUser() user: any, @Body() bdf: BFFitnessProfileDto) {
-    return this.fitnessProfilesService.calculateBodyFatPercentage(user.id, bdf);
+  async calculateBFP(@CurrentUser() user: any, @Body() bdf: BFFitnessProfileDto) {
+    return await this.fitnessProfilesService.calculateBodyFatPercentage(user.id, bdf);
   }
 
   @Delete(':id')
   @UseGuards(SupabaseGuard)
-  remove(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.fitnessProfilesService.remove(id, user.id);
+  async remove(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.fitnessProfilesService.remove(id, user.id);
   }
 }

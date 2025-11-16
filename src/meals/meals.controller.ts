@@ -28,21 +28,21 @@ export class MealsController {
   // create meal - whole
   @Post()
   @UseGuards(AdminSupabaseGuard) // only admin
-  create(@Body() createMealDto: CreateMealDto) {
-    return this.mealsService.create(createMealDto);
+  async create(@Body() createMealDto: CreateMealDto) {
+    return await this.mealsService.create(createMealDto);
   }
 
   // create meal - from ingredients
   @Post('ingredients')
   @UseInterceptors(FileInterceptor('image'))
   @UseGuards(AdminSupabaseGuard) // only admin
-  createFromIngredients(
+  async createFromIngredients(
     @Body() body: { meal: CreateMealDto; ingredients: IngredientPayload[] },
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
-    return this.mealsService.createFromIngredients(
+    return await this.mealsService.createFromIngredients(
       body.meal,
       body.ingredients,
       imageBuffer,
@@ -53,39 +53,39 @@ export class MealsController {
   // admin find all
   @Get('admin')
   @UseGuards(AdminSupabaseGuard)
-  findAll() {
-    return this.mealsService.findAll();
+  async findAll() {
+    return await this.mealsService.findAll();
   }
 
   // user find all => verified only
   @Get()
   @UseGuards(SupabaseGuard)
-  findAllUser() {
-    return this.mealsService.findAllUser();
+  async findAllUser() {
+    return await this.mealsService.findAllUser();
   }
 
   @Get(':id') // admin and user find one
   @UseGuards(SupabaseGuard)
-  findOne(@Param('id') id: string) {
-    return this.mealsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.mealsService.findOne(id);
   }
 
   @Patch(':id') // create update contribution -> if made from ingredients => whole another route, also need to distinguish between admin and user
   @UseGuards(AdminSupabaseGuard)
-  update(@Param('id') id: string, @Body() updateMealDto: UpdateMealDto) {
-    return this.mealsService.update(id, updateMealDto);
+  async update(@Param('id') id: string, @Body() updateMealDto: UpdateMealDto) {
+    return await this.mealsService.update(id, updateMealDto);
   }
 
   @Delete(':id') // create delete contribution -> if made from ingredients => whole another route, also need to distinguish between admin and user
   @UseGuards(AdminSupabaseGuard)
-  remove(@Param('id') id: string) {
-    return this.mealsService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.mealsService.remove(id);
   }
 
   @Patch(':id/ingredients') // create update contribution -> if made from ingredients => whole another route, also need to distinguish between admin and user, if user is not admin then create contribution
   @UseGuards(AdminSupabaseGuard)
-  updateFromIngredients(@Param('id') id: string, @Body() ingredients: IngredientPayload[]) {
-    return this.mealsService.updateFromIngredients(id, ingredients); // for admin
+  async updateFromIngredients(@Param('id') id: string, @Body() ingredients: IngredientPayload[]) {
+    return await this.mealsService.updateFromIngredients(id, ingredients); // for admin
   }
 
   // @Delete('ingredients/:id/:ingreId') // create delete contribution -> if made from ingredients => whole another route, also need to distinguish between admin and user

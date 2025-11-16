@@ -1,4 +1,4 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
 
@@ -10,12 +10,13 @@ export class AdminSupabaseGuard extends AuthGuard('supabase') implements CanActi
 
   handleRequest(err: any, user: any, info: any) {
     if (err || !user) {
-      return null;
+      throw new UnauthorizedException('Authentication required');
     }
 
-    if (user.role == 'admin') {
-      return user;
+    if (user.role !== 'admin') {
+      throw new UnauthorizedException('Admin access required');
     }
-    throw err || new Error('User is not admin');
+
+    return user;
   }
 }
