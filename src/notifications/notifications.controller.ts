@@ -15,53 +15,53 @@ export class NotificationsController {
 
   @Post('user')
   @UseGuards(AdminSupabaseGuard)
-  sendToUser(@Body() createNotificationDto: CreateNotificationDto) {
-    return this.notificationsService.sendToUser(createNotificationDto);
+  async sendToUser(@Body() createNotificationDto: CreateNotificationDto) {
+    return await this.notificationsService.sendToUser(createNotificationDto);
   }
 
   @Post('all-user')
   @UseGuards(AdminSupabaseGuard)
-  sendToAllUsers(@Body() body: { title: string; message: string }) {
-    return this.notificationsService.sendToAllUsers(body);
+  async sendToAllUsers(@Body() body: { title: string; message: string }) {
+    return await this.notificationsService.sendToAllUsers(body);
   }
 
   @Get('admin')
   @UseGuards(AdminSupabaseGuard)
-  findAll() {
-    return this.notificationsService.findAll();
+  async findAll() {
+    return await this.notificationsService.findAll();
   }
 
   @Get() // user id
   @UseGuards(SupabaseGuard)
-  getUserNotifications(@CurrentUserId() id: string) {
-    return this.notificationsService.getUserNotifications(id);
+  async getUserNotifications(@CurrentUserId() id: string) {
+    return await this.notificationsService.getUserNotifications(id);
   }
 
   @Get('unread')
   @UseGuards(SupabaseGuard)
-  getUserUnreadNotifications(@CurrentUserId() id: string) {
-    return this.notificationsService.getUserUnreadNotifications(id);
+  async getUserUnreadNotifications(@CurrentUserId() id: string) {
+    return await this.notificationsService.getUserUnreadNotifications(id);
   }
 
   @Patch('markAsRead/:id') // notification id
   @UseGuards(SupabaseGuard)
-  markAsRead(@Param('id') id: string, @CurrentUser() user: any) {
-    return this.notificationsService.markAsRead(id, user.id);
+  async markAsRead(@Param('id') id: string, @CurrentUser() user: any) {
+    return await this.notificationsService.markAsRead(id, user.id);
   }
 
   @Patch('markAllAsRead')
   @UseGuards(SupabaseGuard)
-  markAllAsRead(@CurrentUser() user: any) {
-    return this.notificationsService.markAllAsRead(user.id);
+  async markAllAsRead(@CurrentUser() user: any) {
+    return await this.notificationsService.markAllAsRead(user.id);
   }
 
   @Delete(':id')
   @UseGuards(SupabaseGuard)
-  remove(@Param('id') id: string, @CurrentUser() user: any) {
+  async remove(@Param('id') id: string, @CurrentUser() user: any) {
     const isAdmin = user.role === 'admin';
     if (isAdmin) {
-      return this.notificationsService.adminRemove(id);
+      return await this.notificationsService.adminRemove(id);
     }
-    return this.notificationsService.remove(id, user.id);
+    return await this.notificationsService.remove(id, user.id);
   }
 }

@@ -27,7 +27,7 @@ export class ContributionIngresController {
   @Post() // user -> create new contribution
   @UseGuards(SupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
-  create(
+  async create(
     @Body() createContributionIngreDto: CreateContributionIngreDto,
     @CurrentUser() user: any,
     @UploadedFile() file?: Express.Multer.File,
@@ -38,7 +38,7 @@ export class ContributionIngresController {
     }
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
-    return this.contributionIngresService.create(
+    return await this.contributionIngresService.create(
       createContributionIngreDto,
       user.id,
       imageBuffer,
@@ -48,28 +48,28 @@ export class ContributionIngresController {
 
   @Get() // admin
   @UseGuards(SupabaseGuard)
-  findAll(@CurrentUser() user: any) {
+  async findAll(@CurrentUser() user: any) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
-      return this.contributionIngresService.findAllUser(user.id); // only their contributions
+      return await this.contributionIngresService.findAllUser(user.id); // only their contributions
     }
-    return this.contributionIngresService.findAll();
+    return await this.contributionIngresService.findAll();
   }
 
   @Get(':id') // admin
   @UseGuards(SupabaseGuard)
-  findOne(@Param('id') id: string, @CurrentUser() user: any) {
+  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
-      return this.contributionIngresService.findOneUser(id, user.id);
+      return await this.contributionIngresService.findOneUser(id, user.id);
     }
-    return this.contributionIngresService.findOne(id);
+    return await this.contributionIngresService.findOne(id);
   }
 
   @Patch(':id') // user => create update contribution
   @UseGuards(SupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateContributionIngreDto: UpdateContributionIngreDto,
     @CurrentUser() user: any,
@@ -82,7 +82,7 @@ export class ContributionIngresController {
     }
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
-    return this.contributionIngresService.createUpdateContribution(
+    return await this.contributionIngresService.createUpdateContribution(
       id,
       updateContributionIngreDto,
       user.id,
@@ -93,31 +93,31 @@ export class ContributionIngresController {
 
   @Delete(':id') // user => create delete contribution
   @UseGuards(SupabaseGuard)
-  remove(@Param('id') id: string, @CurrentUser() user: any) {
+  async remove(@Param('id') id: string, @CurrentUser() user: any) {
     const isAdmin = user.role === 'admin';
     if (isAdmin) {
-      return this.contributionIngresService.remove(id);
+      return await this.contributionIngresService.remove(id);
     }
-    return this.contributionIngresService.createDeleteContribution(id, user.id);
+    return await this.contributionIngresService.createDeleteContribution(id, user.id);
   }
 
   // admin approve
 
   @Get('approve/:id') // admin => approve contribution
   @UseGuards(AdminSupabaseGuard)
-  approve(@Param('id') id: string) {
-    return this.contributionIngresService.adminApprove(id);
+  async approve(@Param('id') id: string) {
+    return await this.contributionIngresService.adminApprove(id);
   }
 
   @Get('reject/:id') // admin => reject contribution
   @UseGuards(AdminSupabaseGuard)
-  reject(@Param('id') id: string) {
-    return this.contributionIngresService.adminReject(id);
+  async reject(@Param('id') id: string) {
+    return await this.contributionIngresService.adminReject(id);
   }
 
   @Get('pending') // admin => get all pending contributions
   @UseGuards(AdminSupabaseGuard)
-  pending() {
-    return this.contributionIngresService.findAllPending();
+  async pending() {
+    return await this.contributionIngresService.findAllPending();
   }
 }

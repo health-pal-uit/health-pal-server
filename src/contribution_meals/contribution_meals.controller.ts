@@ -28,7 +28,7 @@ export class ContributionMealsController {
   @Post() // user -> create new contribution
   @UseGuards(SupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
-  create(
+  async create(
     @Body() createContributionMealDto: CreateContributionMealDto,
     @CurrentUser() user: any,
     @UploadedFile() file?: Express.Multer.File,
@@ -39,7 +39,7 @@ export class ContributionMealsController {
     }
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
-    return this.contributionMealsService.create(
+    return await this.contributionMealsService.create(
       createContributionMealDto,
       user.id,
       imageBuffer,
@@ -49,14 +49,14 @@ export class ContributionMealsController {
 
   @Post('ingredients')
   @UseGuards(SupabaseGuard)
-  createFromIngredients(
+  async createFromIngredients(
     @Body() body: { meal: CreateContributionMealDto; ingredients: IngredientPayload[] },
     @CurrentUser() user: any,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
-    return this.contributionMealsService.createFromIngredients(
+    return await this.contributionMealsService.createFromIngredients(
       body.meal,
       body.ingredients,
       user.id,
@@ -65,28 +65,28 @@ export class ContributionMealsController {
 
   @Get() // admin
   @UseGuards(SupabaseGuard)
-  findAll(@CurrentUser() user: any) {
+  async findAll(@CurrentUser() user: any) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
-      return this.contributionMealsService.findAllUser(user.id); // only their contributions
+      return await this.contributionMealsService.findAllUser(user.id); // only their contributions
     }
-    return this.contributionMealsService.findAll();
+    return await this.contributionMealsService.findAll();
   }
 
   @Get(':id') // admin
   @UseGuards(SupabaseGuard)
-  findOne(@Param('id') id: string, @CurrentUser() user: any) {
+  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
-      return this.contributionMealsService.findOneUser(id, user.id);
+      return await this.contributionMealsService.findOneUser(id, user.id);
     }
-    return this.contributionMealsService.findOne(id);
+    return await this.contributionMealsService.findOne(id);
   }
 
   @Patch(':id') // user => create update contribution
   @UseGuards(SupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateContributionMealDto: UpdateContributionMealDto,
     @CurrentUser() user: any,
@@ -99,7 +99,7 @@ export class ContributionMealsController {
     }
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
-    return this.contributionMealsService.createUpdateContribution(
+    return await this.contributionMealsService.createUpdateContribution(
       id,
       updateContributionMealDto,
       user.id,
@@ -110,12 +110,12 @@ export class ContributionMealsController {
 
   @Patch(':id/ingredients') // create update contribution -> if made from ingredients => whole another route, also need to distinguish between admin and user, if user is not admin then create contribution
   @UseGuards(SupabaseGuard) // user
-  updateFromIngredients(
+  async updateFromIngredients(
     @Param('id') id: string,
     @Body() ingredients: IngredientPayload[],
     @CurrentUser() user: any,
   ) {
-    return this.contributionMealsService.createContributionFromIngredients(
+    return await this.contributionMealsService.createContributionFromIngredients(
       id,
       ingredients,
       user.id,
@@ -124,20 +124,20 @@ export class ContributionMealsController {
 
   @Delete(':id') // user => create delete contribution
   @UseGuards(SupabaseGuard)
-  remove(@Param('id') id: string, @CurrentUser() user: any) {
+  async remove(@Param('id') id: string, @CurrentUser() user: any) {
     const isAdmin = user.role === 'admin';
     if (isAdmin) {
-      return this.contributionMealsService.remove(id);
+      return await this.contributionMealsService.remove(id);
     }
-    return this.contributionMealsService.createDeleteContribution(id, user.id);
+    return await this.contributionMealsService.createDeleteContribution(id, user.id);
   }
 
   // admin approve
 
   @Get('approve/:id') // admin => approve contribution
   @UseGuards(AdminSupabaseGuard)
-  approve(@Param('id') id: string) {
-    return this.contributionMealsService.adminApprove(id);
+  async approve(@Param('id') id: string) {
+    return await this.contributionMealsService.adminApprove(id);
   }
 
   // @Get('approve/:id') // admin => approve contribution
@@ -148,14 +148,14 @@ export class ContributionMealsController {
 
   @Get('reject/:id') // admin => reject contribution
   @UseGuards(AdminSupabaseGuard)
-  reject(@Param('id') id: string) {
-    return this.contributionMealsService.adminReject(id);
+  async reject(@Param('id') id: string) {
+    return await this.contributionMealsService.adminReject(id);
   }
 
   @Get('pending') // admin => get all pending contributions
   @UseGuards(AdminSupabaseGuard)
-  pending() {
-    return this.contributionMealsService.findAllPending();
+  async pending() {
+    return await this.contributionMealsService.findAllPending();
   }
 
   // @Post()

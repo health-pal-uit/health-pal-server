@@ -15,25 +15,28 @@ export class ChatParticipantsController {
 
   @Post()
   @UseGuards(SupabaseGuard)
-  create(@Body() createChatParticipantDto: CreateChatParticipantDto, @CurrentUser() user: any) {
+  async create(
+    @Body() createChatParticipantDto: CreateChatParticipantDto,
+    @CurrentUser() user: any,
+  ) {
     createChatParticipantDto.user_id = user.id;
-    return this.chatParticipantsService.create(createChatParticipantDto);
+    return await this.chatParticipantsService.create(createChatParticipantDto);
   }
 
   @Get()
   @UseGuards(SupabaseGuard)
-  findAll(@CurrentUser() user: any) {
+  async findAll(@CurrentUser() user: any) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
-      return this.chatParticipantsService.findAllUser(user.id);
+      return await this.chatParticipantsService.findAllUser(user.id);
     }
-    return this.chatParticipantsService.findAll();
+    return await this.chatParticipantsService.findAll();
   }
 
   @Get(':id')
   @UseGuards(SupabaseGuard)
-  findOne(@Param('id') id: string) {
-    return this.chatParticipantsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.chatParticipantsService.findOne(id);
   }
 
   // @Patch(':id')
@@ -43,7 +46,7 @@ export class ChatParticipantsController {
 
   @Delete(':id')
   @UseGuards(SupabaseGuard)
-  remove(@Param('id') id: string) {
-    return this.chatParticipantsService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.chatParticipantsService.remove(id);
   }
 }

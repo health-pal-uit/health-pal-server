@@ -13,14 +13,14 @@ export class ChallengesUsersController {
 
   @Get('finish')
   @UseGuards(SupabaseGuard)
-  checkFinishedChallenges(@CurrentUser() user: any) {
-    return this.challengesUsersService.checkFinishedChallenges(user.id);
+  async checkFinishedChallenges(@CurrentUser() user: any) {
+    return await this.challengesUsersService.checkFinishedChallenges(user.id);
   }
 
   @Post(':id')
   @UseGuards(SupabaseGuard)
-  finishChallenge(@Param('id') challengeId: string, @CurrentUser() user: any) {
-    return this.challengesUsersService.finishChallenge(challengeId, user.id);
+  async finishChallenge(@Param('id') challengeId: string, @CurrentUser() user: any) {
+    return await this.challengesUsersService.finishChallenge(challengeId, user.id);
   }
 
   // @Post()

@@ -28,7 +28,7 @@ export class ChatMessagesController {
   @Post()
   @UseGuards(SupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
-  create(
+  async create(
     @Body() createChatMessageDto: CreateChatMessageDto,
     @CurrentUserId() userId: string,
     @UploadedFile() image?: Express.Multer.File,
@@ -36,41 +36,41 @@ export class ChatMessagesController {
     createChatMessageDto.user_id = userId;
     const imageBuffer = image?.buffer;
     const imageName = image?.originalname;
-    return this.chatMessagesService.create(createChatMessageDto, imageBuffer, imageName);
+    return await this.chatMessagesService.create(createChatMessageDto, imageBuffer, imageName);
   }
 
   @Get()
   @UseGuards(SupabaseGuard)
-  findAll(@CurrentUser() user: any) {
+  async findAll(@CurrentUser() user: any) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
-      return this.chatMessagesService.findAllUser(user.id);
+      return await this.chatMessagesService.findAllUser(user.id);
     }
-    return this.chatMessagesService.findAll();
+    return await this.chatMessagesService.findAll();
   }
 
   @Get(':id')
   @UseGuards(AdminSupabaseGuard)
-  findOne(@Param('id') id: string) {
-    return this.chatMessagesService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.chatMessagesService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(SupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateChatMessageDto: UpdateChatMessageDto,
     @UploadedFile() image?: Express.Multer.File,
   ) {
     const imageBuffer = image?.buffer;
     const imageName = image?.originalname;
-    return this.chatMessagesService.update(id, updateChatMessageDto, imageBuffer, imageName);
+    return await this.chatMessagesService.update(id, updateChatMessageDto, imageBuffer, imageName);
   }
 
   @Delete(':id')
   @UseGuards(SupabaseGuard)
-  remove(@Param('id') id: string) {
-    return this.chatMessagesService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.chatMessagesService.remove(id);
   }
 }

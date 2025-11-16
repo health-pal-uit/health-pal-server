@@ -13,14 +13,14 @@ export class MedalsUsersController {
 
   @Get()
   @UseGuards(SupabaseGuard)
-  checkFinishedMedals(@CurrentUser() user: any) {
-    return this.medalsUsersService.checkFinishedMedals(user.id);
+  async checkFinishedMedals(@CurrentUser() user: any) {
+    return await this.medalsUsersService.checkFinishedMedals(user.id);
   }
 
   @Post(':id')
   @UseGuards(SupabaseGuard)
-  finishMedal(@Param('id') medalId: string, @CurrentUser() user: any) {
-    return this.medalsUsersService.finishMedal(medalId, user.id);
+  async finishMedal(@Param('id') medalId: string, @CurrentUser() user: any) {
+    return await this.medalsUsersService.finishMedal(medalId, user.id);
   }
 
   // @Post()

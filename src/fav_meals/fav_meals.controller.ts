@@ -12,20 +12,20 @@ export class FavMealsController {
   constructor(private readonly favMealsService: FavMealsService) {}
   @Post()
   @UseGuards(SupabaseGuard)
-  create(@Body() createFavMealDto: CreateFavMealDto) {
-    return this.favMealsService.create(createFavMealDto);
+  async create(@Body() createFavMealDto: CreateFavMealDto) {
+    return await this.favMealsService.create(createFavMealDto);
   }
 
   // find all of a user
   @Get('user')
   @UseGuards(SupabaseGuard)
-  findAllOfUser(@CurrentUserId() userId: string) {
-    return this.favMealsService.findAllOfUser(userId);
+  async findAllOfUser(@CurrentUserId() userId: string) {
+    return await this.favMealsService.findAllOfUser(userId);
   }
 
   @Delete(':id')
   @UseGuards(SupabaseGuard)
-  remove(@Param('id') id: string) {
-    return this.favMealsService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.favMealsService.remove(id);
   }
 }

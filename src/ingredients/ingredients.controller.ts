@@ -28,40 +28,40 @@ export class IngredientsController {
   @UseGuards(AdminSupabaseGuard)
   @Post()
   @UseInterceptors(FileInterceptor('image'))
-  create(
+  async create(
     @Body() createIngredientDto: CreateIngredientDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
-    return this.ingredientsService.create(createIngredientDto, imageBuffer, imageName);
+    return await this.ingredientsService.create(createIngredientDto, imageBuffer, imageName);
   }
 
   // get all admin
   @Get('admin')
   @UseGuards(AdminSupabaseGuard)
-  findAll() {
-    return this.ingredientsService.findAll();
+  async findAll() {
+    return await this.ingredientsService.findAll();
   }
 
   // get all user (verified only)
   @Get()
   @UseGuards(SupabaseGuard)
-  findAllUser() {
-    return this.ingredientsService.findAllUser();
+  async findAllUser() {
+    return await this.ingredientsService.findAllUser();
   }
 
   @Get(':id')
   @UseGuards(SupabaseGuard)
-  findOne(@Param('id') id: string) {
-    return this.ingredientsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.ingredientsService.findOne(id);
   }
 
   // update ingredient admin
   @Patch(':id')
   @UseGuards(SupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateIngredientDto: UpdateIngredientDto,
     @CurrentUser() user: any,
@@ -73,18 +73,18 @@ export class IngredientsController {
     }
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
-    return this.ingredientsService.update(id, updateIngredientDto, imageBuffer, imageName);
+    return await this.ingredientsService.update(id, updateIngredientDto, imageBuffer, imageName);
   }
 
   // admin delete
   @Delete(':id')
-  remove(@Param('id') id: string, @CurrentUser() user: any) {
+  async remove(@Param('id') id: string, @CurrentUser() user: any) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
       //return this.ingredientsService.removeUser(id, user.id);
       throw new Error('Go to contribution to delete');
     }
-    return this.ingredientsService.remove(id);
+    return await this.ingredientsService.remove(id);
   }
 
   // // verify ingredient

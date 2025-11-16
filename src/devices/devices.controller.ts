@@ -15,23 +15,23 @@ export class DevicesController {
   @Post('register')
   @UseGuards(SupabaseGuard)
   async registerDevice(@Body() createDeviceDto: CreateDeviceDto) {
-    return this.devicesService.registerDevice(createDeviceDto);
+    return await this.devicesService.registerDevice(createDeviceDto);
   }
 
   @Patch('deactivate')
   @UseGuards(SupabaseGuard)
   async deactivateDevice(@CurrentUser() user, @Body() updateDeviceDto: UpdateDeviceDto) {
-    return this.devicesService.deactivateDevice(user, updateDeviceDto);
+    return await this.devicesService.deactivateDevice(user, updateDeviceDto);
   }
 
   @Get('own')
   @UseGuards(AdminSupabaseGuard)
   async getAllDevices(@CurrentUser() user) {
-    return this.devicesService.getAllDevices(user);
+    return await this.devicesService.getAllDevices(user);
   }
 
   @Post('refresh-token')
   async refreshToken(@CurrentUser() user, @Body() dto: { fcm_token: string }) {
-    return this.devicesService.refreshToken(user, dto);
+    return await this.devicesService.refreshToken(user, dto);
   }
 }

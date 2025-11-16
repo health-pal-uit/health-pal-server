@@ -26,40 +26,40 @@ export class MedalsController {
   @Post()
   @UseGuards(AdminSupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
-  create(@Body() createMedalDto: CreateMedalDto, @UploadedFile() file?: Express.Multer.File) {
+  async create(@Body() createMedalDto: CreateMedalDto, @UploadedFile() file?: Express.Multer.File) {
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
-    return this.medalsService.create(createMedalDto, imageBuffer, imageName);
+    return await this.medalsService.create(createMedalDto, imageBuffer, imageName);
   }
 
   @Get()
   @UseGuards(SupabaseGuard)
-  findAll() {
-    return this.medalsService.findAll();
+  async findAll() {
+    return await this.medalsService.findAll();
   }
 
   @Get(':id')
   @UseGuards(SupabaseGuard)
-  findOne(@Param('id') id: string) {
-    return this.medalsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.medalsService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(AdminSupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
-  update(
+  async update(
     @Param('id') id: string,
     @Body() updateMedalDto: UpdateMedalDto,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
-    return this.medalsService.update(id, updateMedalDto, imageBuffer, imageName);
+    return await this.medalsService.update(id, updateMedalDto, imageBuffer, imageName);
   }
 
   @Delete(':id')
   @UseGuards(AdminSupabaseGuard)
-  remove(@Param('id') id: string) {
-    return this.medalsService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.medalsService.remove(id);
   }
 }

@@ -13,31 +13,31 @@ export class PremiumPackagesController {
 
   @Post()
   @UseGuards(AdminSupabaseGuard)
-  create(@Body() createPremiumPackageDto: CreatePremiumPackageDto) {
-    return this.premiumPackagesService.create(createPremiumPackageDto);
+  async create(@Body() createPremiumPackageDto: CreatePremiumPackageDto) {
+    return await this.premiumPackagesService.create(createPremiumPackageDto);
   }
 
   @Get()
   @UseGuards(AdminSupabaseGuard)
-  findAll() {
-    return this.premiumPackagesService.findAll();
+  async findAll() {
+    return await this.premiumPackagesService.findAll();
   }
 
   @Get(':id')
   @UseGuards(SupabaseGuard)
-  findOne(@Param('id') id: string) {
-    return this.premiumPackagesService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.premiumPackagesService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(AdminSupabaseGuard)
-  update(@Param('id') id: string, @Body() updatePremiumPackageDto: UpdatePremiumPackageDto) {
-    return this.premiumPackagesService.update(id, updatePremiumPackageDto);
+  async update(@Param('id') id: string, @Body() updatePremiumPackageDto: UpdatePremiumPackageDto) {
+    return await this.premiumPackagesService.update(id, updatePremiumPackageDto);
   }
 
   @Delete(':id')
   @UseGuards(AdminSupabaseGuard)
-  remove(@Param('id') id: string) {
-    return this.premiumPackagesService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.premiumPackagesService.remove(id);
   }
 }
