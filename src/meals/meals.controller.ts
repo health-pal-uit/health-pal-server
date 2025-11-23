@@ -19,6 +19,8 @@ import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guar
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import type { ReqUserType } from 'src/auth/types/req.type';
+import { ApiOperation, ApiResponse, ApiConsumes, ApiBody, ApiParam } from '@nestjs/swagger';
 
 @ApiBearerAuth()
 @Controller('meals')
@@ -28,6 +30,10 @@ export class MealsController {
   // create meal - whole
   @Post()
   @UseGuards(AdminSupabaseGuard) // only admin
+  @ApiOperation({ summary: 'Admin creates a new meal with pre-calculated nutrition' })
+  @ApiBody({ type: CreateMealDto })
+  @ApiResponse({ status: 201, description: 'Meal created' })
+  @ApiResponse({ status: 403, description: 'Forbidden for non-admins' })
   async create(@Body() createMealDto: CreateMealDto) {
     return await this.mealsService.create(createMealDto);
   }
@@ -36,6 +42,20 @@ export class MealsController {
   @Post('ingredients')
   @UseInterceptors(FileInterceptor('image'))
   @UseGuards(AdminSupabaseGuard) // only admin
+  @ApiOperation({ summary: 'Admin creates a meal from ingredients (calculates nutrition)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Meal data and ingredients array',
+    schema: {
+      type: 'object',
+      properties: {
+        meal: { $ref: '#/components/schemas/CreateMealDto' },
+        ingredients: { type: 'array', items: { $ref: '#/components/schemas/IngredientPayload' } },
+      },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Meal created from ingredients' })
+  @ApiResponse({ status: 403, description: 'Forbidden for non-admins' })
   async createFromIngredients(
     @Body() body: { meal: CreateMealDto; ingredients: IngredientPayload[] },
     @UploadedFile() file?: Express.Multer.File,
@@ -53,6 +73,8 @@ export class MealsController {
   // admin find all
   @Get('admin')
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Admin gets all meals (including unverified)' })
+  @ApiResponse({ status: 200, description: 'List of all meals' })
   async findAll() {
     return await this.mealsService.findAll();
   }
@@ -60,30 +82,59 @@ export class MealsController {
   // user find all => verified only
   @Get()
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'User gets all verified meals' })
+  @ApiResponse({ status: 200, description: 'List of verified meals' })
   async findAllUser() {
     return await this.mealsService.findAllUser();
   }
 
   @Get(':id') // admin and user find one
   @UseGuards(SupabaseGuard)
-  async findOne(@Param('id') id: string) {
+  @ApiOperation({ summary: 'Get a meal by ID (admin sees all, user sees only verified)' })
+  @ApiParam({ name: 'id', type: String, description: 'Meal ID' })
+  @ApiResponse({ status: 200, description: 'Meal details' })
+  @ApiResponse({ status: 404, description: 'Meal not found' })
+  async findOne(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
+    const isAdmin = user.role === 'admin';
+    if (!isAdmin) {
+      return await this.mealsService.findOneUser(id);
+    }
     return await this.mealsService.findOne(id);
   }
 
   @Patch(':id') // create update contribution -> if made from ingredients => whole another route, also need to distinguish between admin and user
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Admin updates a meal (users must use contributions)' })
+  @ApiBody({ type: UpdateMealDto })
+  @ApiParam({ name: 'id', type: String, description: 'Meal ID' })
+  @ApiResponse({ status: 200, description: 'Meal updated' })
+  @ApiResponse({ status: 403, description: 'Forbidden for non-admins' })
   async update(@Param('id') id: string, @Body() updateMealDto: UpdateMealDto) {
     return await this.mealsService.update(id, updateMealDto);
   }
 
   @Delete(':id') // create delete contribution -> if made from ingredients => whole another route, also need to distinguish between admin and user
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Admin deletes a meal (users must use contributions)' })
+  @ApiParam({ name: 'id', type: String, description: 'Meal ID' })
+  @ApiResponse({ status: 200, description: 'Meal deleted' })
+  @ApiResponse({ status: 403, description: 'Forbidden for non-admins' })
   async remove(@Param('id') id: string) {
     return await this.mealsService.remove(id);
   }
 
   @Patch(':id/ingredients') // create update contribution -> if made from ingredients => whole another route, also need to distinguish between admin and user, if user is not admin then create contribution
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({
+    summary: 'Admin updates meal ingredients (replaces all and recalculates nutrition)',
+  })
+  @ApiParam({ name: 'id', type: String, description: 'Meal ID' })
+  @ApiBody({
+    description: 'Ingredients array',
+    schema: { type: 'array', items: { $ref: '#/components/schemas/IngredientPayload' } },
+  })
+  @ApiResponse({ status: 200, description: 'Meal updated from ingredients' })
+  @ApiResponse({ status: 403, description: 'Forbidden for non-admins' })
   async updateFromIngredients(@Param('id') id: string, @Body() ingredients: IngredientPayload[]) {
     return await this.mealsService.updateFromIngredients(id, ingredients); // for admin
   }

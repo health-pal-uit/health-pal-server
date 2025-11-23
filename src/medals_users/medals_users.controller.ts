@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { MedalsUsersService } from './medals_users.service';
 import { CreateMedalsUserDto } from './dto/create-medals_user.dto';
 import { UpdateMedalsUserDto } from './dto/update-medals_user.dto';
@@ -13,12 +13,18 @@ export class MedalsUsersController {
 
   @Get()
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Check finished medals for the current user' })
+  @ApiResponse({ status: 200, description: 'List of finished medals' })
   async checkFinishedMedals(@CurrentUser() user: any) {
     return await this.medalsUsersService.checkFinishedMedals(user.id);
   }
 
   @Post(':id')
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Finish a medal for the current user' })
+  @ApiParam({ name: 'id', description: 'Medal ID' })
+  @ApiResponse({ status: 201, description: 'Medal finished successfully' })
+  @ApiResponse({ status: 400, description: 'Bad request or medal already finished' })
   async finishMedal(@Param('id') medalId: string, @CurrentUser() user: any) {
     return await this.medalsUsersService.finishMedal(medalId, user.id);
   }

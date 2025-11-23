@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateActivityDto } from './dto/create-activity.dto';
 import { UpdateActivityDto } from './dto/update-activity.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Activity } from './entities/activity.entity';
-import { Repository, UpdateResult, IsNull } from 'typeorm';
+import { Repository, IsNull } from 'typeorm';
 
 @Injectable()
 export class ActivitiesService {
@@ -18,15 +18,35 @@ export class ActivitiesService {
     return await this.activitiesRepository.find({ where: { deleted_at: IsNull() } });
   }
 
-  async findOne(id: string): Promise<Activity | null> {
-    return await this.activitiesRepository.findOne({ where: { id } });
+  async findOne(id: string): Promise<Activity> {
+    const activity = await this.activitiesRepository.findOne({
+      where: { id, deleted_at: IsNull() },
+    });
+    if (!activity) {
+      throw new NotFoundException('Activity not found');
+    }
+    return activity;
   }
 
-  async update(id: string, updateActivityDto: UpdateActivityDto): Promise<UpdateResult> {
-    return await this.activitiesRepository.update(id, updateActivityDto);
+  async update(id: string, updateActivityDto: UpdateActivityDto): Promise<Activity> {
+    const activity = await this.activitiesRepository.findOne({
+      where: { id, deleted_at: IsNull() },
+    });
+    if (!activity) {
+      throw new NotFoundException('Activity not found');
+    }
+    await this.activitiesRepository.update(id, updateActivityDto);
+    return this.findOne(id);
   }
 
-  async remove(id: string): Promise<UpdateResult> {
-    return await this.activitiesRepository.softDelete(id);
+  async remove(id: string): Promise<Activity> {
+    const activity = await this.activitiesRepository.findOne({
+      where: { id, deleted_at: IsNull() },
+    });
+    if (!activity) {
+      throw new NotFoundException('Activity not found');
+    }
+    await this.activitiesRepository.softDelete(id);
+    return activity;
   }
 }

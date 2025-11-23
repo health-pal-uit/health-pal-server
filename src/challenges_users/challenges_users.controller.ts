@@ -1,50 +1,35 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { Controller, Get, Post, Param, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ChallengesUsersService } from './challenges_users.service';
-import { CreateChallengesUserDto } from './dto/create-challenges_user.dto';
-import { UpdateChallengesUserDto } from './dto/update-challenges_user.dto';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
+import type { ReqUserType } from 'src/auth/types/req.type';
 
+@ApiTags('challenges-users')
 @ApiBearerAuth()
 @Controller('challenges-users')
 export class ChallengesUsersController {
   constructor(private readonly challengesUsersService: ChallengesUsersService) {}
 
+  @ApiOperation({ summary: 'Get all finished challenges for the current user' })
+  @ApiResponse({ status: 200, description: 'Returns list of finished challenges with metadata' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   @Get('finish')
   @UseGuards(SupabaseGuard)
-  async checkFinishedChallenges(@CurrentUser() user: any) {
+  async checkFinishedChallenges(@CurrentUser() user: ReqUserType) {
     return await this.challengesUsersService.checkFinishedChallenges(user.id);
   }
 
-  @Post(':id')
+  @ApiOperation({ summary: 'Mark a challenge as finished for the current user' })
+  @ApiResponse({ status: 201, description: 'Challenge marked as finished successfully' })
+  @ApiResponse({ status: 404, description: 'Challenge or User not found' })
+  @ApiResponse({ status: 409, description: 'Challenge already finished by this user' })
+  @Post(':challengeId/finish')
   @UseGuards(SupabaseGuard)
-  async finishChallenge(@Param('id') challengeId: string, @CurrentUser() user: any) {
+  async finishChallenge(
+    @Param('challengeId') challengeId: string,
+    @CurrentUser() user: ReqUserType,
+  ) {
     return await this.challengesUsersService.finishChallenge(challengeId, user.id);
   }
-
-  // @Post()
-  // create(@Body() createChallengesUserDto: CreateChallengesUserDto) {
-  //   return this.challengesUsersService.create(createChallengesUserDto);
-  // }
-
-  // @Get()
-  // findAll() {
-  //   return this.challengesUsersService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.challengesUsersService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateChallengesUserDto: UpdateChallengesUserDto) {
-  //   return this.challengesUsersService.update(+id, updateChallengesUserDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.challengesUsersService.remove(+id);
-  // }
 }

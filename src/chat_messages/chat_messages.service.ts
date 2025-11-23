@@ -21,6 +21,14 @@ export class ChatMessagesService {
     private readonly configService: ConfigService,
   ) {}
 
+  async findBySession(sessionId: string): Promise<ChatMessage[]> {
+    return await this.chatMessagesRepository.find({
+      where: { chat_session: { id: sessionId } },
+      order: { created_at: 'ASC' },
+      relations: ['user', 'chat_session'],
+    });
+  }
+
   async create(
     createChatMessageDto: CreateChatMessageDto,
     fileBuffer?: Buffer,

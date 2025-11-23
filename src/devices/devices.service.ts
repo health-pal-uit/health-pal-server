@@ -16,32 +16,41 @@ export class DevicesService {
   ) {}
 
   async registerDevice(createDeviceDto: CreateDeviceDto): Promise<Device> {
+    // user_id must be present in DTO
     const device = this.devicesRepository.create(createDeviceDto);
     return this.devicesRepository.save(device);
   }
 
   async deactivateDevice(user: any, updateDeviceDto: UpdateDeviceDto): Promise<UpdateResult> {
-    const userEntity = await this.usersRepository.findOne({ where: { id: user.id } });
-    if (!userEntity) {
-      throw new Error('User not found');
-    }
+    // Only allow deactivation of user's own device
     return this.devicesRepository.update(
-      { id: updateDeviceDto.device_id, user: { id: userEntity.id } },
+      { id: updateDeviceDto.device_id, user: { id: user.id } },
       { last_active_at: undefined },
     );
   }
 
-  async getAllDevices(user: any): Promise<Device[]> {
+  async getAllDevices(): Promise<Device[]> {
     return this.devicesRepository.find({ relations: ['user'] });
   }
 
+  async getDevicesByUser(userId: string): Promise<Device[]> {
+    return this.devicesRepository.find({ where: { user: { id: userId } }, relations: ['user'] });
+  }
+
+  async getDeviceById(id: string, userId: string): Promise<Device | null> {
+    return this.devicesRepository.findOne({
+      where: { id, user: { id: userId } },
+      relations: ['user'],
+    });
+  }
+
+  async deleteDevice(id: string, userId: string): Promise<DeleteResult> {
+    return this.devicesRepository.delete({ id, user: { id: userId } });
+  }
+
   async refreshToken(user: any, dto: { fcm_token: string }): Promise<{ token: string }> {
-    const userEntity = await this.usersRepository.findOne({ where: { id: user.id } });
-    if (!userEntity) {
-      throw new Error('User not found');
-    }
     const device = await this.devicesRepository.findOne({
-      where: { user: { id: userEntity.id }, last_active_at: Not(IsNull()) },
+      where: { user: { id: user.id }, last_active_at: Not(IsNull()) },
     });
     if (!device) {
       throw new Error('No active device found for the user');

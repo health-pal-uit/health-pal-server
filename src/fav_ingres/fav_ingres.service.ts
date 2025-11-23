@@ -17,12 +17,19 @@ export class FavIngresService {
   async remove(id: string): Promise<DeleteResult> {
     return await this.favIngreRepository.delete(id);
   }
-  async findAllOfUser(userId: string): Promise<Ingredient[]> {
+
+  async removeByUserAndIngredient(userId: string, ingredientId: string): Promise<DeleteResult> {
+    return await this.favIngreRepository.delete({
+      user: { id: userId },
+      ingredient: { id: ingredientId },
+    });
+  }
+  async findAllOfUser(userId: string): Promise<{ id: string; ingredient: Ingredient }[]> {
     const favIngre = await this.favIngreRepository.find({
       where: { user: { id: userId } },
       relations: ['ingredient'],
     });
-    return favIngre.map((fav) => fav.ingredient);
+    return favIngre.map((fav) => ({ id: fav.id, ingredient: fav.ingredient }));
   }
   async create(createFavIngreDto: CreateFavIngreDto) {
     const user = await this.userRepository.findOne({ where: { id: createFavIngreDto.user_id } });
@@ -32,9 +39,23 @@ export class FavIngresService {
     if (!user || !ingredient) {
       throw new Error('User or Ingredient not found');
     }
+    // Check for duplicate
+    const existing = await this.favIngreRepository.findOne({
+      where: { user: { id: user.id }, ingredient: { id: ingredient.id } },
+    });
+    if (existing) {
+      throw new Error('Already favorited');
+    }
     const favIngre = this.favIngreRepository.create();
     favIngre.user = user;
     favIngre.ingredient = ingredient;
     return this.favIngreRepository.save(favIngre);
+  }
+
+  async isFavorited(userId: string, ingredientId: string): Promise<boolean> {
+    const fav = await this.favIngreRepository.findOne({
+      where: { user: { id: userId }, ingredient: { id: ingredientId } },
+    });
+    return !!fav;
   }
 }

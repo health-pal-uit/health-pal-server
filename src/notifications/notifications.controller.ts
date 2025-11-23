@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { UpdateNotificationDto } from './dto/update-notification.dto';
@@ -15,48 +15,78 @@ export class NotificationsController {
 
   @Post('user')
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Send notification to a specific user' })
+  @ApiBody({ type: CreateNotificationDto })
+  @ApiResponse({ status: 201, description: 'Notification sent successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   async sendToUser(@Body() createNotificationDto: CreateNotificationDto) {
     return await this.notificationsService.sendToUser(createNotificationDto);
   }
 
   @Post('all-user')
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Send notification to all users' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: { title: { type: 'string' }, message: { type: 'string' } },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Notifications sent to all users' })
   async sendToAllUsers(@Body() body: { title: string; message: string }) {
     return await this.notificationsService.sendToAllUsers(body);
   }
 
   @Get('admin')
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Get all notifications (admin only)' })
+  @ApiResponse({ status: 200, description: 'List of all notifications' })
   async findAll() {
     return await this.notificationsService.findAll();
   }
 
   @Get() // user id
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: "Get current user's notifications" })
+  @ApiResponse({ status: 200, description: 'List of user notifications' })
   async getUserNotifications(@CurrentUserId() id: string) {
     return await this.notificationsService.getUserNotifications(id);
   }
 
   @Get('unread')
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: "Get current user's unread notifications" })
+  @ApiResponse({ status: 200, description: 'List of unread notifications' })
   async getUserUnreadNotifications(@CurrentUserId() id: string) {
     return await this.notificationsService.getUserUnreadNotifications(id);
   }
 
   @Patch('markAsRead/:id') // notification id
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Mark a specific notification as read' })
+  @ApiParam({ name: 'id', description: 'Notification ID' })
+  @ApiResponse({ status: 200, description: 'Notification marked as read' })
+  @ApiResponse({ status: 404, description: 'Notification not found' })
   async markAsRead(@Param('id') id: string, @CurrentUser() user: any) {
     return await this.notificationsService.markAsRead(id, user.id);
   }
 
   @Patch('markAllAsRead')
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Mark all user notifications as read' })
+  @ApiResponse({ status: 200, description: 'All notifications marked as read' })
   async markAllAsRead(@CurrentUser() user: any) {
     return await this.notificationsService.markAllAsRead(user.id);
   }
 
   @Delete(':id')
   @UseGuards(SupabaseGuard)
+  @ApiOperation({
+    summary: 'Remove a notification (soft delete for users, hard delete for admins)',
+  })
+  @ApiParam({ name: 'id', description: 'Notification ID' })
+  @ApiResponse({ status: 200, description: 'Notification removed' })
+  @ApiResponse({ status: 404, description: 'Notification not found' })
   async remove(@Param('id') id: string, @CurrentUser() user: any) {
     const isAdmin = user.role === 'admin';
     if (isAdmin) {

@@ -18,12 +18,19 @@ export class CommentsService {
     return await this.commentsRepository.save(comment);
   }
 
-  findAll() {
-    return `This action returns all comments`;
+  async findAll(): Promise<Comment[]> {
+    return await this.commentsRepository.find({ relations: ['user', 'post'] });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} comment`;
+  async findOne(id: string): Promise<Comment | null> {
+    return await this.commentsRepository.findOne({ where: { id }, relations: ['user', 'post'] });
+  }
+
+  async findByPost(postId: string): Promise<Comment[]> {
+    return await this.commentsRepository.find({
+      where: { post: { id: postId } },
+      relations: ['user', 'post'],
+    });
   }
 
   async update(commentId: string, updateCommentDto: UpdateCommentDto): Promise<UpdateResult> {

@@ -70,9 +70,11 @@ export class ContributionMealsService {
     return await this.contributionMealRepository.save(createdContribution);
   }
 
-  async adminReject(id: string): Promise<UpdateResult> {
+  async adminReject(id: string, rejectionReason: string): Promise<UpdateResult> {
     return await this.contributionMealRepository.update(id, {
       status: ContributionStatus.REJECTED,
+      rejection_reason: rejectionReason,
+      reviewed_at: new Date(),
     });
     // notification here?
   }
@@ -227,5 +229,21 @@ export class ContributionMealsService {
 
   async remove(id: string): Promise<UpdateResult> {
     return await this.contributionMealRepository.softDelete(id);
+  }
+
+  // user: get rejection reason/status for their own contribution
+  async getRejectionInfo(id: string, userId: string) {
+    const contribution = await this.contributionMealRepository.findOne({ where: { id } });
+    if (!contribution) {
+      throw new Error('Contribution not found');
+    }
+    if (contribution.user_id !== userId) {
+      throw new Error('You do not have access to this contribution');
+    }
+    return {
+      status: contribution.status,
+      rejection_reason: contribution.rejection_reason,
+      reviewed_at: contribution.reviewed_at,
+    };
   }
 }

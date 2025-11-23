@@ -1,23 +1,17 @@
-import { ApiProperty, ApiSchema } from '@nestjs/swagger';
-import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
-import { Meal } from 'src/meals/entities/meal.entity';
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Ingredient } from '../../ingredients/entities/ingredient.entity';
+import { Meal } from '../../meals/entities/meal.entity';
 
-@ApiSchema({ name: IngreMeal.name, description: 'IngreMeal entity' })
 @Entity('ingre_meals')
 export class IngreMeal {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column({ type: 'float' })
-  quantity_kg: number;
-
-  // relations => 2
   @ManyToOne(() => Ingredient, (ingredient) => ingredient.ingre_meals)
-  @JoinColumn({ name: 'ingre_id' })
+  @JoinColumn({ name: 'ingredient_id' })
   ingredient: Ingredient;
 
-  @ManyToOne(() => Meal, (meal) => meal.ingre_meals, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Meal, (meal) => meal.ingre_meals)
   @JoinColumn({ name: 'meal_id' })
   meal: Meal;
 }

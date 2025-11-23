@@ -18,7 +18,15 @@ import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { IngredientPayload } from 'src/meals/dto/ingredient-payload.type';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiConsumes,
+  ApiParam,
+} from '@nestjs/swagger';
+import type { ReqUserType } from 'src/auth/types/req.type';
 
 @ApiBearerAuth()
 @Controller('contribution-meals')
@@ -28,17 +36,25 @@ export class ContributionMealsController {
   @Post() // user -> create new contribution
   @UseGuards(SupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({ summary: 'User creates a new meal contribution' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Contribution data and optional image',
+    type: CreateContributionMealDto,
+  })
+  @ApiResponse({ status: 201, description: 'Contribution created' })
+  @ApiResponse({ status: 403, description: 'Admins cannot create contributions' })
   async create(
     @Body() createContributionMealDto: CreateContributionMealDto,
-    @CurrentUser() user: any,
-    @UploadedFile() file?: Express.Multer.File,
+    @CurrentUser() user: ReqUserType,
+    @UploadedFile() _file?: Express.Multer.File,
   ) {
     const isAdmin = user.role === 'admin';
     if (isAdmin) {
       throw new Error('Admins cannot create contributions');
     }
-    const imageBuffer = file?.buffer;
-    const imageName = file?.originalname;
+    const imageBuffer = _file?.buffer;
+    const imageName = _file?.originalname;
     return await this.contributionMealsService.create(
       createContributionMealDto,
       user.id,
@@ -49,13 +65,23 @@ export class ContributionMealsController {
 
   @Post('ingredients')
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'User creates a meal contribution from ingredients' })
+  @ApiBody({
+    description: 'Meal DTO and ingredients array',
+    schema: {
+      type: 'object',
+      properties: {
+        meal: { $ref: '#/components/schemas/CreateContributionMealDto' },
+        ingredients: { type: 'array', items: { $ref: '#/components/schemas/IngredientPayload' } },
+      },
+    },
+  })
+  @ApiResponse({ status: 201, description: 'Contribution created from ingredients' })
   async createFromIngredients(
     @Body() body: { meal: CreateContributionMealDto; ingredients: IngredientPayload[] },
-    @CurrentUser() user: any,
-    @UploadedFile() file?: Express.Multer.File,
+    @CurrentUser() user: ReqUserType,
+    @UploadedFile() _file?: Express.Multer.File,
   ) {
-    const imageBuffer = file?.buffer;
-    const imageName = file?.originalname;
     return await this.contributionMealsService.createFromIngredients(
       body.meal,
       body.ingredients,
@@ -65,7 +91,9 @@ export class ContributionMealsController {
 
   @Get() // admin
   @UseGuards(SupabaseGuard)
-  async findAll(@CurrentUser() user: any) {
+  @ApiOperation({ summary: 'List all contributions (admin) or user contributions (user)' })
+  @ApiResponse({ status: 200, description: 'List of contributions' })
+  async findAll(@CurrentUser() user: ReqUserType) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
       return await this.contributionMealsService.findAllUser(user.id); // only their contributions
@@ -75,7 +103,11 @@ export class ContributionMealsController {
 
   @Get(':id') // admin
   @UseGuards(SupabaseGuard)
-  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
+  @ApiOperation({ summary: 'Get a contribution by id (admin or user)' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 200, description: 'Contribution detail' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  async findOne(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
       return await this.contributionMealsService.findOneUser(id, user.id);
@@ -86,10 +118,19 @@ export class ContributionMealsController {
   @Patch(':id') // user => create update contribution
   @UseGuards(SupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({ summary: 'User updates their pending meal contribution' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Update data and optional image',
+    type: UpdateContributionMealDto,
+  })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 200, description: 'Contribution updated' })
+  @ApiResponse({ status: 403, description: 'Admins cannot update contributions' })
   async update(
     @Param('id') id: string,
     @Body() updateContributionMealDto: UpdateContributionMealDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: ReqUserType,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     // check if user or admin
@@ -110,10 +151,20 @@ export class ContributionMealsController {
 
   @Patch(':id/ingredients') // create update contribution -> if made from ingredients => whole another route, also need to distinguish between admin and user, if user is not admin then create contribution
   @UseGuards(SupabaseGuard) // user
+  @ApiOperation({ summary: 'User updates meal contribution from ingredients' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiBody({
+    description: 'Ingredients array',
+    schema: {
+      type: 'array',
+      items: { $ref: '#/components/schemas/IngredientPayload' },
+    },
+  })
+  @ApiResponse({ status: 200, description: 'Contribution updated from ingredients' })
   async updateFromIngredients(
     @Param('id') id: string,
     @Body() ingredients: IngredientPayload[],
-    @CurrentUser() user: any,
+    @CurrentUser() user: ReqUserType,
   ) {
     return await this.contributionMealsService.createContributionFromIngredients(
       id,
@@ -124,7 +175,10 @@ export class ContributionMealsController {
 
   @Delete(':id') // user => create delete contribution
   @UseGuards(SupabaseGuard)
-  async remove(@Param('id') id: string, @CurrentUser() user: any) {
+  @ApiOperation({ summary: 'User deletes their pending contribution or admin hard deletes' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 200, description: 'Contribution deleted' })
+  async remove(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
     const isAdmin = user.role === 'admin';
     if (isAdmin) {
       return await this.contributionMealsService.remove(id);
@@ -136,6 +190,9 @@ export class ContributionMealsController {
 
   @Get('approve/:id') // admin => approve contribution
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Admin approves a meal contribution' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 200, description: 'Contribution approved' })
   async approve(@Param('id') id: string) {
     return await this.contributionMealsService.adminApprove(id);
   }
@@ -146,14 +203,31 @@ export class ContributionMealsController {
   //   return this.contributionMealsService.adminApprove(id);
   // }
 
-  @Get('reject/:id') // admin => reject contribution
+  @Patch('reject/:id') // admin => reject contribution with reason
   @UseGuards(AdminSupabaseGuard)
-  async reject(@Param('id') id: string) {
-    return await this.contributionMealsService.adminReject(id);
+  @ApiOperation({ summary: 'Admin rejects a meal contribution with a reason' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiBody({ schema: { properties: { reason: { type: 'string' } } } })
+  @ApiResponse({ status: 200, description: 'Contribution rejected' })
+  async reject(@Param('id') id: string, @Body('reason') reason: string) {
+    return await this.contributionMealsService.adminReject(id, reason);
+  }
+
+  // user: get rejection reason/status for their own contribution
+  @Get('rejection-info/:id')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'User gets rejection reason/status for their own meal contribution' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 200, description: 'Rejection info' })
+  async getRejectionInfo(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
+    // Only allow user to see their own contribution's rejection info
+    return await this.contributionMealsService.getRejectionInfo(id, user.id);
   }
 
   @Get('pending') // admin => get all pending contributions
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Admin gets all pending meal contributions' })
+  @ApiResponse({ status: 200, description: 'List of pending contributions' })
   async pending() {
     return await this.contributionMealsService.findAllPending();
   }

@@ -105,4 +105,15 @@ export class UsersService {
   async remove(id: string) {
     return await this.userRepository.delete(id);
   }
+
+  async getUserMedals(userId: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['medals_users', 'medals_users.medal'],
+    });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    return user.medals_users;
+  }
 }

@@ -27,6 +27,12 @@ export class FitnessGoalsService {
     return await this.fitnessGoalRepository.find({ where: { deleted_at: IsNull() } });
   }
 
+  async findAllOfUser(userId: string): Promise<FitnessGoal[]> {
+    return await this.fitnessGoalRepository.find({
+      where: { user: { id: userId }, deleted_at: IsNull() },
+    });
+  }
+
   async findOne(id: string, userId: string): Promise<FitnessGoal | null> {
     return await this.fitnessGoalRepository.findOneBy({ id: id, user: { id: userId } });
   }
@@ -51,5 +57,42 @@ export class FitnessGoalsService {
       throw new Error('Fitness Goal not found or you do not have permission to delete it');
     }
     return await this.fitnessGoalRepository.softDelete(id);
+  }
+
+  async findAllDeleted(): Promise<FitnessGoal[]> {
+    return await this.fitnessGoalRepository
+      .createQueryBuilder('goal')
+      .withDeleted()
+      .where('goal.deleted_at IS NOT NULL')
+      .leftJoinAndSelect('goal.user', 'user')
+      .getMany();
+  }
+
+  async restore(id: string, userId: string): Promise<UpdateResult> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const goal = await this.fitnessGoalRepository.findOne({
+      where: { id },
+      withDeleted: true,
+      relations: ['user'],
+    });
+    if (!goal) {
+      throw new Error('Fitness goal not found');
+    }
+    if (goal.user.id !== userId) {
+      throw new Error('You do not have access to restore this fitness goal');
+    }
+    return await this.fitnessGoalRepository.restore(id);
+  }
+
+  async checkReferences(
+    _id: string,
+    _userId: string,
+  ): Promise<{ referenced: boolean; references: string[] }> {
+    // Check if any ActivityRecord references this goal (if relation exists)
+    // For now, always return false (no reference) unless you add the relation
+    return { referenced: false, references: [] };
   }
 }

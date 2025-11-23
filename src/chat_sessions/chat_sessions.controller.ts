@@ -1,3 +1,4 @@
+import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiBody } from '@nestjs/swagger';
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { ChatSessionsService } from './chat_sessions.service';
@@ -8,6 +9,7 @@ import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guar
 import { CurrentUserId } from 'src/helpers/decorators/current-user-id.decorator';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 
+@ApiTags('Chat Sessions')
 @ApiBearerAuth()
 @Controller('chat-sessions')
 export class ChatSessionsController {
@@ -15,6 +17,9 @@ export class ChatSessionsController {
 
   @Post()
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Create a new chat session' })
+  @ApiBody({ type: CreateChatSessionDto })
+  @ApiResponse({ status: 201, description: 'The created chat session', type: CreateChatSessionDto })
   async create(
     @Body() createChatSessionDto: CreateChatSessionDto,
     @CurrentUserId() user_id: string,
@@ -24,6 +29,8 @@ export class ChatSessionsController {
 
   @Get()
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get all chat sessions (admin) or user sessions (user)' })
+  @ApiResponse({ status: 200, description: 'List of chat sessions', type: [CreateChatSessionDto] })
   async findUserAll(@CurrentUser() user: any) {
     // user id
     const isAdmin = user.role === 'admin';
@@ -35,18 +42,28 @@ export class ChatSessionsController {
 
   @Get(':id')
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get a chat session by ID' })
+  @ApiParam({ name: 'id', description: 'ID of the chat session' })
+  @ApiResponse({ status: 200, description: 'The chat session', type: CreateChatSessionDto })
   async findOne(@Param('id') id: string) {
     return await this.chatSessionsService.findOne(id);
   }
 
   @Patch(':id')
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Update a chat session' })
+  @ApiParam({ name: 'id', description: 'ID of the chat session' })
+  @ApiBody({ type: UpdateChatSessionDto })
+  @ApiResponse({ status: 200, description: 'The updated chat session', type: CreateChatSessionDto })
   async update(@Param('id') id: string, @Body() updateChatSessionDto: UpdateChatSessionDto) {
     return await this.chatSessionsService.update(id, updateChatSessionDto);
   }
 
   @Delete(':id')
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Delete a chat session' })
+  @ApiParam({ name: 'id', description: 'ID of the chat session' })
+  @ApiResponse({ status: 200, description: 'The deleted chat session' })
   async remove(@Param('id') id: string, @CurrentUser() user: any) {
     if (user.role === 'admin') {
       await this.chatSessionsService.adminRemove(id);

@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { Challenge } from './entities/challenge.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Repository, UpdateResult } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { ActivityRecordsService } from 'src/activity_records/activity_records.service';
 import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
 import { ConfigService } from '@nestjs/config';
@@ -42,7 +42,9 @@ export class ChallengesService {
       where: { id: savedChallenge.id },
       relations: ['activity_records'],
     });
-    if (!foundChallenge) throw new Error('Sth wrong');
+    if (!foundChallenge) {
+      throw new NotFoundException('Challenge not found after creation');
+    }
     return foundChallenge;
   }
 
@@ -53,8 +55,15 @@ export class ChallengesService {
     });
   }
 
-  async findOne(id: string): Promise<Challenge | null> {
-    return await this.challengesRepository.findOneBy({ id });
+  async findOne(id: string): Promise<Challenge> {
+    const challenge = await this.challengesRepository.findOne({
+      where: { id, deleted_at: IsNull() },
+      relations: ['activity_records'],
+    });
+    if (!challenge) {
+      throw new NotFoundException(`Challenge with id ${id} not found`);
+    }
+    return challenge;
   }
 
   async update(
@@ -62,7 +71,10 @@ export class ChallengesService {
     updateChallengeDto: UpdateChallengeDto,
     imageBuffer?: Buffer,
     imageName?: string,
-  ): Promise<UpdateResult> {
+  ): Promise<Challenge> {
+    // Verify challenge exists and is not soft-deleted
+    await this.findOne(id);
+
     if (imageBuffer && imageName) {
       const challengeImgBucketName =
         this.configService.get<string>('CHALLENGE_IMG_BUCKET_NAME') || 'challenge-imgs';
@@ -73,10 +85,13 @@ export class ChallengesService {
       );
       updateChallengeDto.image_url = imageUrl || updateChallengeDto.image_url;
     }
-    return await this.challengesRepository.update(id, updateChallengeDto);
+    await this.challengesRepository.update(id, updateChallengeDto);
+    return this.findOne(id);
   }
 
-  async remove(id: string): Promise<UpdateResult> {
-    return await this.challengesRepository.softDelete(id);
+  async remove(id: string): Promise<Challenge> {
+    const challenge = await this.findOne(id);
+    await this.challengesRepository.softDelete(id);
+    return challenge;
   }
 }
