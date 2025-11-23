@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateActivityRecordDto } from './dto/create-activity_record.dto';
 import { UpdateActivityRecordDto } from './dto/update-activity_record.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -29,18 +34,18 @@ export class ActivityRecordsService {
       where: { id: createActivityRecordDto.activity_id },
     });
     if (!activity) {
-      throw new Error('Activity not found');
+      throw new NotFoundException('Activity not found');
     }
 
     if (!createActivityRecordDto.challenge_id) {
-      throw new Error('Challenge ID is required for challenge activity records');
+      throw new BadRequestException('Challenge ID is required for challenge activity records');
     }
 
     const challenge = await this.challengesRepository.findOneBy({
       id: createActivityRecordDto.challenge_id,
     });
     if (!challenge) {
-      throw new Error('Challenge not found');
+      throw new NotFoundException('Challenge not found');
     }
 
     createActivityRecordDto.user_owned = false;
@@ -56,9 +61,9 @@ export class ActivityRecordsService {
   }
   async assignToChallenge(id: string, challengeId: string): Promise<ActivityRecord> {
     const activityRecord = await this.activityRecordRepository.findOneBy({ id: id });
-    if (!activityRecord) throw new Error('Not found Activity Record');
+    if (!activityRecord) throw new NotFoundException('Activity record not found');
     const challenge = await this.challengesRepository.findOneBy({ id: challengeId });
-    if (!challenge) throw new Error('Challenge not found');
+    if (!challenge) throw new NotFoundException('Challenge not found');
 
     activityRecord.challenge = challenge;
     activityRecord.type = RecordType.CHALLENGE; // Set type when assigning to challenge
@@ -77,14 +82,14 @@ export class ActivityRecordsService {
       where: { id: createActivityRecordDto.activity_id },
     });
     if (!activity) {
-      throw new Error('Activity not found');
+      throw new NotFoundException('Activity not found');
     }
     const dailyLog = await this.dailyLogsService.getOrCreateDailyLog(
       userId,
       createActivityRecordDto.created_at ?? new Date(),
     );
     if (!dailyLog) {
-      throw new Error('Daily log not found or could not be created');
+      throw new NotFoundException('Daily log not found or could not be created');
     }
 
     createActivityRecordDto.user_owned = true;
@@ -188,7 +193,7 @@ export class ActivityRecordsService {
       relations: { daily_log: { user: true }, activity: true },
     });
     if (!activityRecord) {
-      throw new Error('Activity record not found');
+      throw new NotFoundException('Activity record not found');
     }
     if (activityRecord.daily_log?.user.id !== userId) {
       throw new UnauthorizedException('User not authorized to update this activity record');
@@ -196,7 +201,7 @@ export class ActivityRecordsService {
     const dailyLog = activityRecord.daily_log;
     const activity = activityRecord.activity;
     if (!dailyLog || !activity) {
-      throw new Error('Related daily log or activity not found');
+      throw new NotFoundException('Related daily log or activity not found');
     }
 
     // subtract old calories from daily log
@@ -224,7 +229,32 @@ export class ActivityRecordsService {
     id: string,
     updateActivityRecordDto: UpdateActivityRecordDto,
   ): Promise<UpdateResult> {
-    return await this.activityRecordRepository.update(id, updateActivityRecordDto);
+    const activityRecord = await this.activityRecordRepository.findOne({
+      where: { id },
+      relations: { challenge: true },
+    });
+    if (!activityRecord) {
+      throw new NotFoundException('Activity record not found');
+    }
+    if (!activityRecord.challenge) {
+      throw new BadRequestException('Activity record is not a challenge record');
+    }
+
+    // Prevent updating fields that shouldn't be changed
+    const {
+      user_owned: _user_owned,
+      type: _type,
+      daily_log_id: _daily_log_id,
+      challenge_id: _challenge_id,
+      activity_id: _activity_id,
+      ...allowedUpdates
+    } = updateActivityRecordDto;
+
+    if (Object.keys(allowedUpdates).length === 0) {
+      throw new BadRequestException('No valid fields to update');
+    }
+
+    return await this.activityRecordRepository.update(id, allowedUpdates);
   }
 
   async removeDailyLogsOfUser(id: string, userId: string): Promise<DeleteResult> {
@@ -233,7 +263,7 @@ export class ActivityRecordsService {
       relations: { daily_log: { user: true } },
     });
     if (!activityRecord) {
-      throw new Error('Activity record not found');
+      throw new NotFoundException('Activity record not found');
     }
     if (activityRecord.daily_log?.user.id !== userId) {
       throw new UnauthorizedException('User not authorized to delete this activity record');
@@ -267,10 +297,10 @@ export class ActivityRecordsService {
       relations: { challenge: true, activity: true },
     });
     if (!activityRecord) {
-      throw new Error('Activity record not found');
+      throw new NotFoundException('Activity record not found');
     }
     if (!activityRecord.challenge) {
-      throw new Error('Activity record is not associated with a challenge');
+      throw new BadRequestException('Activity record is not associated with a challenge');
     }
 
     // Get when user joined this challenge (to prevent counting historical data)

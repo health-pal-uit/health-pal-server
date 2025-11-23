@@ -1,3 +1,5 @@
+import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiBody } from '@nestjs/swagger';
+
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { ChatParticipantsService } from './chat_participants.service';
@@ -8,13 +10,34 @@ import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guar
 import { CurrentUserId } from 'src/helpers/decorators/current-user-id.decorator';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 
+@ApiTags('Chat Participants')
 @ApiBearerAuth()
 @Controller('chat-participants')
 export class ChatParticipantsController {
   constructor(private readonly chatParticipantsService: ChatParticipantsService) {}
 
+  @Get('session/:sessionId')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get all participants for a chat session' })
+  @ApiParam({ name: 'sessionId', description: 'ID of the chat session' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of chat participants',
+    type: [CreateChatParticipantDto],
+  })
+  async findBySession(@Param('sessionId') sessionId: string) {
+    return await this.chatParticipantsService.findBySession(sessionId);
+  }
+
   @Post()
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Add a user to a chat session' })
+  @ApiBody({ type: CreateChatParticipantDto })
+  @ApiResponse({
+    status: 201,
+    description: 'The created chat participant',
+    type: CreateChatParticipantDto,
+  })
   async create(
     @Body() createChatParticipantDto: CreateChatParticipantDto,
     @CurrentUser() user: any,
@@ -25,6 +48,12 @@ export class ChatParticipantsController {
 
   @Get()
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get all chat participants (admin) or user participations (user)' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of chat participants',
+    type: [CreateChatParticipantDto],
+  })
   async findAll(@CurrentUser() user: any) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
@@ -35,17 +64,35 @@ export class ChatParticipantsController {
 
   @Get(':id')
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get a chat participant by ID' })
+  @ApiParam({ name: 'id', description: 'ID of the chat participant' })
+  @ApiResponse({ status: 200, description: 'The chat participant', type: CreateChatParticipantDto })
   async findOne(@Param('id') id: string) {
     return await this.chatParticipantsService.findOne(id);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateChatParticipantDto: UpdateChatParticipantDto) {
-  //   return this.chatParticipantsService.update(id, updateChatParticipantDto);
-  // }
+  @Patch(':id')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Update a chat participant' })
+  @ApiParam({ name: 'id', description: 'ID of the chat participant' })
+  @ApiBody({ type: UpdateChatParticipantDto })
+  @ApiResponse({
+    status: 200,
+    description: 'The updated chat participant',
+    type: CreateChatParticipantDto,
+  })
+  async update(
+    @Param('id') id: string,
+    @Body() updateChatParticipantDto: UpdateChatParticipantDto,
+  ) {
+    return await this.chatParticipantsService.update(id, updateChatParticipantDto);
+  }
 
   @Delete(':id')
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Remove a chat participant' })
+  @ApiParam({ name: 'id', description: 'ID of the chat participant' })
+  @ApiResponse({ status: 200, description: 'The deleted chat participant' })
   async remove(@Param('id') id: string) {
     return await this.chatParticipantsService.remove(id);
   }

@@ -16,17 +16,17 @@ export class CreateFitnessProfileDto {
   height_m!: number;
 
   @ApiProperty({ description: 'Waist circumference in centimeters' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   waist_cm?: number;
 
   @ApiProperty({ description: 'Hip circumference in centimeters' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   hip_cm?: number;
 
   @ApiProperty({ description: 'Neck circumference in centimeters' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsNumber()
   neck_cm?: number;
 

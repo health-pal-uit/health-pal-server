@@ -18,6 +18,7 @@ import { responseHelper } from 'src/helpers/responses/response.helper';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
+import { ApiOperation, ApiResponse, ApiConsumes } from '@nestjs/swagger';
 
 @ApiBearerAuth()
 @Controller('users')
@@ -29,8 +30,45 @@ export class UsersController {
   //   return this.usersService.create(createUserDto);
   // }
 
+  @Get('/me')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get current user profile' })
+  @ApiResponse({ status: 200, description: 'User profile retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async findOne(@CurrentUser() currentUser: any) {
+    const user = await this.usersService.findOne(currentUser.id);
+    if (!user) {
+      return responseHelper({
+        error: 'User not found',
+        message: 'User not found',
+        statusCode: 404,
+      });
+    }
+    return responseHelper({
+      data: user,
+      message: 'User retrieved successfully',
+      statusCode: 200,
+    });
+  }
+
+  @Get('/me/medals')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: "Get current user's earned medals" })
+  @ApiResponse({ status: 200, description: "List of user's medals" })
+  async getUserMedals(@CurrentUser() currentUser: any) {
+    const medals = await this.usersService.getUserMedals(currentUser.id);
+    return responseHelper({
+      data: medals,
+      message: 'User medals retrieved successfully',
+      statusCode: 200,
+    });
+  }
+
   @Get()
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Get all users (admin only)' })
+  @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'No users found' })
   async findAll() {
     const users = await this.usersService.findAll();
     if (!users) {
@@ -47,10 +85,19 @@ export class UsersController {
     });
   }
 
-  @Get(':id')
-  @UseGuards(AdminSupabaseGuard)
-  async findOne(@Param('id') id: string) {
-    const user = await this.usersService.findOne(id);
+  @Patch('me')
+  @UseGuards(SupabaseGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({ summary: 'Update current user profile' })
+  @ApiResponse({ status: 200, description: 'User profile updated successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiConsumes('multipart/form-data')
+  async updateCurrentUser(
+    @CurrentUser() currentUser: any,
+    @Body() updateUserDto: UpdateUserDto,
+    @UploadedFile() image?: Express.Multer.File,
+  ) {
+    const user = await this.usersService.findOne(currentUser.id);
     if (!user) {
       return responseHelper({
         error: 'User not found',
@@ -58,16 +105,18 @@ export class UsersController {
         statusCode: 404,
       });
     }
-    return responseHelper({
-      data: user,
-      message: 'User retrieved successfully',
-      statusCode: 200,
-    });
+    const imageBuffer = image?.buffer;
+    const imageName = image?.originalname;
+    return await this.usersService.update(currentUser.id, updateUserDto, imageBuffer, imageName);
   }
 
   @Patch(':id')
-  @UseGuards(SupabaseGuard)
+  @UseGuards(AdminSupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({ summary: 'Update user by ID (admin only)' })
+  @ApiResponse({ status: 200, description: 'User updated successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @ApiConsumes('multipart/form-data')
   async update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
@@ -88,11 +137,14 @@ export class UsersController {
 
   @Delete(':id')
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Delete user by ID (own account or admin)' })
+  @ApiResponse({ status: 200, description: 'User deleted successfully' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
   async remove(@Param('id') id: string, @CurrentUser() currentUser: any) {
-    if (id !== currentUser.id || currentUser.role.name !== 'admin') {
+    if (id !== currentUser.id && currentUser.role.name !== 'admin') {
       return responseHelper({
         error: 'Forbidden',
-        message: 'You can only delete your own account',
+        message: 'You can only delete your own account or be an admin',
         statusCode: 403,
       });
     }

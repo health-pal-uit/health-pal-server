@@ -9,18 +9,18 @@ export class IngreMealsService {
   }
 
   findAll() {
-    return `This action returns all ingreMeals`;
+    return `This action returns all ingreMeal`;
   }
 
-  findOne(id: number) {
+  findOne(id: string) {
     return `This action returns a #${id} ingreMeal`;
   }
 
-  update(id: number, updateIngreMealDto: UpdateIngreMealDto) {
+  update(id: string, updateIngreMealDto: UpdateIngreMealDto) {
     return `This action updates a #${id} ingreMeal`;
   }
 
-  remove(id: number) {
+  remove(id: string) {
     return `This action removes a #${id} ingreMeal`;
   }
 }

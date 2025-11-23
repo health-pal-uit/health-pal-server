@@ -45,12 +45,12 @@ export class FitnessProfilesService {
     });
   }
 
-  async findOne(id: string, userId: string): Promise<FitnessProfile | null> {
+  async findOne(userId: string): Promise<FitnessProfile | null> {
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
       throw new Error('User not found');
     }
-    const fitnessProfile = await this.fitnessProfileRepository.findOne({ where: { id, user } });
+    const fitnessProfile = await this.fitnessProfileRepository.findOne({ where: { user } });
     if (!fitnessProfile) {
       throw new UnauthorizedException('You do not have access to this fitness profile');
     }
@@ -58,15 +58,20 @@ export class FitnessProfilesService {
   }
 
   async update(
-    id: string,
     updateFitnessProfileDto: UpdateFitnessProfileDto,
     userId: string,
   ): Promise<UpdateResult> {
-    const user = await this.userRepository.findOneBy({ id: userId });
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['fitnessProfiles'],
+    });
+    const fitnessProfileId = user?.fitness_profiles?.[0]?.id;
     if (!user) {
       throw new Error('User not found');
     }
-    const fitnessProfile = await this.fitnessProfileRepository.findOne({ where: { id, user } });
+    const fitnessProfile = await this.fitnessProfileRepository.findOne({
+      where: { id: fitnessProfileId, user },
+    });
     if (!fitnessProfile) {
       throw new UnauthorizedException('You do not have access to this fitness profile');
     }
@@ -91,7 +96,44 @@ export class FitnessProfilesService {
     updateFitnessProfileDto.bmi = fitnessProfile.bmi;
     updateFitnessProfileDto.tdee_kcal = fitnessProfile.tdee_kcal;
 
-    return await this.fitnessProfileRepository.update(id, updateFitnessProfileDto);
+    return await this.fitnessProfileRepository.update(fitnessProfileId!, updateFitnessProfileDto);
+  }
+
+  async findAllForUser(userId: string): Promise<FitnessProfile[]> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    return await this.fitnessProfileRepository.find({ where: { user, deleted_at: IsNull() } });
+  }
+
+  async findAllDeleted(): Promise<FitnessProfile[]> {
+    // TypeORM does not support string where for deleted_at, so use QueryBuilder
+    return await this.fitnessProfileRepository
+      .createQueryBuilder('profile')
+      .withDeleted()
+      .where('profile.deleted_at IS NOT NULL')
+      .leftJoinAndSelect('profile.user', 'user')
+      .getMany();
+  }
+
+  async restore(id: string, userId: string): Promise<UpdateResult> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const profile = await this.fitnessProfileRepository.findOne({
+      where: { id },
+      withDeleted: true,
+      relations: ['user'],
+    });
+    if (!profile) {
+      throw new Error('Fitness profile not found');
+    }
+    if (profile.user.id !== userId) {
+      throw new UnauthorizedException('You do not have access to restore this fitness profile');
+    }
+    return await this.fitnessProfileRepository.restore(id);
   }
 
   async remove(id: string, userId: string): Promise<UpdateResult> {

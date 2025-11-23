@@ -17,6 +17,7 @@ import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guar
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiOperation, ApiResponse, ApiConsumes, ApiBody, ApiParam } from '@nestjs/swagger';
 
 @ApiBearerAuth()
 @Controller('medals')
@@ -26,6 +27,14 @@ export class MedalsController {
   @Post()
   @UseGuards(AdminSupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({ summary: 'Admin creates a new medal and links to challenges' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Medal data and optional image',
+    type: CreateMedalDto,
+  })
+  @ApiResponse({ status: 201, description: 'Medal created' })
+  @ApiResponse({ status: 403, description: 'Forbidden for non-admins' })
   async create(@Body() createMedalDto: CreateMedalDto, @UploadedFile() file?: Express.Multer.File) {
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
@@ -34,12 +43,18 @@ export class MedalsController {
 
   @Get()
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get all medals (users and admins)' })
+  @ApiResponse({ status: 200, description: 'List of medals' })
   async findAll() {
     return await this.medalsService.findAll();
   }
 
   @Get(':id')
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get a medal by ID' })
+  @ApiParam({ name: 'id', type: String, description: 'Medal ID' })
+  @ApiResponse({ status: 200, description: 'Medal details' })
+  @ApiResponse({ status: 404, description: 'Medal not found' })
   async findOne(@Param('id') id: string) {
     return await this.medalsService.findOne(id);
   }
@@ -47,6 +62,15 @@ export class MedalsController {
   @Patch(':id')
   @UseGuards(AdminSupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({ summary: 'Admin updates a medal and its challenge links' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Update data and optional image',
+    type: UpdateMedalDto,
+  })
+  @ApiParam({ name: 'id', type: String, description: 'Medal ID' })
+  @ApiResponse({ status: 200, description: 'Medal updated' })
+  @ApiResponse({ status: 403, description: 'Forbidden for non-admins' })
   async update(
     @Param('id') id: string,
     @Body() updateMedalDto: UpdateMedalDto,
@@ -59,6 +83,10 @@ export class MedalsController {
 
   @Delete(':id')
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Admin deletes a medal' })
+  @ApiParam({ name: 'id', type: String, description: 'Medal ID' })
+  @ApiResponse({ status: 200, description: 'Medal deleted' })
+  @ApiResponse({ status: 403, description: 'Forbidden for non-admins' })
   async remove(@Param('id') id: string) {
     return await this.medalsService.remove(id);
   }

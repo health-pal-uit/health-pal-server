@@ -18,12 +18,16 @@ export class FavMealsService {
   async remove(id: string): Promise<DeleteResult> {
     return await this.favMealRepository.delete(id);
   }
-  async findAllOfUser(userId: string): Promise<Meal[]> {
+
+  async removeByUserAndMeal(userId: string, mealId: string): Promise<DeleteResult> {
+    return await this.favMealRepository.delete({ user: { id: userId }, meal: { id: mealId } });
+  }
+  async findAllOfUser(userId: string): Promise<{ id: string; meal: Meal }[]> {
     const favMeal = await this.favMealRepository.find({
       where: { user: { id: userId } },
       relations: ['meal'],
     });
-    return favMeal.map((fav) => fav.meal);
+    return favMeal.map((fav) => ({ id: fav.id, meal: fav.meal }));
   }
   async create(createFavMealDto: CreateFavMealDto) {
     const user = await this.userRepository.findOne({ where: { id: createFavMealDto.user_id } });
@@ -31,9 +35,23 @@ export class FavMealsService {
     if (!user || !meal) {
       throw new Error('User or meal not found');
     }
+    // Check for duplicate
+    const existing = await this.favMealRepository.findOne({
+      where: { user: { id: user.id }, meal: { id: meal.id } },
+    });
+    if (existing) {
+      throw new Error('Already favorited');
+    }
     const favMeal = this.favMealRepository.create();
     favMeal.user = user;
     favMeal.meal = meal;
     return this.favMealRepository.save(favMeal);
+  }
+
+  async isFavorited(userId: string, mealId: string): Promise<boolean> {
+    const fav = await this.favMealRepository.findOne({
+      where: { user: { id: userId }, meal: { id: mealId } },
+    });
+    return !!fav;
   }
 }

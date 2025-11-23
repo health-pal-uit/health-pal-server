@@ -36,25 +36,25 @@ export class RegisterDto {
   email!: string;
 
   @ApiProperty({ example: '+1234567890', description: 'Phone number', required: false })
-  @IsNotEmpty()
+  @IsOptional()
   @IsPhoneNumber()
-  phone!: string;
+  phone?: string;
 
   @ApiProperty({ example: 'John Doe', description: 'Full name', required: false })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  fullname!: string;
+  fullname?: string;
 
   @ApiProperty({ example: true, description: 'User gender' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsBoolean()
-  gender!: boolean;
+  gender?: boolean;
 
   @ApiProperty({ example: '1990-01-01', description: 'Birth date', required: false })
-  @IsNotEmpty()
+  @IsOptional()
   @TransformToISODate()
   @IsDateString()
-  birth_date!: Date;
+  birth_date?: Date;
 
   @IsUrl()
   @ApiProperty({

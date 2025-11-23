@@ -31,6 +31,21 @@ export class ChatParticipantsService {
     return await this.chatParticipantRepository.save(chatParticipant);
   }
 
+  async findBySession(sessionId: string): Promise<ChatParticipant[]> {
+    return await this.chatParticipantRepository.find({
+      where: { chat_session: { id: sessionId } },
+      relations: ['user', 'chat_session'],
+    });
+  }
+
+  async update(
+    id: string,
+    updateChatParticipantDto: UpdateChatParticipantDto,
+  ): Promise<ChatParticipant | null> {
+    await this.chatParticipantRepository.update(id, updateChatParticipantDto);
+    return this.findOne(id);
+  }
+
   async findAll(): Promise<ChatParticipant[]> {
     return await this.chatParticipantRepository.find();
   }

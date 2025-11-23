@@ -27,10 +27,27 @@ export class ContributionIngresService {
     });
   }
 
-  async adminReject(id: string): Promise<UpdateResult> {
+  async adminReject(id: string, reason?: string): Promise<UpdateResult> {
     return await this.contributionIngreRepository.update(id, {
       status: ContributionStatus.REJECTED,
+      rejection_reason: reason || null,
+      reviewed_at: new Date(),
     });
+  }
+  // user: get rejection reason/status for their own contribution
+  async getRejectionInfo(id: string, userId: string) {
+    const contribution = await this.contributionIngreRepository.findOne({ where: { id } });
+    if (!contribution) {
+      throw new Error('Contribution not found');
+    }
+    if (contribution.user_id !== userId) {
+      throw new Error('You do not have access to this contribution');
+    }
+    return {
+      status: contribution.status,
+      rejection_reason: contribution.rejection_reason,
+      reviewed_at: contribution.reviewed_at,
+    };
   }
 
   // convert to real ingredient

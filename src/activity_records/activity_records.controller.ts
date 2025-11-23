@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ActivityRecordsService } from './activity_records.service';
 import { CreateActivityRecordDto } from './dto/create-activity_record.dto';
 import { UpdateActivityRecordDto } from './dto/update-activity_record.dto';
@@ -8,36 +8,73 @@ import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 
 @ApiBearerAuth()
+@ApiTags('activity-records')
 @Controller('activity-records')
 @UseGuards(SupabaseGuard)
 export class ActivityRecordsController {
   constructor(private readonly activityRecordsService: ActivityRecordsService) {}
 
-  // trả về number và lưu vào challenge_user.progress_percent
   @Get('check-challenge-progress/:challengeId')
+  @ApiOperation({
+    summary: 'Check challenge progress',
+    description:
+      'Calculates and returns overall progress percentage for a challenge and saves it to challenge_user table',
+  })
+  @ApiResponse({ status: 200, description: 'Progress percentage calculated successfully' })
+  @ApiResponse({ status: 404, description: 'Challenge not found' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async checkProgress(@Param('challengeId') challengeId: string, @CurrentUser() user: any) {
-    return await this.activityRecordsService.recalculateProgressChallengesForUser(
+    const progress_percent = await this.activityRecordsService.recalculateProgressChallengesForUser(
       challengeId,
       user.id,
     );
+    return { progress_percent };
   }
 
-  // chỉ trả về number
-  @Get('check-activity-log-progress/:activityLogId')
+  @Get('check-activity-log-progress/:activityRecordId')
+  @ApiOperation({
+    summary: 'Check activity record progress',
+    description: 'Calculates progress percentage for a specific activity record within a challenge',
+  })
+  @ApiResponse({ status: 200, description: 'Progress percentage calculated successfully' })
+  @ApiResponse({ status: 404, description: 'Activity record not found' })
+  @ApiResponse({ status: 400, description: 'Activity record is not associated with a challenge' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async checkActivityLogProgress(
-    @Param('activityLogId') activityLogId: string,
+    @Param('activityRecordId') activityRecordId: string,
     @CurrentUser() user: any,
   ) {
-    return await this.activityRecordsService.calculateProgressPercent(activityLogId, user.id);
+    const progress_percent = await this.activityRecordsService.calculateProgressPercent(
+      activityRecordId,
+      user.id,
+    );
+    return { progress_percent };
   }
 
   @Post('challenges')
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({
+    summary: 'Create challenge activity record',
+    description: 'Admin only - Creates an activity requirement/template for a challenge',
+  })
+  @ApiResponse({ status: 201, description: 'Challenge activity record created successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid input data or missing challenge_id' })
+  @ApiResponse({ status: 404, description: 'Activity or challenge not found' })
+  @ApiResponse({ status: 401, description: 'Unauthorized - Admin access required' })
   async createChallenges(@Body() createActivityRecordDto: CreateActivityRecordDto) {
     return await this.activityRecordsService.createChallenges(createActivityRecordDto);
   }
 
   @Post('daily-logs')
+  @ApiOperation({
+    summary: 'Create daily log activity record',
+    description:
+      'Records user activity for the day. Creates or updates daily log and calculates calories burned',
+  })
+  @ApiResponse({ status: 201, description: 'Daily activity record created successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 404, description: 'Activity not found' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async createDailyLogs(
     @Body() createActivityRecordDto: CreateActivityRecordDto,
     @CurrentUser() user: any,
@@ -46,21 +83,54 @@ export class ActivityRecordsController {
   }
 
   @Get('challenges/:challengeId')
+  @ApiOperation({
+    summary: 'Get all challenge activity records',
+    description: 'Retrieves all activity requirements for a specific challenge',
+  })
+  @ApiResponse({ status: 200, description: 'Challenge activity records retrieved successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async findAllChallenges(@Param('challengeId') challengeId: string) {
     return await this.activityRecordsService.findAllChallenges(challengeId);
   }
 
   @Get('daily-logs/:dailyLogId')
+  @ApiOperation({
+    summary: 'Get user daily log activity records',
+    description: "Retrieves all activity records for a user's specific daily log",
+  })
+  @ApiResponse({ status: 200, description: 'Daily activity records retrieved successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async findAllDailyLogs(@CurrentUser() user: any, @Param('dailyLogId') dailyLogId: string) {
     return await this.activityRecordsService.findAllDailyLogsOfUser(user.id, dailyLogId);
   }
   @Get(':id')
+  @ApiOperation({
+    summary: 'Get activity record by ID',
+    description:
+      'Retrieves a specific activity record. User can only access their own daily log records',
+  })
+  @ApiResponse({ status: 200, description: 'Activity record retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'Activity record not found' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - User not authorized to access this record',
+  })
   async findOne(@Param('id') id: string, @CurrentUser() user: any) {
     return await this.activityRecordsService.findOne(id, user.id);
   }
 
   @Patch('challenges/:id')
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({
+    summary: 'Update challenge activity record',
+    description:
+      'Admin only - Updates an activity requirement for a challenge. Cannot change relations or type',
+  })
+  @ApiResponse({ status: 200, description: 'Challenge activity record updated successfully' })
+  @ApiResponse({ status: 404, description: 'Activity record not found' })
+  @ApiResponse({ status: 400, description: 'Invalid input data or no valid fields to update' })
+  @ApiResponse({ status: 401, description: 'Unauthorized - Admin access required' })
   async updateChallenges(
     @Param('id') id: string,
     @Body() updateActivityRecordDto: UpdateActivityRecordDto,
@@ -70,11 +140,28 @@ export class ActivityRecordsController {
 
   @Delete('challenges/:id')
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({
+    summary: 'Delete challenge activity record',
+    description: 'Admin only - Deletes an activity requirement from a challenge',
+  })
+  @ApiResponse({ status: 200, description: 'Challenge activity record deleted successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized - Admin access required' })
   async removeChallenges(@Param('id') id: string) {
     return await this.activityRecordsService.removeChallenges(id);
   }
 
   @Patch('daily-logs/:id')
+  @ApiOperation({
+    summary: 'Update daily log activity record',
+    description: 'Updates user activity record in daily log. Recalculates calories burned',
+  })
+  @ApiResponse({ status: 200, description: 'Daily activity record updated successfully' })
+  @ApiResponse({ status: 404, description: 'Activity record not found' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - User not authorized to update this record',
+  })
   async updateDailyLogs(
     @Param('id') id: string,
     @Body() updateActivityRecordDto: UpdateActivityRecordDto,
@@ -88,25 +175,18 @@ export class ActivityRecordsController {
   }
 
   @Delete('daily-logs/:id')
+  @ApiOperation({
+    summary: 'Delete daily log activity record',
+    description: 'Deletes user activity record from daily log. Updates total calories burned',
+  })
+  @ApiResponse({ status: 200, description: 'Daily activity record deleted successfully' })
+  @ApiResponse({ status: 404, description: 'Activity record not found' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden - User not authorized to delete this record',
+  })
   async removeDailyLogs(@Param('id') id: string, @CurrentUser() user: any) {
     return await this.activityRecordsService.removeDailyLogsOfUser(id, user.id);
   }
-  // @Delete('challenges/:id')
-  // removeChallengesOfUser(@Param('id') id: string, @CurrentUser() user: any) {
-  //   return this.activityRecordsService.removeChallengesOfUser(id, user.id);
-  // }
-
-  // @Patch('challenges-users/:id')
-  // updateChallengesOfUser(@Param('id') id: string, @Body() updateActivityRecordDto: UpdateActivityRecordDto, @CurrentUser() user: any) {
-  //   return this.activityRecordsService.updateChallengesOfUser(id, updateActivityRecordDto, user.id);
-  // }
-
-  // @Post('challenges-users')
-  // createChallengesForUser(@Body() createActivityRecordDto: CreateActivityRecordDto, @CurrentUser() user: any) {
-  //   return this.activityRecordsService.createChallengesForUser(createActivityRecordDto, user.id);
-  // }
-  // @Get('challenges-users')
-  // findAllChallengesOfUser(@CurrentUser() user: any, @Body() challengeId: string) {
-  //   return this.activityRecordsService.findAllChallengesOfUser(user.id, challengeId);
-  // }
 }

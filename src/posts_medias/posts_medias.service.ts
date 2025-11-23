@@ -20,7 +20,18 @@ export class PostsMediasService {
     createPostsMediaDto: CreatePostsMediaDto,
     fileBuffer?: Buffer,
     fileName?: string,
+    userId?: string,
   ): Promise<PostsMedia> {
+    // Check if the post belongs to the user
+    if (userId && createPostsMediaDto.post_id) {
+      const post = await this.postsMediasRepository.manager.findOne('Post', {
+        where: { id: createPostsMediaDto.post_id },
+        relations: ['user'],
+      });
+      if (!post || post.user.id !== userId) {
+        throw new Error('User does not own the post');
+      }
+    }
     if (createPostsMediaDto.media_type == MediaType.VIDEO) {
       const postVideoBucketName =
         this.configService.get<string>('POST_VIDEO_BUCKET_NAME') || 'post-videos';
@@ -61,10 +72,17 @@ export class PostsMediasService {
     updatePostsMediaDto: UpdatePostsMediaDto,
     fileBuffer?: Buffer,
     fileName?: string,
+    userId?: string,
   ): Promise<UpdateResult> {
-    const media = await this.postsMediasRepository.findOne({ where: { id } });
+    const media = await this.postsMediasRepository.findOne({
+      where: { id },
+      relations: ['post', 'post.user'],
+    });
     if (!media) {
       throw new Error('PostsMedia not found');
+    }
+    if (userId && media.post.user.id !== userId) {
+      throw new Error('User does not own the post');
     }
     if (fileBuffer && fileName) {
       const postImgBucketName =
@@ -79,7 +97,17 @@ export class PostsMediasService {
     return await this.postsMediasRepository.update(id, updatePostsMediaDto);
   }
 
-  async remove(id: string): Promise<DeleteResult> {
+  async remove(id: string, userId?: string): Promise<DeleteResult> {
+    const media = await this.postsMediasRepository.findOne({
+      where: { id },
+      relations: ['post', 'post.user'],
+    });
+    if (!media) {
+      throw new Error('PostsMedia not found');
+    }
+    if (userId && media.post.user.id !== userId) {
+      throw new Error('User does not own the post');
+    }
     return await this.postsMediasRepository.delete(id);
   }
 }

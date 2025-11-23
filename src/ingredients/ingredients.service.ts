@@ -54,6 +54,12 @@ export class IngredientsService {
     });
   }
 
+  async findOneUser(id: string) {
+    return await this.ingredientRepository.findOne({
+      where: { id, is_verified: true, deleted_at: IsNull() },
+    });
+  }
+
   async update(
     id: string,
     updateIngredientDto: UpdateIngredientDto,

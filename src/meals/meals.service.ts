@@ -168,6 +168,13 @@ export class MealsService {
     });
   }
 
+  async findOneUser(id: string): Promise<Meal | null> {
+    return await this.mealsRepository.findOne({
+      where: { id, is_verified: true, deleted_at: IsNull() },
+      relations: ['ingre_meals', 'ingre_meals.ingredient'],
+    });
+  }
+
   async update(id: string, updateMealDto: UpdateMealDto): Promise<UpdateResult> {
     return await this.mealsRepository.update(id, updateMealDto);
   }

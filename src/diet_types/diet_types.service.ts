@@ -20,15 +20,34 @@ export class DietTypesService {
 
   async findOne(id: string): Promise<DietType | null> {
     return await this.dietTypeRepository.findOne({
-      where: { id },
+      where: { id, deleted_at: IsNull() },
     });
+  }
+
+  async findDeleted(): Promise<DietType[]> {
+    return await this.dietTypeRepository.find({ where: { deleted_at: Not(IsNull()) } });
+  }
+
+  async restore(id: string): Promise<UpdateResult> {
+    return await this.dietTypeRepository.restore(id);
+  }
+
+  async isReferenced(id: string): Promise<boolean> {
+    // Check if any fitness profile references this diet type
+    const count = await this.dietTypeRepository.manager.count('FitnessProfile', {
+      where: { diet_type: { id } },
+    });
+    return count > 0;
   }
 
   async update(id: string, updateDietTypeDto: UpdateDietTypeDto): Promise<UpdateResult> {
     return await this.dietTypeRepository.update(id, updateDietTypeDto);
   }
 
-  async remove(id: string): Promise<UpdateResult> {
+  async remove(id: string): Promise<UpdateResult | { error: string }> {
+    if (await this.isReferenced(id)) {
+      return { error: 'Cannot delete: DietType is still referenced by FitnessProfile(s).' };
+    }
     return await this.dietTypeRepository.softDelete(id);
   }
 }

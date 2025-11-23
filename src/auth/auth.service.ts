@@ -1,4 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Inject,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { SupabaseClient, User } from '@supabase/supabase-js';
 import { SUPABASE_ADMIN } from 'src/supabase/supabase-admin.provider';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
@@ -25,15 +32,17 @@ export class AuthService {
   async signUp(createUserDto: CreateUserDto) {
     const existingUser = await this.usersService.findOneByEmail(createUserDto.email);
     if (existingUser) {
-      throw new Error('User already exists in the database');
+      throw new ConflictException('User already exists in the database');
     }
-    const { data: users, error: listError } = await this.supabase.auth.admin.listUsers();
-    if (listError) {
-      throw listError;
+
+    // Check if user exists in Supabase Auth
+    const { data: supabaseUser } = await this.supabase.auth.admin.getUserByEmail(
+      createUserDto.email,
+    );
+    if (supabaseUser?.user) {
+      throw new ConflictException('User already exists');
     }
-    if (users.users.find((user) => user.email === createUserDto.email)) {
-      throw new Error('User already exists');
-    }
+
     const { data, error } = await this.supabase.auth.signUp({
       email: createUserDto.email,
       password: createUserDto.password,
@@ -42,7 +51,7 @@ export class AuthService {
       },
     });
     if (error) {
-      throw error;
+      throw new BadRequestException(error.message);
     }
 
     try {
@@ -61,25 +70,24 @@ export class AuthService {
       } catch (rollbackError) {
         console.error('Error rolling back user creation:', rollbackError);
       }
-      throw dbError;
+      throw new BadRequestException('Failed to create user in database');
     }
 
     return { user: data.user };
   }
 
   async checkVerification(email: string) {
-    const { data: users, error: listError } = await this.supabase.auth.admin.listUsers();
-    if (listError) {
-      throw listError;
+    const { data: supabaseUser, error } = await this.supabase.auth.admin.getUserByEmail(email);
+    if (error) {
+      throw new BadRequestException(error.message);
     }
-    const user = users.users.find((user) => user.email === email);
-    if (!user) {
-      throw new Error('User not found');
+    if (!supabaseUser?.user) {
+      throw new NotFoundException('User not found');
     }
-    if (user.confirmed_at) {
-      await this.usersService.markVerified(user.id);
+    if (supabaseUser.user.confirmed_at) {
+      await this.usersService.markVerified(supabaseUser.user.id);
     }
-    return { isVerified: !!user.confirmed_at };
+    return { isVerified: !!supabaseUser.user.confirmed_at };
   }
 
   async login(loginDto: LoginDto): Promise<{ token: string }> {
@@ -89,7 +97,7 @@ export class AuthService {
       password,
     });
     if (error) {
-      throw error;
+      throw new UnauthorizedException('Invalid credentials');
     }
     return { token: data.session.access_token };
   }
@@ -97,7 +105,7 @@ export class AuthService {
   async logOut(): Promise<{ message: string }> {
     const { error } = await this.supabase.auth.signOut();
     if (error) {
-      throw error;
+      throw new BadRequestException(error.message);
     }
     return { message: 'Logged out successfully' };
   }
@@ -105,7 +113,7 @@ export class AuthService {
   async getUserById(id: string): Promise<User | null> {
     const { data, error } = await this.supabase.auth.admin.getUserById(id);
     if (error) {
-      throw error;
+      throw new NotFoundException('User not found');
     }
     return data.user;
   }
@@ -113,7 +121,7 @@ export class AuthService {
   async deleteUser(id: string): Promise<{ message: string }> {
     const { error } = await this.supabase.auth.admin.deleteUser(id);
     if (error) {
-      throw error;
+      throw new BadRequestException(error.message);
     }
     return { message: 'User deleted successfully' };
   }
@@ -123,27 +131,18 @@ export class AuthService {
     googleUser.username = sanitizeName(googleUser.username || googleUser.email.split('@')[0]);
 
     const { email } = googleUser;
-    // check if user already exists if yes, return the user
     const existingUser = await this.usersService.findOneByEmail(email);
     if (existingUser) {
       return existingUser;
     }
-    // const { data, error } = await this.supabase.auth.admin.getUserByEmail(email);
-    // if (error) {
-    //   throw error;
-    // }
-    // if (!data.user) {
-    //   throw new Error('User not found');
-    // }
-    // check on supabase auth side
-    const { data: users, error: listError } = await this.supabase.auth.admin.listUsers();
-    if (listError) {
-      throw listError;
+
+    // Check if user exists in Supabase Auth
+    const { data: supabaseUser } = await this.supabase.auth.admin.getUserByEmail(email);
+    if (supabaseUser?.user) {
+      throw new ConflictException('User already exists');
     }
-    if (users.users.find((user) => user.email === googleUser.email)) {
-      throw new Error('User already exists');
-    }
-    // create new user on both supabase auth and db
+
+    // Create new user on both Supabase Auth and DB
     const { data, error } = await this.supabase.auth.admin.createUser({
       email: googleUser.email,
       password: googleUser.password,
@@ -153,7 +152,7 @@ export class AuthService {
       },
     });
     if (error) {
-      throw error;
+      throw new BadRequestException(error.message);
     }
 
     return this.usersService.createFromSupabase(
@@ -167,14 +166,12 @@ export class AuthService {
   }
 
   async signToken(payload: ReqUserType): Promise<string> {
-    // get user from database to retrieve their supabaseId and password
     const user = await this.usersService.findOneByEmail(payload.email);
     if (!user) {
-      throw new Error('User not found in database');
+      throw new NotFoundException('User not found in database');
     }
 
-    // sign in the user to get a valid session token
-    const password = generateSecurePassword(payload.email + '@HealthPal'); // match the password generation logic
+    const password = generateSecurePassword(payload.email + '@HealthPal');
 
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email: payload.email,
@@ -182,10 +179,9 @@ export class AuthService {
     });
 
     if (error) {
-      return ''; // return empty string if sign-in fails
+      return '';
     }
 
-    // return the access token from the session
     return data.session.access_token;
   }
 }

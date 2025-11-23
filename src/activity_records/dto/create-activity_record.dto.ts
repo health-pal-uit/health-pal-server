@@ -73,7 +73,7 @@ export class CreateActivityRecordDto {
   @TransformToISODate()
   @IsOptional()
   @IsDateString()
-  created_at: Date;
+  created_at?: Date;
 
   // relations => 2
 

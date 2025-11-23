@@ -17,7 +17,15 @@ import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiBody,
+  ApiConsumes,
+  ApiParam,
+} from '@nestjs/swagger';
+import type { ReqUserType } from 'src/auth/types/req.type';
 
 @ApiBearerAuth()
 @Controller('contribution-ingres')
@@ -27,9 +35,17 @@ export class ContributionIngresController {
   @Post() // user -> create new contribution
   @UseGuards(SupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({ summary: 'User creates a new ingredient contribution' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Contribution data and optional image',
+    type: CreateContributionIngreDto,
+  })
+  @ApiResponse({ status: 201, description: 'Contribution created' })
+  @ApiResponse({ status: 403, description: 'Admins cannot create contributions' })
   async create(
     @Body() createContributionIngreDto: CreateContributionIngreDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: ReqUserType,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const isAdmin = user.role === 'admin';
@@ -46,9 +62,11 @@ export class ContributionIngresController {
     );
   }
 
-  @Get() // admin
+  @Get()
   @UseGuards(SupabaseGuard)
-  async findAll(@CurrentUser() user: any) {
+  @ApiOperation({ summary: 'List all contributions (admin) or user contributions (user)' })
+  @ApiResponse({ status: 200, description: 'List of contributions' })
+  async findAll(@CurrentUser() user: ReqUserType) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
       return await this.contributionIngresService.findAllUser(user.id); // only their contributions
@@ -58,7 +76,11 @@ export class ContributionIngresController {
 
   @Get(':id') // admin
   @UseGuards(SupabaseGuard)
-  async findOne(@Param('id') id: string, @CurrentUser() user: any) {
+  @ApiOperation({ summary: 'Get a contribution by id (admin or user)' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 200, description: 'Contribution detail' })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  async findOne(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
       return await this.contributionIngresService.findOneUser(id, user.id);
@@ -69,10 +91,19 @@ export class ContributionIngresController {
   @Patch(':id') // user => create update contribution
   @UseGuards(SupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({ summary: 'User updates their pending contribution' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Update data and optional image',
+    type: UpdateContributionIngreDto,
+  })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 200, description: 'Contribution updated' })
+  @ApiResponse({ status: 403, description: 'Admins cannot update contributions' })
   async update(
     @Param('id') id: string,
     @Body() updateContributionIngreDto: UpdateContributionIngreDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: ReqUserType,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     // check if user or admin
@@ -93,7 +124,10 @@ export class ContributionIngresController {
 
   @Delete(':id') // user => create delete contribution
   @UseGuards(SupabaseGuard)
-  async remove(@Param('id') id: string, @CurrentUser() user: any) {
+  @ApiOperation({ summary: 'User deletes their pending contribution or admin hard deletes' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 200, description: 'Contribution deleted' })
+  async remove(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
     const isAdmin = user.role === 'admin';
     if (isAdmin) {
       return await this.contributionIngresService.remove(id);
@@ -105,18 +139,38 @@ export class ContributionIngresController {
 
   @Get('approve/:id') // admin => approve contribution
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Admin approves a contribution' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 200, description: 'Contribution approved' })
   async approve(@Param('id') id: string) {
     return await this.contributionIngresService.adminApprove(id);
   }
 
-  @Get('reject/:id') // admin => reject contribution
+  @Patch('reject/:id') // admin => reject contribution with reason
   @UseGuards(AdminSupabaseGuard)
-  async reject(@Param('id') id: string) {
-    return await this.contributionIngresService.adminReject(id);
+  @ApiOperation({ summary: 'Admin rejects a contribution with a reason' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiBody({ schema: { properties: { reason: { type: 'string' } } } })
+  @ApiResponse({ status: 200, description: 'Contribution rejected' })
+  async reject(@Param('id') id: string, @Body('reason') reason: string) {
+    return await this.contributionIngresService.adminReject(id, reason);
+  }
+
+  // user: get rejection reason/status for their own contribution
+  @Get('rejection-info/:id')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'User gets rejection reason/status for their own contribution' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 200, description: 'Rejection info' })
+  async getRejectionInfo(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
+    // Only allow user to see their own contribution's rejection info
+    return await this.contributionIngresService.getRejectionInfo(id, user.id);
   }
 
   @Get('pending') // admin => get all pending contributions
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Admin gets all pending contributions' })
+  @ApiResponse({ status: 200, description: 'List of pending contributions' })
   async pending() {
     return await this.contributionIngresService.findAllPending();
   }

@@ -15,10 +15,11 @@ import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
-import { CurrentUserId } from 'src/helpers/decorators/current-user-id.decorator';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import type { ReqUserType } from 'src/auth/types/req.type';
+import { ApiOperation, ApiResponse, ApiConsumes, ApiBody, ApiParam } from '@nestjs/swagger';
 
 @ApiBearerAuth()
 @Controller('ingredients')
@@ -28,6 +29,13 @@ export class IngredientsController {
   @UseGuards(AdminSupabaseGuard)
   @Post()
   @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({ summary: 'Admin creates a new ingredient' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Ingredient data and optional image',
+    type: CreateIngredientDto,
+  })
+  @ApiResponse({ status: 201, description: 'Ingredient created' })
   async create(
     @Body() createIngredientDto: CreateIngredientDto,
     @UploadedFile() file?: Express.Multer.File,
@@ -40,6 +48,8 @@ export class IngredientsController {
   // get all admin
   @Get('admin')
   @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Admin gets all ingredients (including unverified)' })
+  @ApiResponse({ status: 200, description: 'List of all ingredients' })
   async findAll() {
     return await this.ingredientsService.findAll();
   }
@@ -47,13 +57,23 @@ export class IngredientsController {
   // get all user (verified only)
   @Get()
   @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'User gets all verified ingredients' })
+  @ApiResponse({ status: 200, description: 'List of verified ingredients' })
   async findAllUser() {
     return await this.ingredientsService.findAllUser();
   }
 
   @Get(':id')
   @UseGuards(SupabaseGuard)
-  async findOne(@Param('id') id: string) {
+  @ApiOperation({ summary: 'Get an ingredient by ID (admin sees all, user sees only verified)' })
+  @ApiParam({ name: 'id', type: String, description: 'Ingredient ID' })
+  @ApiResponse({ status: 200, description: 'Ingredient details' })
+  @ApiResponse({ status: 404, description: 'Ingredient not found' })
+  async findOne(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
+    const isAdmin = user.role === 'admin';
+    if (!isAdmin) {
+      return await this.ingredientsService.findOneUser(id);
+    }
     return await this.ingredientsService.findOne(id);
   }
 
@@ -61,10 +81,19 @@ export class IngredientsController {
   @Patch(':id')
   @UseGuards(SupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({ summary: 'Admin updates an ingredient (users must use contributions)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    description: 'Update data and optional image',
+    type: UpdateIngredientDto,
+  })
+  @ApiParam({ name: 'id', type: String, description: 'Ingredient ID' })
+  @ApiResponse({ status: 200, description: 'Ingredient updated' })
+  @ApiResponse({ status: 403, description: 'Forbidden for non-admins' })
   async update(
     @Param('id') id: string,
     @Body() updateIngredientDto: UpdateIngredientDto,
-    @CurrentUser() user: any,
+    @CurrentUser() user: ReqUserType,
     @UploadedFile() file?: Express.Multer.File,
   ) {
     const isAdmin = user.role === 'admin';
@@ -78,7 +107,11 @@ export class IngredientsController {
 
   // admin delete
   @Delete(':id')
-  async remove(@Param('id') id: string, @CurrentUser() user: any) {
+  @ApiOperation({ summary: 'Admin deletes an ingredient (users must use contributions)' })
+  @ApiParam({ name: 'id', type: String, description: 'Ingredient ID' })
+  @ApiResponse({ status: 200, description: 'Ingredient deleted' })
+  @ApiResponse({ status: 403, description: 'Forbidden for non-admins' })
+  async remove(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
       //return this.ingredientsService.removeUser(id, user.id);

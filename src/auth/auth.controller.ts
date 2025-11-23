@@ -1,16 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  Patch,
-  Param,
-  Delete,
-  UseGuards,
-  Res,
-  Query,
-  Req,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards, Res, Query, Req } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from 'src/users/dto/create-user.dto';
 import { LoginDto } from './dto/login.dto';
@@ -19,39 +7,25 @@ import type { Response } from 'express';
 import { GoogleGuard } from './guards/google/google.guard';
 import { ReqUserType } from './types/req.type';
 import { responseHelper } from 'src/helpers/responses/response.helper';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiBearerAuth()
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  // @Post()
-  // create(@Body() createAuthDto: CreateAuthDto) {
-  //   return this.authService.create(createAuthDto);
-  // }
-
-  // @Get()
-  // findAll() {
-  //   return this.authService.findAll();
-  // }
-
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.authService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateAuthDto: UpdateAuthDto) {
-  //   return this.authService.update(+id, updateAuthDto);
-  // }
-
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.authService.remove(+id);
-  // }
-
   @Post('signup')
+  @ApiOperation({
+    summary: 'Sign up new user',
+    description: 'Creates a new user account with email verification',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'User signed up successfully. Verification email sent.',
+  })
+  @ApiResponse({ status: 400, description: 'Invalid input data' })
+  @ApiResponse({ status: 409, description: 'User already exists' })
   async signUp(@Body() createUserDto: CreateUserDto) {
     const result = await this.authService.signUp(createUserDto);
     return responseHelper({
@@ -62,6 +36,12 @@ export class AuthController {
   }
 
   @Get('check-verification/:email')
+  @ApiOperation({
+    summary: 'Check email verification status',
+    description: 'Checks if user email has been verified',
+  })
+  @ApiResponse({ status: 200, description: 'Verification status retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
   async checkVerification(@Param('email') email: string) {
     const result = await this.authService.checkVerification(email);
     return responseHelper({
@@ -72,6 +52,12 @@ export class AuthController {
   }
 
   @Post('login')
+  @ApiOperation({
+    summary: 'Login user',
+    description: 'Authenticates user and returns access token',
+  })
+  @ApiResponse({ status: 200, description: 'Login successful. Returns access token.' })
+  @ApiResponse({ status: 401, description: 'Invalid credentials' })
   async login(@Body() loginDto: LoginDto) {
     const result = await this.authService.login(loginDto);
     return responseHelper({
@@ -83,6 +69,12 @@ export class AuthController {
 
   @Get('logout')
   @UseGuards(SupabaseGuard)
+  @ApiOperation({
+    summary: 'Logout user',
+    description: 'Logs out the current user and invalidates their session',
+  })
+  @ApiResponse({ status: 200, description: 'Logout successful' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
   async logOut() {
     const result = await this.authService.logOut();
     return responseHelper({
@@ -92,13 +84,12 @@ export class AuthController {
     });
   }
 
-  // @Get('google/login')
-  // async googleLogin() {
-  //   return "hello";
-  // }
-
-  // no guard here, to initiate the OAuth2 flow
   @Get('google/login')
+  @ApiOperation({
+    summary: 'Initiate Google OAuth login',
+    description: 'Redirects to Google OAuth flow',
+  })
+  @ApiResponse({ status: 302, description: 'Redirects to Google OAuth' })
   async googleLogin(@Res() res: Response, @Query('redirectUrl') redirectUrl: string) {
     res.cookie('redirect_url', redirectUrl, { httpOnly: true });
     return res.redirect('/auth/google');
@@ -106,12 +97,17 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(GoogleGuard)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async googleCallback(@Res() res: Response, @Req() req: any) {
+  @ApiOperation({
+    summary: 'Google OAuth callback',
+    description: 'Handles Google OAuth callback and returns access token',
+  })
+  @ApiResponse({ status: 302, description: 'Redirects with access token' })
+  async googleCallback(
+    @Res() res: Response,
+    @Req() req: Request & { user: ReqUserType; cookies: any },
+  ) {
     const user = req.user;
-    // generate a JWT token for the user
-    const redirectUrl = req.cookies.redirect_url || 'http://localhost:3001/auth/success';
-    // sign the token
+    const redirectUrl = req.cookies?.redirect_url || 'http://localhost:3001/auth/success';
     const payload: ReqUserType = { email: user.email, role: 'user', id: user.id };
     const token = await this.authService.signToken(payload);
     if (token === '') {
@@ -124,5 +120,9 @@ export class AuthController {
 
   @Get('google')
   @UseGuards(GoogleGuard)
+  @ApiOperation({
+    summary: 'Google OAuth endpoint',
+    description: 'Protected Google OAuth endpoint',
+  })
   async googleAuth() {}
 }
