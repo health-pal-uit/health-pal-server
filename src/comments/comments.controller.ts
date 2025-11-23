@@ -52,14 +52,20 @@ export class CommentsController {
 
   @Get()
   @UseGuards(SupabaseGuard)
-  @ApiOperation({ summary: 'Get all comments or comments for a specific post' })
+  @ApiOperation({ summary: 'Get all comments or comments for a specific post with pagination' })
   @ApiQuery({ name: 'postId', required: false, description: 'ID of the post to filter comments' })
+  @ApiQuery({ name: 'page', required: false, description: 'Page number for pagination' })
+  @ApiQuery({ name: 'limit', required: false, description: 'Number of items per page' })
   @ApiResponse({ status: 200, description: 'List of comments', type: [CreateCommentDto] })
-  async findAll(@Query('postId') postId?: string) {
+  async findAll(
+    @Query('postId') postId?: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
     if (postId) {
-      return await this.commentsService.findByPost(postId);
+      return await this.commentsService.findByPost(postId, page, limit);
     }
-    return await this.commentsService.findAll();
+    return await this.commentsService.findAll(page, limit);
   }
 
   @Get(':id')

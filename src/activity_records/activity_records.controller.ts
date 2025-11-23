@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ActivityRecordsService } from './activity_records.service';
 import { CreateActivityRecordDto } from './dto/create-activity_record.dto';
@@ -84,24 +94,38 @@ export class ActivityRecordsController {
 
   @Get('challenges/:challengeId')
   @ApiOperation({
-    summary: 'Get all challenge activity records',
+    summary: 'Get all challenge activity records with pagination',
     description: 'Retrieves all activity requirements for a specific challenge',
   })
   @ApiResponse({ status: 200, description: 'Challenge activity records retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async findAllChallenges(@Param('challengeId') challengeId: string) {
-    return await this.activityRecordsService.findAllChallenges(challengeId);
+  async findAllChallenges(
+    @Param('challengeId') challengeId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return await this.activityRecordsService.findAllChallenges(challengeId, page, limit);
   }
 
   @Get('daily-logs/:dailyLogId')
   @ApiOperation({
-    summary: 'Get user daily log activity records',
+    summary: 'Get user daily log activity records with pagination',
     description: "Retrieves all activity records for a user's specific daily log",
   })
   @ApiResponse({ status: 200, description: 'Daily activity records retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async findAllDailyLogs(@CurrentUser() user: any, @Param('dailyLogId') dailyLogId: string) {
-    return await this.activityRecordsService.findAllDailyLogsOfUser(user.id, dailyLogId);
+  async findAllDailyLogs(
+    @CurrentUser() user: any,
+    @Param('dailyLogId') dailyLogId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return await this.activityRecordsService.findAllDailyLogsOfUser(
+      user.id,
+      dailyLogId,
+      page,
+      limit,
+    );
   }
   @Get(':id')
   @ApiOperation({

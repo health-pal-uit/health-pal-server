@@ -4,7 +4,6 @@ import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 
 @Controller('google-fit')
-// Don't apply guard at controller level - callback doesn't need auth
 export class GoogleFitController {
   constructor(private readonly googleFitService: GoogleFitService) {}
 

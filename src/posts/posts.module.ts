@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { PostsController } from './posts.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -14,10 +14,11 @@ import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Post, User, Challenge, Medal, Meal, Ingredient]),
-    CommentsModule,
+    forwardRef(() => CommentsModule),
     LikesModule,
   ],
   controllers: [PostsController],
   providers: [PostsService],
+  exports: [PostsService],
 })
 export class PostsModule {}

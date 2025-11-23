@@ -18,8 +18,18 @@ export class DailyIngresService {
     private dailyLogsService: DailyLogsService,
   ) {}
 
-  async findAllByUser(userId: string) {
-    return await this.dailyIngreRepository.find({ where: { daily_log: { user: { id: userId } } } });
+  async findAllByUser(
+    userId: string,
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: DailyIngre[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.dailyIngreRepository.findAndCount({
+      where: { daily_log: { user: { id: userId } } },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { logged_at: 'DESC' },
+    });
+    return { data, total, page, limit };
   }
   // will implement create many daily ingredients at once later
 
@@ -76,8 +86,16 @@ export class DailyIngresService {
     return saved;
   }
 
-  async findAll(): Promise<DailyIngre[]> {
-    return await this.dailyIngreRepository.find();
+  async findAll(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: DailyIngre[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.dailyIngreRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { logged_at: 'DESC' },
+    });
+    return { data, total, page, limit };
   }
 
   async findOneOwned(id: string, userId: string): Promise<DailyIngre | null> {

@@ -47,9 +47,12 @@ export class ChallengesMedalsService {
     return this.challengesMedalRepository.save(challengesMedal);
   }
 
-  async findAll(): Promise<ChallengesMedal[]> {
+  async findAll(page: number = 1, limit: number = 10): Promise<ChallengesMedal[]> {
+    const skip = (page - 1) * limit;
     return await this.challengesMedalRepository.find({
       relations: ['challenge', 'medal'],
+      skip,
+      take: limit,
     });
   }
 

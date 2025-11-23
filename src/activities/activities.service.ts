@@ -14,8 +14,13 @@ export class ActivitiesService {
     return await this.activitiesRepository.save(activity);
   }
 
-  async findAll(): Promise<Activity[]> {
-    return await this.activitiesRepository.find({ where: { deleted_at: IsNull() } });
+  async findAll(page: number = 1, limit: number = 10): Promise<Activity[]> {
+    const skip = (page - 1) * limit;
+    return await this.activitiesRepository.find({
+      where: { deleted_at: IsNull() },
+      skip,
+      take: limit,
+    });
   }
 
   async findOne(id: string): Promise<Activity> {

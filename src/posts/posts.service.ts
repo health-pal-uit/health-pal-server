@@ -84,8 +84,14 @@ export class PostsService {
     return this.postsRepository.save(post);
   }
 
-  async findAll(): Promise<Post[]> {
-    return this.postsRepository.find({ relations: ['user'], where: { deleted_at: IsNull() } });
+  async findAll(page: number = 1, limit: number = 10): Promise<Post[]> {
+    const skip = (page - 1) * limit;
+    return this.postsRepository.find({
+      relations: ['user'],
+      where: { deleted_at: IsNull() },
+      skip,
+      take: limit,
+    });
   }
 
   async findOne(id: string): Promise<Post | null> {

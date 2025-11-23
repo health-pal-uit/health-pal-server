@@ -79,16 +79,20 @@ export class MedalsUsersService {
     return medal_users;
   }
 
-  async checkFinishedMedals(userId: string): Promise<Medal[]> {
-    const medal_users = await this.checkProgress(userId);
-    const medals: Medal[] = [];
-    for (const mu of medal_users) {
-      const medal = await this.medalsRepository.findOneBy({ id: mu.medal.id });
-      if (!medal) {
-        throw new Error('Medal not found');
-      }
-      medals.push(medal);
-    }
-    return medals;
+  async checkFinishedMedals(
+    userId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Medal[]; total: number; page: number; limit: number }> {
+    const skip = (page - 1) * limit;
+    const [medalUsers, total] = await this.medalsUsersRepository.findAndCount({
+      where: { user: { id: userId } },
+      relations: { medal: true },
+      skip,
+      take: limit,
+      order: { achieved_at: 'DESC' },
+    });
+    const medals = medalUsers.map((mu) => mu.medal);
+    return { data: medals, total, page, limit };
   }
 }

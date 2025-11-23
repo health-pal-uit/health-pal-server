@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ActivitiesService } from './activities.service';
 import { CreateActivityDto } from './dto/create-activity.dto';
@@ -29,12 +39,12 @@ export class ActivitiesController {
   @UseGuards(SupabaseGuard)
   @ApiOperation({
     summary: 'Get all activities',
-    description: 'Retrieves all non-deleted activities',
+    description: 'Retrieves all non-deleted activities with pagination',
   })
   @ApiResponse({ status: 200, description: 'List of activities retrieved successfully' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
-  async findAll() {
-    return await this.activitiesService.findAll();
+  async findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    return await this.activitiesService.findAll(page, limit);
   }
 
   @Get(':id')

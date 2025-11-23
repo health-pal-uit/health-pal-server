@@ -37,15 +37,31 @@ export class IngredientsService {
     return await this.ingredientRepository.save(ingredient);
   }
   // admin find all
-  async findAll() {
-    return await this.ingredientRepository.find({ where: { deleted_at: IsNull() } });
+  async findAll(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: Ingredient[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.ingredientRepository.findAndCount({
+      where: { deleted_at: IsNull() },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: 'DESC' },
+    });
+    return { data, total, page, limit };
   }
 
   // find all verified for user
-  async findAllUser() {
-    return await this.ingredientRepository.find({
+  async findAllUser(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: Ingredient[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.ingredientRepository.findAndCount({
       where: { is_verified: true, deleted_at: IsNull() },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: 'DESC' },
     });
+    return { data, total, page, limit };
   }
   async findOne(id: string) {
     return await this.ingredientRepository.findOne({

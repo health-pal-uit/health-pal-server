@@ -18,19 +18,27 @@ export class CommentsService {
     return await this.commentsRepository.save(comment);
   }
 
-  async findAll(): Promise<Comment[]> {
-    return await this.commentsRepository.find({ relations: ['user', 'post'] });
+  async findAll(page: number = 1, limit: number = 10): Promise<Comment[]> {
+    const skip = (page - 1) * limit;
+    return await this.commentsRepository.find({
+      relations: ['user', 'post'],
+      skip,
+      take: limit,
+    });
   }
 
-  async findOne(id: string): Promise<Comment | null> {
-    return await this.commentsRepository.findOne({ where: { id }, relations: ['user', 'post'] });
-  }
-
-  async findByPost(postId: string): Promise<Comment[]> {
+  async findByPost(postId: string, page: number = 1, limit: number = 10): Promise<Comment[]> {
+    const skip = (page - 1) * limit;
     return await this.commentsRepository.find({
       where: { post: { id: postId } },
       relations: ['user', 'post'],
+      skip,
+      take: limit,
     });
+  }
+
+  async findOne(commentId: string): Promise<Comment | null> {
+    return await this.commentsRepository.findOneBy({ id: commentId });
   }
 
   async update(commentId: string, updateCommentDto: UpdateCommentDto): Promise<UpdateResult> {

@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, ManyToOne, JoinColumn, Column } from 'typeorm';
 import { Ingredient } from '../../ingredients/entities/ingredient.entity';
 import { Meal } from '../../meals/entities/meal.entity';
 
@@ -6,6 +6,9 @@ import { Meal } from '../../meals/entities/meal.entity';
 export class IngreMeal {
   @PrimaryGeneratedColumn('uuid')
   id: string;
+
+  @Column({ type: 'numeric', precision: 10, scale: 3, nullable: true })
+  quantity_kg: number;
 
   @ManyToOne(() => Ingredient, (ingredient) => ingredient.ingre_meals)
   @JoinColumn({ name: 'ingredient_id' })

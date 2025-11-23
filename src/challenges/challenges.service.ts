@@ -48,10 +48,13 @@ export class ChallengesService {
     return foundChallenge;
   }
 
-  async findAll(): Promise<Challenge[]> {
+  async findAll(page: number = 1, limit: number = 10): Promise<Challenge[]> {
+    const skip = (page - 1) * limit;
     return await this.challengesRepository.find({
       where: { deleted_at: IsNull() },
       relations: ['activity_records'],
+      skip,
+      take: limit,
     });
   }
 

@@ -26,10 +26,17 @@ export class ContributionMealsService {
     private readonly configService: ConfigService,
   ) {}
 
-  async findAllPending(): Promise<ContributionMeal[]> {
-    return await this.contributionMealRepository.find({
+  async findAllPending(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: ContributionMeal[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.contributionMealRepository.findAndCount({
       where: { status: ContributionStatus.PENDING, deleted_at: IsNull() },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: 'DESC' },
     });
+    return { data, total, page, limit };
   }
 
   async createFromIngredients(
@@ -219,8 +226,17 @@ export class ContributionMealsService {
     return await this.contributionMealRepository.save(contributionMeal);
   }
 
-  async findAll() {
-    return await this.contributionMealRepository.find({ where: { deleted_at: IsNull() } });
+  async findAll(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: ContributionMeal[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.contributionMealRepository.findAndCount({
+      where: { deleted_at: IsNull() },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: 'DESC' },
+    });
+    return { data, total, page, limit };
   }
 
   async findOne(id: string) {

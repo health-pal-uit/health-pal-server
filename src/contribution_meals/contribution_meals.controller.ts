@@ -9,7 +9,9 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
+import { ContributionMealPaginationDto } from './dto/contribution-meal-pagination.dto';
 import { ContributionMealsService } from './contribution_meals.service';
 import { CreateContributionMealDto } from './dto/create-contribution_meal.dto';
 import { UpdateContributionMealDto } from './dto/update-contribution_meal.dto';
@@ -93,12 +95,13 @@ export class ContributionMealsController {
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'List all contributions (admin) or user contributions (user)' })
   @ApiResponse({ status: 200, description: 'List of contributions' })
-  async findAll(@CurrentUser() user: ReqUserType) {
+  async findAll(@CurrentUser() user: ReqUserType, @Query() query: ContributionMealPaginationDto) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
       return await this.contributionMealsService.findAllUser(user.id); // only their contributions
     }
-    return await this.contributionMealsService.findAll();
+    const { page = 1, limit = 10 } = query;
+    return await this.contributionMealsService.findAll(page, limit);
   }
 
   @Get(':id') // admin
@@ -228,8 +231,9 @@ export class ContributionMealsController {
   @UseGuards(AdminSupabaseGuard)
   @ApiOperation({ summary: 'Admin gets all pending meal contributions' })
   @ApiResponse({ status: 200, description: 'List of pending contributions' })
-  async pending() {
-    return await this.contributionMealsService.findAllPending();
+  async pending(@Query() query: ContributionMealPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.contributionMealsService.findAllPending(page, limit);
   }
 
   // @Post()

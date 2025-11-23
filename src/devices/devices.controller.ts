@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -14,6 +24,7 @@ import { UpdateDeviceDto } from './dto/update-device.dto';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
+import { DevicePaginationDto } from './dto/device-pagination.dto';
 
 @ApiBearerAuth()
 @ApiTags('Devices')
@@ -49,8 +60,9 @@ export class DevicesController {
   @UseGuards(AdminSupabaseGuard)
   @ApiOperation({ summary: 'Admin: Get all devices' })
   @ApiResponse({ status: 200, description: 'List all devices.' })
-  async getAllDevices() {
-    return await this.devicesService.getAllDevices();
+  async getAllDevices(@Query() query: DevicePaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.devicesService.getAllDevices(page, limit);
   }
 
   // User: get own devices
@@ -58,8 +70,9 @@ export class DevicesController {
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Get all devices for current user' })
   @ApiResponse({ status: 200, description: 'List user devices.' })
-  async getOwnDevices(@CurrentUser() user: ReqUserType) {
-    return await this.devicesService.getDevicesByUser(user.id);
+  async getOwnDevices(@CurrentUser() user: ReqUserType, @Query() query: DevicePaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.devicesService.getDevicesByUser(user.id, page, limit);
   }
 
   // User: get device by id

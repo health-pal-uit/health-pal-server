@@ -97,25 +97,49 @@ export class NotificationsService {
     }
   }
 
-  async findAll() {
-    const notifications = await this.notificationRepository.find({ relations: ['user'] });
-    return notifications;
-  }
-
-  async getUserNotifications(id: string) {
-    const notifications = await this.notificationRepository.find({
-      where: { user: { id: id } },
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Notification[]; total: number; page: number; limit: number }> {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.notificationRepository.findAndCount({
+      relations: ['user'],
+      skip,
+      take: limit,
       order: { created_at: 'DESC' },
     });
-    return notifications;
+    return { data, total, page, limit };
   }
 
-  async getUserUnreadNotifications(id: string) {
-    const notifications = await this.notificationRepository.find({
+  async getUserNotifications(
+    id: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Notification[]; total: number; page: number; limit: number }> {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.notificationRepository.findAndCount({
+      where: { user: { id: id } },
+      skip,
+      take: limit,
+      order: { created_at: 'DESC' },
+    });
+    return { data, total, page, limit };
+  }
+
+  async getUserUnreadNotifications(
+    id: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Notification[]; total: number; page: number; limit: number }> {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.notificationRepository.findAndCount({
       where: { user: { id: id }, is_read: false },
       relations: ['user'],
+      skip,
+      take: limit,
+      order: { created_at: 'DESC' },
     });
-    return notifications;
+    return { data, total, page, limit };
   }
 
   async markAsRead(id: string, userId: string) {

@@ -147,19 +147,33 @@ export class MealsService {
     return await this.mealsRepository.save(meal);
   }
 
-  async findAll(): Promise<Meal[]> {
-    return await this.mealsRepository.find({
+  async findAll(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: Meal[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.mealsRepository.findAndCount({
       relations: ['ingre_meals', 'ingre_meals.ingredient'],
       where: { deleted_at: IsNull() },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: 'DESC' },
     });
+    return { data, total, page, limit };
   }
 
   // only verified meals for user
-  async findAllUser(): Promise<Meal[]> {
-    return await this.mealsRepository.find({
+  async findAllUser(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: Meal[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.mealsRepository.findAndCount({
       where: { is_verified: true, deleted_at: IsNull() },
       relations: ['ingre_meals', 'ingre_meals.ingredient'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: 'DESC' },
     });
+    return { data, total, page, limit };
   }
   async findOne(id: string): Promise<Meal | null> {
     return await this.mealsRepository.findOne({

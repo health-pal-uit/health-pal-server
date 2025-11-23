@@ -9,6 +9,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { ChallengesService } from './challenges.service';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
@@ -62,7 +63,7 @@ export class ChallengesController {
   }
 
   @ApiOperation({
-    summary: 'Get all active challenges',
+    summary: 'Get all active challenges with pagination',
     description:
       'Retrieves all non-deleted challenges with their associated activity records. Available to all authenticated users.',
   })
@@ -95,8 +96,8 @@ export class ChallengesController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Get()
   @UseGuards(SupabaseGuard)
-  async findAll() {
-    return await this.challengesService.findAll();
+  async findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    return await this.challengesService.findAll(page, limit);
   }
 
   @ApiOperation({

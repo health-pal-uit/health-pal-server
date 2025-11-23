@@ -26,10 +26,10 @@ export class ChatService {
     const messages = await this.chatMessageRepository.find({
       where: { chat_session: { id: sessionId } },
       relations: ['user', 'chat_session'],
-      order: { created_at: 'ASC' }, // Oldest first
+      order: { created_at: 'DESC' }, // Newest first for chat history
       take: limit,
     });
-    return messages;
+    return messages.reverse(); // Reverse to show oldest to newest
   }
 
   async saveMessage(userId: string, sessionId: string, content: string) {

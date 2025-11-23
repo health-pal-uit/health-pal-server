@@ -23,8 +23,17 @@ export class FitnessGoalsService {
     return await this.fitnessGoalRepository.save(fitnessGoal);
   }
 
-  async findAll(): Promise<FitnessGoal[]> {
-    return await this.fitnessGoalRepository.find({ where: { deleted_at: IsNull() } });
+  async findAll(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: FitnessGoal[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.fitnessGoalRepository.findAndCount({
+      where: { deleted_at: IsNull() },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: 'DESC' },
+    });
+    return { data, total, page, limit };
   }
 
   async findAllOfUser(userId: string): Promise<FitnessGoal[]> {

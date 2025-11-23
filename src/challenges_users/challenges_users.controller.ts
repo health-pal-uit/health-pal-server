@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Param, UseGuards, Query } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ChallengesUsersService } from './challenges_users.service';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
@@ -11,13 +11,17 @@ import type { ReqUserType } from 'src/auth/types/req.type';
 export class ChallengesUsersController {
   constructor(private readonly challengesUsersService: ChallengesUsersService) {}
 
-  @ApiOperation({ summary: 'Get all finished challenges for the current user' })
+  @ApiOperation({ summary: 'Get all finished challenges for the current user with pagination' })
   @ApiResponse({ status: 200, description: 'Returns list of finished challenges with metadata' })
   @ApiResponse({ status: 404, description: 'User not found' })
   @Get('finish')
   @UseGuards(SupabaseGuard)
-  async checkFinishedChallenges(@CurrentUser() user: ReqUserType) {
-    return await this.challengesUsersService.checkFinishedChallenges(user.id);
+  async checkFinishedChallenges(
+    @CurrentUser() user: ReqUserType,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return await this.challengesUsersService.checkFinishedChallenges(user.id, page, limit);
   }
 
   @ApiOperation({ summary: 'Mark a challenge as finished for the current user' })

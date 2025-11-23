@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
+import { DailyMealPaginationDto } from './dto/daily-meal-pagination.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
 import type { ReqUserType } from 'src/auth/types/req.type';
 import { DailyMealsService } from './daily_meals.service';
@@ -37,12 +48,13 @@ export class DailyMealsController {
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Get all daily meals (admin: all, user: own)' })
   @ApiResponse({ status: 200, description: 'List of daily meals' })
-  async findAll(@CurrentUser() user: ReqUserType) {
+  async findAll(@CurrentUser() user: ReqUserType, @Query() query: DailyMealPaginationDto) {
     const isAdmin = user.role === 'admin';
+    const { page = 1, limit = 10 } = query;
     if (!isAdmin) {
-      return await this.dailyMealsService.findAllByUser(user.id);
+      return await this.dailyMealsService.findAllByUser(user.id, page, limit);
     }
-    return await this.dailyMealsService.findAll();
+    return await this.dailyMealsService.findAll(page, limit);
   }
 
   @Get(':id')

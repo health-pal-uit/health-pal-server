@@ -9,8 +9,18 @@ import { Equal, Repository } from 'typeorm';
 export class DailyLogsService {
   constructor(@InjectRepository(DailyLog) private dailyLogRepository: Repository<DailyLog>) {}
 
-  async findAllByUser(id: any) {
-    return await this.dailyLogRepository.find({ where: { user: { id } } });
+  async findAllByUser(
+    id: any,
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: DailyLog[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.dailyLogRepository.findAndCount({
+      where: { user: { id } },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { date: 'DESC' },
+    });
+    return { data, total, page, limit };
   }
 
   async findAll() {

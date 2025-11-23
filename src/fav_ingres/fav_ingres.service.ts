@@ -24,12 +24,25 @@ export class FavIngresService {
       ingredient: { id: ingredientId },
     });
   }
-  async findAllOfUser(userId: string): Promise<{ id: string; ingredient: Ingredient }[]> {
-    const favIngre = await this.favIngreRepository.find({
+  async findAllOfUser(
+    userId: string,
+    page = 1,
+    limit = 10,
+  ): Promise<{
+    data: { id: string; ingredient: Ingredient }[];
+    total: number;
+    page: number;
+    limit: number;
+  }> {
+    const [favIngre, total] = await this.favIngreRepository.findAndCount({
       where: { user: { id: userId } },
       relations: ['ingredient'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { id: 'DESC' },
     });
-    return favIngre.map((fav) => ({ id: fav.id, ingredient: fav.ingredient }));
+    const data = favIngre.map((fav) => ({ id: fav.id, ingredient: fav.ingredient }));
+    return { data, total, page, limit };
   }
   async create(createFavIngreDto: CreateFavIngreDto) {
     const user = await this.userRepository.findOne({ where: { id: createFavIngreDto.user_id } });

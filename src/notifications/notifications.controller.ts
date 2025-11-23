@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 import { NotificationsService } from './notifications.service';
 import { CreateNotificationDto } from './dto/create-notification.dto';
@@ -7,6 +17,7 @@ import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guar
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUserId } from 'src/helpers/decorators/current-user-id.decorator';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
+import { NotificationPaginationDto } from './notification-pagination.dto';
 
 @ApiBearerAuth()
 @Controller('notifications')
@@ -41,24 +52,33 @@ export class NotificationsController {
   @UseGuards(AdminSupabaseGuard)
   @ApiOperation({ summary: 'Get all notifications (admin only)' })
   @ApiResponse({ status: 200, description: 'List of all notifications' })
-  async findAll() {
-    return await this.notificationsService.findAll();
+  async findAll(@Query() query: NotificationPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.notificationsService.findAll(page, limit);
   }
 
   @Get() // user id
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: "Get current user's notifications" })
   @ApiResponse({ status: 200, description: 'List of user notifications' })
-  async getUserNotifications(@CurrentUserId() id: string) {
-    return await this.notificationsService.getUserNotifications(id);
+  async getUserNotifications(
+    @CurrentUserId() id: string,
+    @Query() query: NotificationPaginationDto,
+  ) {
+    const { page = 1, limit = 10 } = query;
+    return await this.notificationsService.getUserNotifications(id, page, limit);
   }
 
   @Get('unread')
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: "Get current user's unread notifications" })
   @ApiResponse({ status: 200, description: 'List of unread notifications' })
-  async getUserUnreadNotifications(@CurrentUserId() id: string) {
-    return await this.notificationsService.getUserUnreadNotifications(id);
+  async getUserUnreadNotifications(
+    @CurrentUserId() id: string,
+    @Query() query: NotificationPaginationDto,
+  ) {
+    const { page = 1, limit = 10 } = query;
+    return await this.notificationsService.getUserUnreadNotifications(id, page, limit);
   }
 
   @Patch('markAsRead/:id') // notification id

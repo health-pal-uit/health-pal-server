@@ -1,4 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
+import { DailyIngrePaginationDto } from './dto/daily-ingre-pagination.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
 import type { ReqUserType } from 'src/auth/types/req.type';
 import { DailyIngresService } from './daily_ingres.service';
@@ -40,12 +51,13 @@ export class DailyIngresController {
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Get all daily ingredients (admin: all, user: own)' })
   @ApiResponse({ status: 200, description: 'List of daily ingredients' })
-  async findAll(@CurrentUser() user: ReqUserType) {
+  async findAll(@CurrentUser() user: ReqUserType, @Query() query: DailyIngrePaginationDto) {
     const isAdmin = user.role === 'admin';
+    const { page = 1, limit = 10 } = query;
     if (!isAdmin) {
-      return await this.dailyIngresService.findAllByUser(user.id);
+      return await this.dailyIngresService.findAllByUser(user.id, page, limit);
     }
-    return await this.dailyIngresService.findAll();
+    return await this.dailyIngresService.findAll(page, limit);
   }
 
   // get daily ingredient by id
