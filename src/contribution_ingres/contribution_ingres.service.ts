@@ -21,10 +21,17 @@ export class ContributionIngresService {
     private configService: ConfigService,
   ) {}
 
-  async findAllPending(): Promise<ContributionIngre[]> {
-    return await this.contributionIngreRepository.find({
+  async findAllPending(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: ContributionIngre[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.contributionIngreRepository.findAndCount({
       where: { status: ContributionStatus.PENDING },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: 'DESC' },
     });
+    return { data, total, page, limit };
   }
 
   async adminReject(id: string, reason?: string): Promise<UpdateResult> {
@@ -197,8 +204,17 @@ export class ContributionIngresService {
     return await this.contributionIngreRepository.save(contributionIngre);
   }
 
-  async findAll(): Promise<ContributionIngre[]> {
-    return await this.contributionIngreRepository.find({ where: { deleted_at: IsNull() } });
+  async findAll(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: ContributionIngre[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.contributionIngreRepository.findAndCount({
+      where: { deleted_at: IsNull() },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: 'DESC' },
+    });
+    return { data, total, page, limit };
   }
 
   async findOne(id: string): Promise<ContributionIngre | null> {

@@ -17,8 +17,18 @@ export class DailyMealsService {
     private dailyLogsService: DailyLogsService,
   ) {}
 
-  async findAllByUser(userId: string): Promise<DailyMeal[]> {
-    return await this.dailyMealsRepository.find({ where: { daily_log: { user: { id: userId } } } });
+  async findAllByUser(
+    userId: string,
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: DailyMeal[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.dailyMealsRepository.findAndCount({
+      where: { daily_log: { user: { id: userId } } },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { logged_at: 'DESC' },
+    });
+    return { data, total, page, limit };
   }
   async create(createDailyMealDto: CreateDailyMealDto, userId: string): Promise<DailyMeal> {
     const meal = await this.mealsRepository.findOne({ where: { id: createDailyMealDto.meal_id } });
@@ -98,8 +108,16 @@ export class DailyMealsService {
     return dailyMealList;
   }
 
-  async findAll(): Promise<DailyMeal[]> {
-    return await this.dailyMealsRepository.find();
+  async findAll(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: DailyMeal[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.dailyMealsRepository.findAndCount({
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { logged_at: 'DESC' },
+    });
+    return { data, total, page, limit };
   }
 
   async findOneOwned(id: string, userId: string): Promise<DailyMeal | null> {

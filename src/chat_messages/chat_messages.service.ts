@@ -21,11 +21,18 @@ export class ChatMessagesService {
     private readonly configService: ConfigService,
   ) {}
 
-  async findBySession(sessionId: string): Promise<ChatMessage[]> {
+  async findBySession(
+    sessionId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<ChatMessage[]> {
+    const skip = (page - 1) * limit;
     return await this.chatMessagesRepository.find({
       where: { chat_session: { id: sessionId } },
       order: { created_at: 'ASC' },
       relations: ['user', 'chat_session'],
+      skip,
+      take: limit,
     });
   }
 
@@ -61,12 +68,21 @@ export class ChatMessagesService {
     return await this.chatMessagesRepository.save(chatMessage);
   }
 
-  async findAll(): Promise<ChatMessage[]> {
-    return await this.chatMessagesRepository.find();
+  async findAll(page: number = 1, limit: number = 10): Promise<ChatMessage[]> {
+    const skip = (page - 1) * limit;
+    return await this.chatMessagesRepository.find({
+      skip,
+      take: limit,
+    });
   }
 
-  async findAllUser(userId: string): Promise<ChatMessage[]> {
-    return await this.chatMessagesRepository.find({ where: { user: { id: Equal(userId) } } });
+  async findAllUser(userId: string, page: number = 1, limit: number = 10): Promise<ChatMessage[]> {
+    const skip = (page - 1) * limit;
+    return await this.chatMessagesRepository.find({
+      where: { user: { id: Equal(userId) } },
+      skip,
+      take: limit,
+    });
   }
 
   async findOne(id: string): Promise<ChatMessage | null> {

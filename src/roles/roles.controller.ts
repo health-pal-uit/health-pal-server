@@ -1,10 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { RolesService } from './roles.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
+import { RolePaginationDto } from './role-pagination.dto';
 
 @ApiBearerAuth()
 @Controller('roles')
@@ -24,8 +35,9 @@ export class RolesController {
   @UseGuards(AdminSupabaseGuard)
   @ApiOperation({ summary: 'Get all roles (admin only)' })
   @ApiResponse({ status: 200, description: 'List of roles' })
-  async findAll() {
-    return await this.rolesService.findAll();
+  async findAll(@Query() query: RolePaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.rolesService.findAll(page, limit);
   }
 
   @Get(':id')

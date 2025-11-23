@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -15,6 +25,7 @@ import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guar
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { BFFitnessProfileDto } from './dto/body-fat-fitness_profile.dto';
 import type { ReqUserType } from 'src/auth/types/req.type';
+import { FitnessProfilePaginationDto } from './dto/fitness-profile-pagination.dto';
 
 @ApiTags('FitnessProfiles')
 @ApiBearerAuth()
@@ -45,8 +56,9 @@ export class FitnessProfilesController {
     description: 'Returns a list of all fitness profiles in the system. Admin only.',
   })
   @ApiResponse({ status: 200, description: 'List of all fitness profiles.' })
-  async findAll() {
-    return await this.fitnessProfilesService.findAll();
+  async findAll(@Query() query: FitnessProfilePaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.fitnessProfilesService.findAll(page, limit);
   }
 
   @UseGuards(SupabaseGuard)

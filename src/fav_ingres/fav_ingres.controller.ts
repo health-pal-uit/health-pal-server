@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -12,6 +12,7 @@ import { CreateFavIngreDto } from './dto/create-fav_ingre.dto';
 
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUserId } from 'src/helpers/decorators/current-user-id.decorator';
+import { FavIngrePaginationDto } from './dto/fav-ingre-pagination.dto';
 
 @ApiTags('FavIngres')
 @ApiBearerAuth()
@@ -33,8 +34,9 @@ export class FavIngresController {
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Get all favorite ingredients for the current user' })
   @ApiResponse({ status: 200, description: 'List of favorite ingredients with ids.' })
-  async findAllOfUser(@CurrentUserId() userId: string) {
-    return await this.favIngresService.findAllOfUser(userId);
+  async findAllOfUser(@CurrentUserId() userId: string, @Query() query: FavIngrePaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.favIngresService.findAllOfUser(userId, page, limit);
   }
   // check if a specific ingredient is favorited by user
   @Get('user/:ingredientId')

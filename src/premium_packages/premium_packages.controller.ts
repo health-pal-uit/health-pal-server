@@ -1,10 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { PremiumPackagesService } from './premium_packages.service';
 import { CreatePremiumPackageDto } from './dto/create-premium_package.dto';
 import { UpdatePremiumPackageDto } from './dto/update-premium_package.dto';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
+import { PremiumPackagePaginationDto } from './premium-package-pagination.dto';
 
 @ApiBearerAuth()
 @Controller('premium-packages')
@@ -24,8 +35,9 @@ export class PremiumPackagesController {
   @UseGuards(AdminSupabaseGuard)
   @ApiOperation({ summary: 'Get all premium packages (admin only)' })
   @ApiResponse({ status: 200, description: 'List of packages' })
-  async findAll() {
-    return await this.premiumPackagesService.findAll();
+  async findAll(@Query() query: PremiumPackagePaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.premiumPackagesService.findAll(page, limit);
   }
 
   @Get(':id')

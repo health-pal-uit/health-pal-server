@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, Query } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -12,6 +12,7 @@ import { CreateFavMealDto } from './dto/create-fav_meal.dto';
 
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUserId } from 'src/helpers/decorators/current-user-id.decorator';
+import { FavMealPaginationDto } from './dto/fav-meal-pagination.dto';
 
 @ApiTags('FavMeals')
 @ApiBearerAuth()
@@ -34,8 +35,9 @@ export class FavMealsController {
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Get all favorite meals for the current user' })
   @ApiResponse({ status: 200, description: 'List of favorite meals with ids.' })
-  async findAllOfUser(@CurrentUserId() userId: string) {
-    return await this.favMealsService.findAllOfUser(userId);
+  async findAllOfUser(@CurrentUserId() userId: string, @Query() query: FavMealPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.favMealsService.findAllOfUser(userId, page, limit);
   }
   // check if a specific meal is favorited by user
   @Get('user/:mealId')

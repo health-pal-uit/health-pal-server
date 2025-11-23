@@ -64,25 +64,26 @@ export class ChatSessionsService {
   //   return this.chatSessionRepository.save(chatSession);
   // }
 
-  async findAll(): Promise<ChatSession[]> {
+  async findAll(page: number = 1, limit: number = 10): Promise<ChatSession[]> {
+    const skip = (page - 1) * limit;
     return await this.chatSessionRepository.find({
       relations: ['participants'],
       where: { deleted_at: IsNull() },
+      skip,
+      take: limit,
     });
   }
 
-  async findUserAll(id: string): Promise<ChatSession[]> {
-    // const allSessions = await this.chatSessionRepository.find({
-    //   relations: ['participants'],
-    // });
-    // const userSessions = allSessions.filter(session => session.participants.map(p => p.id).includes(id));
-    // return userSessions;
+  async findUserAll(id: string, page: number = 1, limit: number = 10): Promise<ChatSession[]> {
+    const skip = (page - 1) * limit;
     return await this.chatSessionRepository.find({
       relations: ['participants', 'participants.user'],
       where: {
         participants: { user: { id: Equal(id) } },
         deleted_at: IsNull(),
       },
+      skip,
+      take: limit,
     });
   }
 

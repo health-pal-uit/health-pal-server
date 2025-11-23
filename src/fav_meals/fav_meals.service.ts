@@ -22,12 +22,20 @@ export class FavMealsService {
   async removeByUserAndMeal(userId: string, mealId: string): Promise<DeleteResult> {
     return await this.favMealRepository.delete({ user: { id: userId }, meal: { id: mealId } });
   }
-  async findAllOfUser(userId: string): Promise<{ id: string; meal: Meal }[]> {
-    const favMeal = await this.favMealRepository.find({
+  async findAllOfUser(
+    userId: string,
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: { id: string; meal: Meal }[]; total: number; page: number; limit: number }> {
+    const [favMeal, total] = await this.favMealRepository.findAndCount({
       where: { user: { id: userId } },
       relations: ['meal'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { id: 'DESC' },
     });
-    return favMeal.map((fav) => ({ id: fav.id, meal: fav.meal }));
+    const data = favMeal.map((fav) => ({ id: fav.id, meal: fav.meal }));
+    return { data, total, page, limit };
   }
   async create(createFavMealDto: CreateFavMealDto) {
     const user = await this.userRepository.findOne({ where: { id: createFavMealDto.user_id } });

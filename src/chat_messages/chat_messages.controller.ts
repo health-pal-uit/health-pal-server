@@ -10,6 +10,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { ChatMessagesService } from './chat_messages.service';
 import { CreateChatMessageDto } from './dto/create-chat_message.dto';
@@ -29,11 +30,15 @@ export class ChatMessagesController {
 
   @Get('session/:sessionId')
   @UseGuards(SupabaseGuard)
-  @ApiOperation({ summary: 'Get all messages for a chat session' })
+  @ApiOperation({ summary: 'Get all messages for a chat session with pagination' })
   @ApiParam({ name: 'sessionId', description: 'ID of the chat session' })
   @ApiResponse({ status: 200, description: 'List of chat messages', type: [CreateChatMessageDto] })
-  async findBySession(@Param('sessionId') sessionId: string) {
-    return await this.chatMessagesService.findBySession(sessionId);
+  async findBySession(
+    @Param('sessionId') sessionId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return await this.chatMessagesService.findBySession(sessionId, page, limit);
   }
 
   @Post()
@@ -55,14 +60,20 @@ export class ChatMessagesController {
 
   @Get()
   @UseGuards(SupabaseGuard)
-  @ApiOperation({ summary: 'Get all chat messages (admin) or user messages (user)' })
+  @ApiOperation({
+    summary: 'Get all chat messages (admin) or user messages (user) with pagination',
+  })
   @ApiResponse({ status: 200, description: 'List of chat messages', type: [CreateChatMessageDto] })
-  async findAll(@CurrentUser() user: any) {
+  async findAll(
+    @CurrentUser() user: any,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
-      return await this.chatMessagesService.findAllUser(user.id);
+      return await this.chatMessagesService.findAllUser(user.id, page, limit);
     }
-    return await this.chatMessagesService.findAll();
+    return await this.chatMessagesService.findAll(page, limit);
   }
 
   @Get(':id')

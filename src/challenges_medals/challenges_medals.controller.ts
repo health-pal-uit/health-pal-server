@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { ChallengesMedalsService } from './challenges_medals.service';
 import { CreateChallengesMedalDto } from './dto/create-challenges_medal.dto';
@@ -29,15 +39,15 @@ export class ChallengesMedalsController {
   }
 
   @ApiOperation({
-    summary: 'Get all challenge-medal assignments',
+    summary: 'Get all challenge-medal assignments with pagination',
     description: 'Retrieves all medal assignments for challenges with relations included.',
   })
   @ApiResponse({ status: 200, description: 'Returns list of all challenge-medal assignments' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   @Get()
   @UseGuards(SupabaseGuard)
-  async findAll() {
-    return await this.challengesMedalsService.findAll();
+  async findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    return await this.challengesMedalsService.findAll(page, limit);
   }
 
   @ApiOperation({

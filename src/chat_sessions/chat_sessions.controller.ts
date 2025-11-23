@@ -1,5 +1,15 @@
 import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiBody } from '@nestjs/swagger';
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { ChatSessionsService } from './chat_sessions.service';
 import { CreateChatSessionDto } from './dto/create-chat_session.dto';
@@ -29,15 +39,21 @@ export class ChatSessionsController {
 
   @Get()
   @UseGuards(SupabaseGuard)
-  @ApiOperation({ summary: 'Get all chat sessions (admin) or user sessions (user)' })
+  @ApiOperation({
+    summary: 'Get all chat sessions (admin) or user sessions (user) with pagination',
+  })
   @ApiResponse({ status: 200, description: 'List of chat sessions', type: [CreateChatSessionDto] })
-  async findUserAll(@CurrentUser() user: any) {
+  async findUserAll(
+    @CurrentUser() user: any,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
     // user id
     const isAdmin = user.role === 'admin';
     if (isAdmin) {
-      return await this.chatSessionsService.findAll();
+      return await this.chatSessionsService.findAll(page, limit);
     }
-    return await this.chatSessionsService.findUserAll(user.id);
+    return await this.chatSessionsService.findUserAll(user.id, page, limit);
   }
 
   @Get(':id')

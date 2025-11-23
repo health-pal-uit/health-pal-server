@@ -91,15 +91,22 @@ export class ChallengesUsersService {
     return challenge_users;
   }
 
-  async checkFinishedChallenges(userId: string): Promise<ChallengesUser[]> {
+  async checkFinishedChallenges(
+    userId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<ChallengesUser[]> {
     const user = await this.usersRepository.findOneBy({ id: userId });
     if (!user) {
       throw new NotFoundException('User not found');
     }
+    const skip = (page - 1) * limit;
     // Single optimized query with relations
     const finishedChallenges = await this.challengesUsersRepository.find({
       where: { user: { id: userId }, progress_percent: 100 },
       relations: ['challenge', 'user'],
+      skip,
+      take: limit,
     });
     return finishedChallenges;
   }

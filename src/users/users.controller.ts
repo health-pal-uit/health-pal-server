@@ -9,6 +9,7 @@ import {
   UseInterceptors,
   UploadedFile,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -19,6 +20,7 @@ import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { ApiOperation, ApiResponse, ApiConsumes } from '@nestjs/swagger';
+import { UserPaginationDto } from './user-pagination.dto';
 
 @ApiBearerAuth()
 @Controller('users')
@@ -69,9 +71,10 @@ export class UsersController {
   @ApiOperation({ summary: 'Get all users (admin only)' })
   @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
   @ApiResponse({ status: 404, description: 'No users found' })
-  async findAll() {
-    const users = await this.usersService.findAll();
-    if (!users) {
+  async findAll(@Query() query: UserPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    const users = await this.usersService.findAll(page, limit);
+    if (!users.data || users.data.length === 0) {
       return responseHelper({
         error: 'No users found',
         message: 'No users found',

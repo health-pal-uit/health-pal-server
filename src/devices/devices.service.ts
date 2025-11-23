@@ -29,12 +29,32 @@ export class DevicesService {
     );
   }
 
-  async getAllDevices(): Promise<Device[]> {
-    return this.devicesRepository.find({ relations: ['user'] });
+  async getAllDevices(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: Device[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.devicesRepository.findAndCount({
+      relations: ['user'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: 'DESC' },
+    });
+    return { data, total, page, limit };
   }
 
-  async getDevicesByUser(userId: string): Promise<Device[]> {
-    return this.devicesRepository.find({ where: { user: { id: userId } }, relations: ['user'] });
+  async getDevicesByUser(
+    userId: string,
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: Device[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.devicesRepository.findAndCount({
+      where: { user: { id: userId } },
+      relations: ['user'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: 'DESC' },
+    });
+    return { data, total, page, limit };
   }
 
   async getDeviceById(id: string, userId: string): Promise<Device | null> {

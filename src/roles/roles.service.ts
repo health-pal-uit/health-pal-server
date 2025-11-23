@@ -18,8 +18,18 @@ export class RolesService {
     return await this.roleRepository.save(role);
   }
 
-  async findAll(): Promise<Role[]> {
-    return await this.roleRepository.find({ where: { deleted_at: IsNull() } });
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Role[]; total: number; page: number; limit: number }> {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.roleRepository.findAndCount({
+      where: { deleted_at: IsNull() },
+      skip,
+      take: limit,
+      order: { created_at: 'DESC' },
+    });
+    return { data, total, page, limit };
   }
 
   async findOne(id: string): Promise<Role | null> {

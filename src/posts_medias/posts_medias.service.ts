@@ -7,11 +7,13 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
 import { ConfigService } from '@nestjs/config';
 import { MediaType } from 'src/helpers/enums/media-type.enum';
+import { Post } from 'src/posts/entities/post.entity';
 
 @Injectable()
 export class PostsMediasService {
   constructor(
     @InjectRepository(PostsMedia) private postsMediasRepository: Repository<PostsMedia>,
+    @InjectRepository(Post) private postRepository: Repository<Post>,
     private readonly supabaseStorageService: SupabaseStorageService,
     private readonly configService: ConfigService,
   ) {}
@@ -24,7 +26,7 @@ export class PostsMediasService {
   ): Promise<PostsMedia> {
     // Check if the post belongs to the user
     if (userId && createPostsMediaDto.post_id) {
-      const post = await this.postsMediasRepository.manager.findOne('Post', {
+      const post = await this.postRepository.findOne({
         where: { id: createPostsMediaDto.post_id },
         relations: ['user'],
       });
@@ -59,8 +61,17 @@ export class PostsMediasService {
     return this.postsMediasRepository.save(postsMedia);
   }
 
-  async findAll(): Promise<PostsMedia[]> {
-    return this.postsMediasRepository.find();
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: PostsMedia[]; total: number; page: number; limit: number }> {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.postsMediasRepository.findAndCount({
+      skip,
+      take: limit,
+      order: { id: 'DESC' },
+    });
+    return { data, total, page, limit };
   }
 
   async findOne(id: string): Promise<PostsMedia | null> {

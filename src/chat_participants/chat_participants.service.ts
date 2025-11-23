@@ -31,10 +31,17 @@ export class ChatParticipantsService {
     return await this.chatParticipantRepository.save(chatParticipant);
   }
 
-  async findBySession(sessionId: string): Promise<ChatParticipant[]> {
+  async findBySession(
+    sessionId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<ChatParticipant[]> {
+    const skip = (page - 1) * limit;
     return await this.chatParticipantRepository.find({
       where: { chat_session: { id: sessionId } },
       relations: ['user', 'chat_session'],
+      skip,
+      take: limit,
     });
   }
 
@@ -46,14 +53,25 @@ export class ChatParticipantsService {
     return this.findOne(id);
   }
 
-  async findAll(): Promise<ChatParticipant[]> {
-    return await this.chatParticipantRepository.find();
+  async findAll(page: number = 1, limit: number = 10): Promise<ChatParticipant[]> {
+    const skip = (page - 1) * limit;
+    return await this.chatParticipantRepository.find({
+      skip,
+      take: limit,
+    });
   }
 
-  async findAllUser(user_id: string): Promise<ChatParticipant[]> {
+  async findAllUser(
+    user_id: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<ChatParticipant[]> {
+    const skip = (page - 1) * limit;
     return await this.chatParticipantRepository.find({
       where: { user: { id: Equal(user_id) } },
       relations: ['chat_session'],
+      skip,
+      take: limit,
     });
   }
 

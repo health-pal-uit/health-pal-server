@@ -9,6 +9,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { PostsMediasService } from './posts_medias.service';
 import { CreatePostsMediaDto } from './dto/create-posts_media.dto';
@@ -24,6 +25,7 @@ import {
   ApiBody,
 } from '@nestjs/swagger';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
+import { PostsMediaPaginationDto } from './posts-media-pagination.dto';
 
 @ApiBearerAuth()
 @Controller('posts-medias')
@@ -62,8 +64,9 @@ export class PostsMediasController {
   @Get()
   @ApiOperation({ summary: 'Get all medias' })
   @ApiResponse({ status: 200, description: 'List of medias' })
-  async findAll() {
-    return await this.postsMediasService.findAll();
+  async findAll(@Query() query: PostsMediaPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.postsMediasService.findAll(page, limit);
   }
 
   @Get(':id')

@@ -17,8 +17,18 @@ export class PremiumPackagesService {
     return this.premiumPackageRepository.save(premiumPackage);
   }
 
-  async findAll(): Promise<PremiumPackage[]> {
-    return this.premiumPackageRepository.find({ where: { deleted_at: IsNull() } });
+  async findAll(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: PremiumPackage[]; total: number; page: number; limit: number }> {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.premiumPackageRepository.findAndCount({
+      where: { deleted_at: IsNull() },
+      skip,
+      take: limit,
+      order: { updated_at: 'DESC' },
+    });
+    return { data, total, page, limit };
   }
 
   async findOne(id: string): Promise<PremiumPackage | null> {

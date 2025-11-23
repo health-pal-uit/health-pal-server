@@ -1,6 +1,16 @@
 import { ApiOperation, ApiResponse, ApiTags, ApiParam, ApiBody } from '@nestjs/swagger';
 
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { ChatParticipantsService } from './chat_participants.service';
 import { CreateChatParticipantDto } from './dto/create-chat_participant.dto';
@@ -18,15 +28,19 @@ export class ChatParticipantsController {
 
   @Get('session/:sessionId')
   @UseGuards(SupabaseGuard)
-  @ApiOperation({ summary: 'Get all participants for a chat session' })
+  @ApiOperation({ summary: 'Get all participants for a chat session with pagination' })
   @ApiParam({ name: 'sessionId', description: 'ID of the chat session' })
   @ApiResponse({
     status: 200,
     description: 'List of chat participants',
     type: [CreateChatParticipantDto],
   })
-  async findBySession(@Param('sessionId') sessionId: string) {
-    return await this.chatParticipantsService.findBySession(sessionId);
+  async findBySession(
+    @Param('sessionId') sessionId: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return await this.chatParticipantsService.findBySession(sessionId, page, limit);
   }
 
   @Post()
@@ -48,18 +62,24 @@ export class ChatParticipantsController {
 
   @Get()
   @UseGuards(SupabaseGuard)
-  @ApiOperation({ summary: 'Get all chat participants (admin) or user participations (user)' })
+  @ApiOperation({
+    summary: 'Get all chat participants (admin) or user participations (user) with pagination',
+  })
   @ApiResponse({
     status: 200,
     description: 'List of chat participants',
     type: [CreateChatParticipantDto],
   })
-  async findAll(@CurrentUser() user: any) {
+  async findAll(
+    @CurrentUser() user: any,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
-      return await this.chatParticipantsService.findAllUser(user.id);
+      return await this.chatParticipantsService.findAllUser(user.id, page, limit);
     }
-    return await this.chatParticipantsService.findAll();
+    return await this.chatParticipantsService.findAll(page, limit);
   }
 
   @Get(':id')

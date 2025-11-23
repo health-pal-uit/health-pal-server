@@ -9,6 +9,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { MealsService } from './meals.service';
 import { CreateMealDto } from './dto/create-meal.dto';
@@ -21,6 +22,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import type { ReqUserType } from 'src/auth/types/req.type';
 import { ApiOperation, ApiResponse, ApiConsumes, ApiBody, ApiParam } from '@nestjs/swagger';
+import { MealPaginationDto } from './dto/meal-pagination.dto';
 
 @ApiBearerAuth()
 @Controller('meals')
@@ -75,8 +77,9 @@ export class MealsController {
   @UseGuards(AdminSupabaseGuard)
   @ApiOperation({ summary: 'Admin gets all meals (including unverified)' })
   @ApiResponse({ status: 200, description: 'List of all meals' })
-  async findAll() {
-    return await this.mealsService.findAll();
+  async findAll(@Query() query: MealPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.mealsService.findAll(page, limit);
   }
 
   // user find all => verified only
@@ -84,8 +87,9 @@ export class MealsController {
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'User gets all verified meals' })
   @ApiResponse({ status: 200, description: 'List of verified meals' })
-  async findAllUser() {
-    return await this.mealsService.findAllUser();
+  async findAllUser(@Query() query: MealPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.mealsService.findAllUser(page, limit);
   }
 
   @Get(':id') // admin and user find one

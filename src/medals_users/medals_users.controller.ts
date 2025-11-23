@@ -1,10 +1,21 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { MedalsUsersService } from './medals_users.service';
 import { CreateMedalsUserDto } from './dto/create-medals_user.dto';
 import { UpdateMedalsUserDto } from './dto/update-medals_user.dto';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
+import { MedalsUserPaginationDto } from './medals-user-pagination.dto';
 
 @ApiBearerAuth()
 @Controller('medals-users')
@@ -15,8 +26,9 @@ export class MedalsUsersController {
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Check finished medals for the current user' })
   @ApiResponse({ status: 200, description: 'List of finished medals' })
-  async checkFinishedMedals(@CurrentUser() user: any) {
-    return await this.medalsUsersService.checkFinishedMedals(user.id);
+  async checkFinishedMedals(@CurrentUser() user: any, @Query() query: MedalsUserPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.medalsUsersService.checkFinishedMedals(user.id, page, limit);
   }
 
   @Post(':id')

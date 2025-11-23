@@ -143,7 +143,13 @@ export class ActivityRecordsService {
   }
 
   // controller !!
-  async findAllDailyLogsOfUser(userId: string, dailyLogId: string): Promise<ActivityRecord[]> {
+  async findAllDailyLogsOfUser(
+    userId: string,
+    dailyLogId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<ActivityRecord[]> {
+    const skip = (page - 1) * limit;
     return await this.activityRecordRepository.find({
       where: {
         user_owned: true,
@@ -151,14 +157,23 @@ export class ActivityRecordsService {
         deleted_at: IsNull(),
       },
       relations: { activity: true, daily_log: true },
+      skip,
+      take: limit,
     });
   }
 
   // controller !!
-  async findAllChallenges(challengeId: string): Promise<ActivityRecord[]> {
+  async findAllChallenges(
+    challengeId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<ActivityRecord[]> {
+    const skip = (page - 1) * limit;
     return await this.activityRecordRepository.find({
       where: { user_owned: false, challenge: { id: challengeId }, deleted_at: IsNull() },
       relations: { activity: true, challenge: true },
+      skip,
+      take: limit,
     });
   }
 

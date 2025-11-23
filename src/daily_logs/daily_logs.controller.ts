@@ -8,7 +8,9 @@ import {
   Delete,
   UseGuards,
   ForbiddenException,
+  Query,
 } from '@nestjs/common';
+import { DailyLogPaginationDto } from './dto/daily-log-pagination.dto';
 import { DailyLogsService } from './daily_logs.service';
 import { CreateDailyLogDto } from './dto/create-daily_log.dto';
 import { UpdateDailyLogDto } from './dto/update-daily_log.dto';
@@ -26,8 +28,9 @@ export class DailyLogsController {
   @Get()
   @ApiOperation({ summary: 'Get all daily logs for the current user' })
   @ApiResponse({ status: 200, description: 'List of daily logs' })
-  async findAll(@CurrentUser() user: ReqUserType) {
-    return await this.dailyLogsService.findAllByUser(user.id);
+  async findAll(@CurrentUser() user: ReqUserType, @Query() query: DailyLogPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.dailyLogsService.findAllByUser(user.id, page, limit);
   }
 
   @Get(':id')

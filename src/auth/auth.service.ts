@@ -36,10 +36,9 @@ export class AuthService {
     }
 
     // Check if user exists in Supabase Auth
-    const { data: supabaseUser } = await this.supabase.auth.admin.getUserByEmail(
-      createUserDto.email,
-    );
-    if (supabaseUser?.user) {
+    const { data: usersList } = await this.supabase.auth.admin.listUsers();
+    const supabaseUser = usersList.users.find((u: User) => u.email === createUserDto.email);
+    if (supabaseUser) {
       throw new ConflictException('User already exists');
     }
 
@@ -77,17 +76,15 @@ export class AuthService {
   }
 
   async checkVerification(email: string) {
-    const { data: supabaseUser, error } = await this.supabase.auth.admin.getUserByEmail(email);
-    if (error) {
-      throw new BadRequestException(error.message);
-    }
-    if (!supabaseUser?.user) {
+    const { data: usersList } = await this.supabase.auth.admin.listUsers();
+    const supabaseUser = usersList.users.find((u: User) => u.email === email);
+    if (!supabaseUser) {
       throw new NotFoundException('User not found');
     }
-    if (supabaseUser.user.confirmed_at) {
-      await this.usersService.markVerified(supabaseUser.user.id);
+    if (supabaseUser.confirmed_at) {
+      await this.usersService.markVerified(supabaseUser.id);
     }
-    return { isVerified: !!supabaseUser.user.confirmed_at };
+    return { isVerified: !!supabaseUser.confirmed_at };
   }
 
   async login(loginDto: LoginDto): Promise<{ token: string }> {
@@ -137,8 +134,9 @@ export class AuthService {
     }
 
     // Check if user exists in Supabase Auth
-    const { data: supabaseUser } = await this.supabase.auth.admin.getUserByEmail(email);
-    if (supabaseUser?.user) {
+    const { data: usersList } = await this.supabase.auth.admin.listUsers();
+    const supabaseUser = usersList.users.find((u: User) => u.email === googleUser.email);
+    if (supabaseUser) {
       throw new ConflictException('User already exists');
     }
 

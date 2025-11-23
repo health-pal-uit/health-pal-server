@@ -9,6 +9,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { IngredientsService } from './ingredients.service';
 import { CreateIngredientDto } from './dto/create-ingredient.dto';
@@ -20,6 +21,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import type { ReqUserType } from 'src/auth/types/req.type';
 import { ApiOperation, ApiResponse, ApiConsumes, ApiBody, ApiParam } from '@nestjs/swagger';
+import { IngredientPaginationDto } from './dto/ingredient-pagination.dto';
 
 @ApiBearerAuth()
 @Controller('ingredients')
@@ -50,8 +52,9 @@ export class IngredientsController {
   @UseGuards(AdminSupabaseGuard)
   @ApiOperation({ summary: 'Admin gets all ingredients (including unverified)' })
   @ApiResponse({ status: 200, description: 'List of all ingredients' })
-  async findAll() {
-    return await this.ingredientsService.findAll();
+  async findAll(@Query() query: IngredientPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.ingredientsService.findAll(page, limit);
   }
 
   // get all user (verified only)
@@ -59,8 +62,9 @@ export class IngredientsController {
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'User gets all verified ingredients' })
   @ApiResponse({ status: 200, description: 'List of verified ingredients' })
-  async findAllUser() {
-    return await this.ingredientsService.findAllUser();
+  async findAllUser(@Query() query: IngredientPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.ingredientsService.findAllUser(page, limit);
   }
 
   @Get(':id')

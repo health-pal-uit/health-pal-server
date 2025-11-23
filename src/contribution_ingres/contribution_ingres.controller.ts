@@ -9,7 +9,9 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
+import { ContributionIngrePaginationDto } from './dto/contribution-ingre-pagination.dto';
 import { ContributionIngresService } from './contribution_ingres.service';
 import { CreateContributionIngreDto } from './dto/create-contribution_ingre.dto';
 import { UpdateContributionIngreDto } from './dto/update-contribution_ingre.dto';
@@ -66,12 +68,13 @@ export class ContributionIngresController {
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'List all contributions (admin) or user contributions (user)' })
   @ApiResponse({ status: 200, description: 'List of contributions' })
-  async findAll(@CurrentUser() user: ReqUserType) {
+  async findAll(@CurrentUser() user: ReqUserType, @Query() query: ContributionIngrePaginationDto) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
       return await this.contributionIngresService.findAllUser(user.id); // only their contributions
     }
-    return await this.contributionIngresService.findAll();
+    const { page = 1, limit = 10 } = query;
+    return await this.contributionIngresService.findAll(page, limit);
   }
 
   @Get(':id') // admin
@@ -171,7 +174,8 @@ export class ContributionIngresController {
   @UseGuards(AdminSupabaseGuard)
   @ApiOperation({ summary: 'Admin gets all pending contributions' })
   @ApiResponse({ status: 200, description: 'List of pending contributions' })
-  async pending() {
-    return await this.contributionIngresService.findAllPending();
+  async pending(@Query() query: ContributionIngrePaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.contributionIngresService.findAllPending(page, limit);
   }
 }

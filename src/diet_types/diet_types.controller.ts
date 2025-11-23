@@ -1,4 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiTags,
@@ -12,6 +22,7 @@ import { CreateDietTypeDto } from './dto/create-diet_type.dto';
 import { UpdateDietTypeDto } from './dto/update-diet_type.dto';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
+import { DietTypePaginationDto } from './dto/diet-type-pagination.dto';
 
 @ApiTags('DietTypes')
 @ApiBearerAuth()
@@ -32,8 +43,9 @@ export class DietTypesController {
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Get all diet types (user)' })
   @ApiResponse({ status: 200, description: 'List all diet types.' })
-  async findAll() {
-    return await this.dietTypesService.findAll();
+  async findAll(@Query() query: DietTypePaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.dietTypesService.findAll(page, limit);
   }
 
   @Get(':id')

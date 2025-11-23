@@ -9,6 +9,7 @@ import {
   UseGuards,
   UseInterceptors,
   UploadedFile,
+  Query,
 } from '@nestjs/common';
 import { MedalsService } from './medals.service';
 import { CreateMedalDto } from './dto/create-medal.dto';
@@ -18,6 +19,7 @@ import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { ApiOperation, ApiResponse, ApiConsumes, ApiBody, ApiParam } from '@nestjs/swagger';
+import { MedalPaginationDto } from './medal-pagination.dto';
 
 @ApiBearerAuth()
 @Controller('medals')
@@ -45,8 +47,9 @@ export class MedalsController {
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Get all medals (users and admins)' })
   @ApiResponse({ status: 200, description: 'List of medals' })
-  async findAll() {
-    return await this.medalsService.findAll();
+  async findAll(@Query() query: MedalPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.medalsService.findAll(page, limit);
   }
 
   @Get(':id')
