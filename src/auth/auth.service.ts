@@ -14,6 +14,7 @@ import { LoginDto } from './dto/login.dto';
 import { User as UserEntity } from 'src/users/entities/user.entity';
 import * as crypto from 'crypto';
 import { ReqUserType } from './types/req.type';
+import { ResetPasswordDto } from './dto/reset-password.dto';
 @Injectable()
 export class AuthService {
   constructor(
@@ -105,6 +106,37 @@ export class AuthService {
       throw new BadRequestException(error.message);
     }
     return { message: 'Logged out successfully' };
+  }
+
+  async resetPassword(email: string): Promise<{ message: string }> {
+    const { data, error } = await this.supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'http://localhost:3001/auth/reset-password', // Frontend reset password page
+    });
+    if (error) {
+      throw new NotFoundException('User not found');
+    }
+    return { message: 'Password reset email sent' };
+  }
+
+  async updatePassword(resetPasswordDto: ResetPasswordDto): Promise<{ message: string }> {
+    const { newPassword, token } = resetPasswordDto;
+
+    const { error: setError } = await this.supabase.auth.setSession({
+      access_token: token,
+      refresh_token: token,
+    });
+
+    if (setError) {
+      throw new BadRequestException('Invalid or expired token');
+    }
+
+    const { data, error: updateError } = await this.supabase.auth.updateUser({
+      password: newPassword,
+    });
+    if (updateError) {
+      throw new BadRequestException('Invalid or expired token');
+    }
+    return { message: 'Password updated successfully' };
   }
 
   async getUserById(id: string): Promise<User | null> {
