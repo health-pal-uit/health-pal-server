@@ -42,6 +42,7 @@ import { SupabaseStorageModule } from './supabase-storage/supabase-storage.modul
 import { SeedModule } from './seed/seed.module';
 import { ChatModule } from './chat/chat.module';
 import { GoogleFitModule } from './google-fit/google-fit.module';
+import { AdminReportsModule } from './admin-reports/admin-reports.module';
 import configuration from './config/configuration';
 import * as joi from 'joi';
 
@@ -98,6 +99,7 @@ import * as joi from 'joi';
     SeedModule,
     ChatModule,
     GoogleFitModule,
+    AdminReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
