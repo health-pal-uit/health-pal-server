@@ -8,6 +8,8 @@ import { GoogleGuard } from './guards/google/google.guard';
 import { ReqUserType } from './types/req.type';
 import { responseHelper } from 'src/helpers/responses/response.helper';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ResetPasswordDto } from './dto/reset-password.dto';
+import { ForgotPasswordDto } from './dto/forgot-password.dto';
 
 @ApiBearerAuth()
 @ApiTags('auth')
@@ -63,6 +65,38 @@ export class AuthController {
     return responseHelper({
       data: result,
       message: 'Login successful',
+      statusCode: 200,
+    });
+  }
+
+  @Post('forgot-password')
+  @ApiOperation({
+    summary: 'Forgot password',
+    description: 'Sends a password forgot email to the user',
+  })
+  @ApiResponse({ status: 200, description: 'Password reset email sent successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async resetPassword(@Body('dto') forgotPasswordDto: ForgotPasswordDto) {
+    const result = await this.authService.resetPassword(forgotPasswordDto.email);
+    return responseHelper({
+      data: result,
+      message: 'Password reset email sent',
+      statusCode: 200,
+    });
+  }
+
+  @Post('reset-password')
+  @ApiOperation({
+    summary: 'Reset password',
+    description: 'Resets the user password',
+  })
+  @ApiResponse({ status: 200, description: 'Password updated successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid or expired token' })
+  async updatePassword(@Body('dto') resetPasswordDto: ResetPasswordDto) {
+    const result = await this.authService.updatePassword(resetPasswordDto);
+    return responseHelper({
+      data: result,
+      message: 'Password updated successfully',
       statusCode: 200,
     });
   }
