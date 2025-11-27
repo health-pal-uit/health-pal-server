@@ -1,0 +1,188 @@
+{
+  "project": "health-pal-server",
+  "description": "HealthPal is your fun, supportive health and fitness buddy! Track meals, log activities, join challenges, connect with friends, and get personalized tips—all in one app. AI chat for quick help and motivation! 💪🍎",
+  "stack": {
+    "framework": "NestJS 11 (TypeScript)",
+    "platforms": [
+      "HTTP REST API",
+      "Socket.IO (WebSockets for real-time features like chat, but chat-ai is HTTP-only)"
+    ],
+    "auth": "Supabase Auth (email/password + Google OAuth), JWT tokens issued by AuthService",
+    "database": "TypeORM with PostgreSQL, soft-deletes for posts/comments",
+    "storage": "Supabase Storage for images/icons/avatars",
+    "llm": "@google/genai (Gemini API, model: gemini-2.5-flash), used in chat-ai module for non-streaming HTTP POST",
+    "environment": ".env with keys like SUPABASE_URL, SUPABASE_ANON_KEY, GEMINI_API_KEY, DB credentials, storage bucket names",
+    "dependencies": {
+      "key": [
+        "@nestjs/common@^11.0.1",
+        "@nestjs/core@^11.0.1",
+        "@nestjs/typeorm@^11.0.0",
+        "@google/genai@^1.30.0",
+        "@supabase/supabase-js@^2.57.4",
+        "firebase-admin@^13.6.0",
+        "passport@^0.7.0",
+        "passport-google-oauth2@^0.2.0",
+        "typeorm@^0.3.25",
+        "pg@^8.16.3",
+        "class-validator@^0.14.2",
+        "class-transformer@^0.5.1",
+        "multer@^2.0.2",
+        "axios@^1.13.2"
+      ],
+      "dev": [
+        "jest@^30.1.3",
+        "eslint@^9.35.0",
+        "prettier@^3.6.2",
+        "typescript@^5.9.2",
+        "@nestjs/cli@^11.0.0"
+      ]
+    }
+  },
+  "datasets": {
+    "activities": "database/data/activities/activities_dataset.csv - imported into activities table (columns: id, name, description, calories_per_hour, etc.)",
+    "ingredients": "database/data/food/ingredients_dataset.csv - imported into ingredients table (nutrition data like calories, protein, fat, carbs)",
+    "meals": "database/data/food/meals_dataset.csv - imported into meals table (meal compositions with ingredient references)",
+    "note": "All datasets are seeded into PostgreSQL DB via TypeORM. No re-import needed; query tables directly for data."
+  },
+  "modules": {
+    "auth": "Easy login/signup with email or Google—secure and quick!",
+    "users": "Manage your profile, upload avatars, and update info.",
+    "fitness-profiles": "Set up your age, weight, height for personalized goals.",
+    "fitness-goals": "Define calorie and macro targets to stay on track.",
+    "daily-logs": "Track daily meals, ingredients, and activities in one place.",
+    "daily-meals": "Log what you eat—search from our meal database!",
+    "daily-ingres": "Add ingredients to meals for accurate nutrition.",
+    "activity-records": "Record workouts and burn calories.",
+    "activities": "Browse fun activities to try.",
+    "meals": "Explore recipes and meal ideas.",
+    "ingredients": "Check nutrition facts for foods.",
+    "ingre-meals": "See how ingredients make up meals.",
+    "posts": "Share updates, read feeds, and connect.",
+    "comments": "Chat on posts.",
+    "likes": "Like what you enjoy!",
+    "notifications": "Stay updated on friends and challenges.",
+    "challenges": "Join fun fitness challenges with rewards.",
+    "medals": "Earn badges for achievements.",
+    "challenges-users": "Track your challenge progress.",
+    "medals-users": "Show off your earned medals.",
+    "challenges-medals": "Links challenges to medals.",
+    "premium-packages": "Upgrade for extra features.",
+    "contribution-ingres": "Suggest new ingredients for approval.",
+    "contribution-meals": "Propose new meals.",
+    "fav-meals": "Save your go-to meals.",
+    "fav-ingres": "Bookmark favorite ingredients.",
+    "devices": "Connect your wearables.",
+    "diet-types": "Choose your diet preferences.",
+    "roles": "User or admin access.",
+    "chat": "Real-time messaging with friends.",
+    "chat-ai": "Your friendly AI helper for tips and questions!",
+    "google-fit": "Sync with Google Fit for easy tracking.",
+    "admin-reports": "Insights for admins.",
+    "supabase": "Secure auth and storage.",
+    "supabase-storage": "Upload photos and files.",
+    "seed": "Loads initial data."
+  },
+  "api_endpoints": {
+    "auth": [
+      "POST /auth/login",
+      "POST /auth/signup",
+      "GET /auth/google/login",
+      "GET /auth/google",
+      "GET /auth/logout",
+      "POST /auth/forgot-password",
+      "POST /auth/reset-password"
+    ],
+    "users": ["GET /users/me", "PATCH /users/me", "DELETE /users/:id"],
+    "fitness": [
+      "POST /fitness-profiles",
+      "POST /fitness-goals",
+      "GET /daily-logs",
+      "POST /daily-meals",
+      "PATCH /daily-meals/:id",
+      "DELETE /daily-meals/:id",
+      "POST /daily-ingres",
+      "PATCH /daily-ingres/:id",
+      "DELETE /daily-ingres/:id"
+    ],
+    "activities": [
+      "POST /activity-records/daily-logs",
+      "GET /activity-records/daily-logs/:dailyLogId",
+      "PATCH /activity-records/daily-logs/:id",
+      "DELETE /activity-records/:id"
+    ],
+    "content": [
+      "GET /posts",
+      "POST /posts",
+      "PATCH /posts/:id",
+      "DELETE /posts/:id",
+      "GET /posts/:postId/comments",
+      "POST /posts/:postId/comments",
+      "PATCH /posts/:postId/comments/:commentId",
+      "DELETE /posts/:postId/comments/:commentId",
+      "POST /posts/:id/like",
+      "POST /posts/:id/report"
+    ],
+    "challenges_medals": [
+      "GET /challenges",
+      "POST /challenges (admin)",
+      "PATCH /challenges/:id (admin)",
+      "DELETE /challenges/:id (admin)",
+      "GET /medals",
+      "POST /medals (admin)",
+      "PATCH /medals/:id (admin)",
+      "DELETE /medals/:id (admin)",
+      "POST /challenges-users/:challengeId/finish",
+      "POST /medals-users/:medalId"
+    ],
+    "contributions": [
+      "POST /contribution-ingres",
+      "GET /contribution-ingres/my",
+      "PATCH /contribution-ingres/:id",
+      "DELETE /contribution-ingres/:id",
+      "POST /contribution-ingres/:id/approve (admin)",
+      "POST /contribution-ingres/:id/reject (admin)"
+    ],
+    "analytics": ["GET /admin-reports"],
+    "integrations": ["POST /google-fit/sync"],
+    "chat": ["POST /chat-ai"]
+  },
+  "key_flows": {
+    "authentication": "Supabase handles auth; backend issues JWT. Google OAuth via Passport strategy.",
+    "data_logging": "DailyLogsService orchestrates creation of daily_log; meals/ingres/activities update and recalc macros.",
+    "social_features": "Posts with comments/likes; soft deletes; admin moderation.",
+    "contributions": "Users submit; admins approve/reject; approved create new ingredients/meals.",
+    "ai_chat": "POST /chat-ai with {message, history?}; service calls Gemini; returns {reply, history}. Friendly, emoji-filled responses for user support and health tips. Stateless; history managed client-side.",
+    "sync": "Google Fit OAuth; normalize data and upsert to activity_records."
+  },
+  "chat_ai_details": {
+    "model": "gemini-2.5-flash",
+    "system_instruction": "You are a super friendly and enthusiastic assistant for HealthPal! 🎉 Always respond with lots of emojis 😊👍❤️, positive energy, and a supportive tone—like a cheerful health coach cheering users on! Keep answers short, fun, and helpful. Use phrases like 'Awesome!', 'You've got this!', or 'Let's crush those goals! 💪'. Focus on motivating users, answering app questions warmly, and sharing health tips with a smile. NEVER mention technical stuff like databases, modules, CSVs, or code—users don't care! If something isn't found, suggest checking the app's tabs (e.g., 'Meals' tab, 'Ingredients' screen) to search manually. Guide them to features like logging meals, challenges, or tips.",
+    "history_format": "Array of {role: 'user'|'assistant', content: string}",
+    "request_format": "{message: string, history?: [...]}",
+    "response_format": "{reply: string, history: [...]}",
+    "current_implementation": "Service uses generateContent with contents: chatDto.message (ignores history). Needs fix to use chat session with history.",
+    "enhancements": "Add DB queries for data questions (e.g., check if dish exists by querying meals/ingredients). Use retrieval: embed docs/files, fetch relevant snippets per query."
+  },
+  "answering_guidelines": {
+    "style": "Friendly, engaging, and supportive! Use emojis 😊👍 to make responses fun. Be concise but warm—like chatting with a health buddy. Reference app features helpfully (e.g., 'Check the Meals tab!'), but prioritize user feelings and goals. NEVER talk about code, databases, CSVs, or technical internals—keep it 100% user-focused.",
+    "security": "Respect auth/roles; don't expose secrets; note Supabase deps.",
+    "performance": "Warn on large histories/payloads; suggest limits/pagination.",
+    "data_queries": "For questions like 'is dish ABC in app?', query DB in chat-ai service or include in prompt context.",
+    "updates": "Keep this JSON updated as code changes."
+  },
+  "paths_of_interest": [
+    "src/app.module.ts (all modules)",
+    "src/chat-ai/ (AI chat impl)",
+    "src/auth/ (auth logic)",
+    "src/daily-logs/ (data aggregation)",
+    "src/posts/ (social features)",
+    "src/contribution-ingres/ (moderation)",
+    "database/data/ (CSV seeds)",
+    "src/google-fit/ (integrations)"
+  ],
+  "limitations": {
+    "llm_visibility": "LLM sees only provided context; no direct DB/file access.",
+    "chat_ai": "Stateless; no server-side sessions; history client-managed. Responses are fun and supportive! 😄",
+    "streaming": "Not implemented; HTTP only."
+  }
+}
