@@ -76,7 +76,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 200, description: 'Password reset email sent successfully' })
   @ApiResponse({ status: 404, description: 'User not found' })
-  async resetPassword(@Body('dto') forgotPasswordDto: ForgotPasswordDto) {
+  async resetPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     const result = await this.authService.resetPassword(forgotPasswordDto.email);
     return responseHelper({
       data: result,
@@ -92,7 +92,7 @@ export class AuthController {
   })
   @ApiResponse({ status: 200, description: 'Password updated successfully' })
   @ApiResponse({ status: 400, description: 'Invalid or expired token' })
-  async updatePassword(@Body('dto') resetPasswordDto: ResetPasswordDto) {
+  async updatePassword(@Body() resetPasswordDto: ResetPasswordDto) {
     const result = await this.authService.updatePassword(resetPasswordDto);
     return responseHelper({
       data: result,

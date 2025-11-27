@@ -43,6 +43,7 @@ import { SeedModule } from './seed/seed.module';
 import { ChatModule } from './chat/chat.module';
 import { GoogleFitModule } from './google-fit/google-fit.module';
 import { AdminReportsModule } from './admin-reports/admin-reports.module';
+import { ChatAiModule } from './chat-ai/chat-ai.module';
 import configuration from './config/configuration';
 import * as joi from 'joi';
 
@@ -100,6 +101,7 @@ import * as joi from 'joi';
     ChatModule,
     GoogleFitModule,
     AdminReportsModule,
+    ChatAiModule,
   ],
   controllers: [AppController],
   providers: [AppService],
