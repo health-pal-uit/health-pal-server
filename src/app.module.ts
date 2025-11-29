@@ -44,6 +44,7 @@ import { ChatModule } from './chat/chat.module';
 import { GoogleFitModule } from './google-fit/google-fit.module';
 import { AdminReportsModule } from './admin-reports/admin-reports.module';
 import { ChatAiModule } from './chat-ai/chat-ai.module';
+import { RecommendationsModule } from './recommendations/recommendations.module';
 import configuration from './config/configuration';
 import * as joi from 'joi';
 
@@ -102,6 +103,7 @@ import * as joi from 'joi';
     GoogleFitModule,
     AdminReportsModule,
     ChatAiModule,
+    RecommendationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

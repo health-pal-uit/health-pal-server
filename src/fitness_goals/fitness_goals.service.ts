@@ -13,6 +13,13 @@ export class FitnessGoalsService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
+  async findByUserId(userId: string): Promise<FitnessGoal[]> {
+    return await this.fitnessGoalRepository.find({
+      where: { user: { id: userId }, deleted_at: IsNull() },
+      order: { created_at: 'DESC' },
+    });
+  }
+
   async create(createFitnessGoalDto: CreateFitnessGoalDto, userId: string): Promise<FitnessGoal> {
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
