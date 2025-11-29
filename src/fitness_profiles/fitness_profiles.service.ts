@@ -19,6 +19,18 @@ export class FitnessProfilesService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
+  async findOneByUserId(userId: string): Promise<FitnessProfile | null> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new Error('User not found');
+    }
+    const fitnessProfile = await this.fitnessProfileRepository.findOne({ where: { user } });
+    if (!fitnessProfile) {
+      throw new UnauthorizedException('You do not have access to this fitness profile');
+    }
+    return fitnessProfile;
+  }
+
   async create(
     createFitnessProfileDto: CreateFitnessProfileDto,
     userId: string,
