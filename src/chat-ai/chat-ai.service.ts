@@ -13,10 +13,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import * as path from 'path';
 import * as fs from 'fs';
 
+type IngredientGeneratedImage = {
+  name: string;
+  mimeType: string;
+  base64: string;
+  dataUri: string;
+};
+
 @Injectable()
 export class ChatAiService {
   private systemInstruction: string;
   private readonly ai: GoogleGenAI;
+  private readonly logger = new Logger(ChatAiService.name);
+  private readonly imageModel: string;
 
   constructor(
     @InjectRepository(Meal) private readonly mealsRepository: Repository<Meal>,
@@ -39,6 +48,8 @@ export class ChatAiService {
     }
 
     this.ai = new GoogleGenAI({});
+    this.imageModel = this.configService.get<string>('GEMINI_IMAGE_MODEL') || 'gemini-1.5-flash';
+    this.logger.log(`Using Gemini image model: ${this.imageModel}`);
   }
 
   async chat(chatDto: {
@@ -55,7 +66,7 @@ export class ChatAiService {
       return potentialNames.length > 0 ? potentialNames[potentialNames.length - 1] : null;
     };
 
-    // const foodWords = ['chicken', 'beef', 'rice', 'apple', 'pasta', 'salad', 'bread', 'cheese', 'milk', 'egg', 'fish', 'pork', 'vegetable', 'fruit', 'meat', 'drink', 'soup', 'pizza', 'burger', 'sandwich']; // Expand as needed
+    // const foodWords = ['chicken', 'beef', 'rice', 'apple', 'pasta', 'salad', 'bread', 'cheese', 'milk', 'egg', 'fish', 'pork', 'vegetable', 'fruit', 'meat', 'drink', 'soup', 'pizza', 'burger', 'sandwich'];
     // const detectedFood = foodWords.find(word => message.toLowerCase().includes(word));
 
     // if (detectedFood) {
@@ -149,5 +160,107 @@ export class ChatAiService {
         { role: 'assistant', content: reply },
       ],
     };
+  }
+
+  async generateImagesForIngredients(): Promise<{ images: IngredientGeneratedImage[] }> {
+    const targets = [
+      'chicken breast',
+      'pork loin',
+      'beef steak',
+      'salmon fillet',
+      'shrimp',
+      'egg',
+      'milk',
+      'yogurt',
+      'cheddar cheese',
+      'mozzarella',
+      'rice',
+      'pasta',
+      'bread',
+      'potato',
+      'tomato',
+      'broccoli',
+      'spinach',
+      'carrot',
+      'apple',
+      'banana',
+    ];
+
+    this.logger.log(`Generating ingredient images for ${targets.length} items`);
+    const results: IngredientGeneratedImage[] = [];
+    let quotaExceeded = false;
+    let quotaMessage = '';
+
+    for (const name of targets) {
+      try {
+        const prompt = `High-resolution photo of ${name} alone, centered, on a clean light background, in focus, no people, no props, no plate, food-safe, SFW.`;
+        const res = await (this.ai.models.generateContent as any)({
+          model: this.imageModel,
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: 'image/png' },
+        });
+        const part = res.candidates?.[0]?.content?.parts?.[0];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const data = (part as any)?.inlineData?.data as string | undefined;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const mimeType = (part as any)?.inlineData?.mimeType as string | undefined;
+
+        if (data && mimeType) {
+          results.push({
+            name,
+            mimeType,
+            base64: data,
+            dataUri: `data:${mimeType};base64,${data}`,
+          });
+          this.logger.log(`Generated image for ${name}`);
+        } else {
+          this.logger.warn(`No inline image data returned for ${name}`);
+        }
+      } catch (error) {
+        const msg = (error as Error).message;
+        this.logger.warn(`Failed to generate image for ${name}: ${msg}`);
+        if (msg && msg.toLowerCase().includes('quota')) {
+          quotaExceeded = true;
+          quotaMessage = msg;
+          break; // stop after quota failure
+        }
+      }
+    }
+
+    this.logger.log(`Generated ${results.length}/${targets.length} ingredient images`);
+    if (quotaExceeded && results.length === 0) {
+      throw new Error(
+        `Gemini image generation quota exceeded. Configure billing or try again later. Details: ${quotaMessage}`,
+      );
+    }
+    return { images: results };
+  }
+
+  async testGenerateImage(model?: string): Promise<IngredientGeneratedImage | null> {
+    const prompt =
+      'Create a picture of a nano banana dish in a fancy restaurant with a Gemini theme';
+
+    const response = await this.ai.models.generateContent({
+      model: 'gemini-2.5-flash-image',
+      contents: prompt,
+    });
+    if (
+      response.candidates &&
+      response.candidates[0] &&
+      response.candidates[0].content &&
+      response.candidates[0].content.parts
+    ) {
+      for (const part of response.candidates[0].content.parts) {
+        if (part.text) {
+          console.log(part.text);
+        } else if (part.inlineData && part.inlineData.data) {
+          const imageData = part.inlineData.data;
+          const buffer = Buffer.from(imageData, 'base64');
+          fs.writeFileSync('gemini-native-image.png', buffer);
+          console.log('Image saved as gemini-native-image.png');
+        }
+      }
+    }
+    return null;
   }
 }

@@ -144,7 +144,7 @@ export class UsersController {
   @ApiResponse({ status: 200, description: 'User deleted successfully' })
   @ApiResponse({ status: 403, description: 'Forbidden' })
   async remove(@Param('id') id: string, @CurrentUser() currentUser: any) {
-    if (id !== currentUser.id && currentUser.role.name !== 'admin') {
+    if (id !== currentUser.id && currentUser.role !== 'admin') {
       return responseHelper({
         error: 'Forbidden',
         message: 'You can only delete your own account or be an admin',
