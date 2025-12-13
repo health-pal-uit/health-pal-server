@@ -40,7 +40,7 @@ jobs:
         with:
           node-version: 20
       - run: npm ci
-      - run: npm test -- --coverage --passWithNoTests
+      - run: npm run test:e2e
 
   build:
     name: Build
