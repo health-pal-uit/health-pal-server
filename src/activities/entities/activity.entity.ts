@@ -24,7 +24,7 @@ export class Activity {
   @Column({ type: 'varchar', length: 255, unique: true })
   name: string;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   met_value: number;
 
   @Column({ type: 'enum', enum: ActivityType, array: true })

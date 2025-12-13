@@ -19,7 +19,7 @@ export class CreateChatSessionDto {
 
   @ApiProperty({ description: 'Title of the chat session' })
   @IsString()
-  @IsOptional()
+  @IsNotEmpty()
   title: string;
 
   @ApiProperty({ description: 'Is the chat session a group chat?' })

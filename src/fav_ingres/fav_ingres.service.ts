@@ -14,15 +14,30 @@ export class FavIngresService {
     @InjectRepository(Ingredient) private ingredientRepository: Repository<Ingredient>,
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
-  async remove(id: string): Promise<DeleteResult> {
-    return await this.favIngreRepository.delete(id);
+  async remove(id: string): Promise<FavIngre | null> {
+    if (!id || id === 'undefined') {
+      return null;
+    }
+    const favIngre = await this.favIngreRepository.findOne({ where: { id } });
+    if (!favIngre) {
+      return null;
+    }
+    await this.favIngreRepository.delete(id);
+    return favIngre;
   }
 
-  async removeByUserAndIngredient(userId: string, ingredientId: string): Promise<DeleteResult> {
-    return await this.favIngreRepository.delete({
+  async removeByUserAndIngredient(userId: string, ingredientId: string): Promise<FavIngre | null> {
+    const favIngre = await this.favIngreRepository.findOne({
+      where: {
+        user: { id: userId },
+        ingredient: { id: ingredientId },
+      },
+    });
+    await this.favIngreRepository.delete({
       user: { id: userId },
       ingredient: { id: ingredientId },
     });
+    return favIngre;
   }
   async findAllOfUser(
     userId: string,
@@ -45,6 +60,15 @@ export class FavIngresService {
     return { data, total, page, limit };
   }
   async create(createFavIngreDto: CreateFavIngreDto) {
+    // Validate UUIDs before querying database
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (
+      !uuidRegex.test(createFavIngreDto.ingredient_id) ||
+      !uuidRegex.test(createFavIngreDto.user_id)
+    ) {
+      throw new Error('Invalid ingredient or user ID');
+    }
+
     const user = await this.userRepository.findOne({ where: { id: createFavIngreDto.user_id } });
     const ingredient = await this.ingredientRepository.findOne({
       where: { id: createFavIngreDto.ingredient_id },

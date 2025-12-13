@@ -77,26 +77,31 @@ export class ContributionMealsService {
     return await this.contributionMealRepository.save(createdContribution);
   }
 
-  async adminReject(id: string, rejectionReason: string): Promise<UpdateResult> {
-    return await this.contributionMealRepository.update(id, {
-      status: ContributionStatus.REJECTED,
-      rejection_reason: rejectionReason,
-      reviewed_at: new Date(),
-    });
+  async adminReject(id: string, rejectionReason: string): Promise<ContributionMeal> {
+    const contribution = await this.contributionMealRepository.findOne({ where: { id } });
+    if (!contribution) {
+      throw new Error('Contribution not found');
+    }
+    contribution.status = ContributionStatus.REJECTED;
+    contribution.rejection_reason = rejectionReason;
+    contribution.reviewed_at = new Date();
+    return await this.contributionMealRepository.save(contribution);
     // notification here?
   }
 
   // convert to meal
-  async adminApprove(id: string): Promise<Meal | UpdateResult> {
-    await this.contributionMealRepository.update(id, { status: ContributionStatus.APPROVED });
+  async adminApprove(id: string): Promise<ContributionMeal> {
     const existingContribution = await this.contributionMealRepository.findOne({ where: { id } });
     if (!existingContribution) {
       throw new Error('Contribution not found');
     }
     if (existingContribution.meal) {
-      return await this.mealsRepository.update(existingContribution.meal!.id, {
+      await this.mealsRepository.update(existingContribution.meal!.id, {
         is_verified: true,
       }); // just verify if already has ingredients
+      existingContribution.status = ContributionStatus.APPROVED;
+      existingContribution.reviewed_at = new Date();
+      return await this.contributionMealRepository.save(existingContribution);
     }
     const mealData: Partial<Meal> = {
       name: existingContribution.name,
@@ -115,16 +120,20 @@ export class ContributionMealsService {
     const savedMeal = await this.mealsRepository.save(meal);
     existingContribution.meal = savedMeal;
     existingContribution.updated_at = new Date();
-    await this.contributionMealRepository.save(existingContribution);
-    return savedMeal;
+    existingContribution.status = ContributionStatus.APPROVED;
+    existingContribution.reviewed_at = new Date();
+    return await this.contributionMealRepository.save(existingContribution);
   }
 
   async createDeleteContribution(id: string, userId: any): Promise<ContributionMeal> {
-    const existingContribution = await this.contributionMealRepository.findOne({ where: { id } });
+    const existingContribution = await this.contributionMealRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
     if (!existingContribution) {
       throw new Error('Contribution not found');
     }
-    if (existingContribution.user_id !== userId) {
+    if (existingContribution.author?.id !== userId) {
       throw new Error('Access denied');
     }
     if (existingContribution.status !== ContributionStatus.PENDING) {
@@ -140,11 +149,14 @@ export class ContributionMealsService {
     imageBuffer?: Buffer,
     imageName?: string,
   ): Promise<ContributionMeal> {
-    const existingContribution = await this.contributionMealRepository.findOne({ where: { id } });
+    const existingContribution = await this.contributionMealRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
     if (!existingContribution) {
       throw new Error('Contribution not found');
     }
-    if (existingContribution.user_id !== userId) {
+    if (existingContribution.author?.id !== userId) {
       throw new Error('Access denied');
     }
     if (existingContribution.status !== ContributionStatus.PENDING) {
@@ -171,11 +183,14 @@ export class ContributionMealsService {
     ingredients: IngredientPayload[],
     userId: any,
   ): Promise<ContributionMeal> {
-    const existingContribution = await this.contributionMealRepository.findOne({ where: { id } });
+    const existingContribution = await this.contributionMealRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
     if (!existingContribution) {
       throw new Error('Contribution not found');
     }
-    if (existingContribution.user_id !== userId) {
+    if (existingContribution.author?.id !== userId) {
       throw new Error('Access denied');
     }
     if (existingContribution.status !== ContributionStatus.PENDING) {
@@ -187,8 +202,11 @@ export class ContributionMealsService {
     return await this.contributionMealRepository.save(existingContribution);
   }
   async findOneUser(id: string, userId: any): Promise<ContributionMeal> {
-    const contribution = await this.contributionMealRepository.findOne({ where: { id } });
-    if (!contribution || contribution.user_id !== userId) {
+    const contribution = await this.contributionMealRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
+    if (!contribution || contribution.author?.id !== userId) {
       throw new Error('Contribution not found or access denied');
     }
     return contribution;
@@ -196,7 +214,8 @@ export class ContributionMealsService {
 
   async findAllUser(userId: any): Promise<ContributionMeal[]> {
     return await this.contributionMealRepository.find({
-      where: { user_id: userId, deleted_at: IsNull() },
+      where: { author: { id: userId }, deleted_at: IsNull() },
+      relations: ['author'],
     });
   }
 
@@ -208,7 +227,7 @@ export class ContributionMealsService {
   ): Promise<ContributionMeal> {
     const contributionMeal = this.contributionMealRepository.create({
       ...createContributionMealDto,
-      user_id: userId,
+      author: { id: userId } as any,
     });
     contributionMeal.status = ContributionStatus.PENDING;
     contributionMeal.opt = ContributionOptions.NEW;
@@ -249,11 +268,14 @@ export class ContributionMealsService {
 
   // user: get rejection reason/status for their own contribution
   async getRejectionInfo(id: string, userId: string) {
-    const contribution = await this.contributionMealRepository.findOne({ where: { id } });
+    const contribution = await this.contributionMealRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
     if (!contribution) {
       throw new Error('Contribution not found');
     }
-    if (contribution.user_id !== userId) {
+    if (contribution.author?.id !== userId) {
       throw new Error('You do not have access to this contribution');
     }
     return {

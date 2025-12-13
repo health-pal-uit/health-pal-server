@@ -25,7 +25,14 @@ export class FitnessGoalsService {
     if (!user) {
       throw new Error('User not found');
     }
-    const fitnessGoal = this.fitnessGoalRepository.create({ ...createFitnessGoalDto });
+    const fitnessGoal = this.fitnessGoalRepository.create({
+      ...createFitnessGoalDto,
+      target_kcal: createFitnessGoalDto.target_kcal ?? 0,
+      target_protein_gr: createFitnessGoalDto.target_protein_gr ?? 0,
+      target_fat_gr: createFitnessGoalDto.target_fat_gr ?? 0,
+      target_carbs_gr: createFitnessGoalDto.target_carbs_gr ?? 0,
+      target_fiber_gr: createFitnessGoalDto.target_fiber_gr ?? 0,
+    });
     fitnessGoal.user = user;
     return await this.fitnessGoalRepository.save(fitnessGoal);
   }
@@ -57,14 +64,12 @@ export class FitnessGoalsService {
     id: string,
     updateFitnessGoalDto: UpdateFitnessGoalDto,
     userId: string,
-  ): Promise<UpdateResult> {
-    return await this.fitnessGoalRepository.update(
-      { id: id, user: { id: userId } },
-      updateFitnessGoalDto,
-    );
+  ): Promise<FitnessGoal | null> {
+    await this.fitnessGoalRepository.update({ id: id, user: { id: userId } }, updateFitnessGoalDto);
+    return this.findOne(id, userId);
   }
 
-  async remove(id: string, userId: string): Promise<UpdateResult> {
+  async remove(id: string, userId: string): Promise<FitnessGoal | null> {
     const fitnessGoal = await this.fitnessGoalRepository.findOneBy({
       id: id,
       user: { id: userId },
@@ -72,7 +77,12 @@ export class FitnessGoalsService {
     if (!fitnessGoal) {
       throw new Error('Fitness Goal not found or you do not have permission to delete it');
     }
-    return await this.fitnessGoalRepository.softDelete(id);
+    await this.fitnessGoalRepository.softDelete(id);
+    return this.fitnessGoalRepository
+      .createQueryBuilder('goal')
+      .where('goal.id = :id', { id })
+      .withDeleted()
+      .getOne();
   }
 
   async findAllDeleted(): Promise<FitnessGoal[]> {
@@ -84,7 +94,7 @@ export class FitnessGoalsService {
       .getMany();
   }
 
-  async restore(id: string, userId: string): Promise<UpdateResult> {
+  async restore(id: string, userId: string): Promise<FitnessGoal | null> {
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
       throw new Error('User not found');
@@ -100,7 +110,8 @@ export class FitnessGoalsService {
     if (goal.user.id !== userId) {
       throw new Error('You do not have access to restore this fitness goal');
     }
-    return await this.fitnessGoalRepository.restore(id);
+    await this.fitnessGoalRepository.restore(id);
+    return this.findOne(id, userId);
   }
 
   async checkReferences(

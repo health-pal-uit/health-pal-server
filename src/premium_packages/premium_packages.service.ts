@@ -38,11 +38,16 @@ export class PremiumPackagesService {
   async update(
     id: string,
     updatePremiumPackageDto: UpdatePremiumPackageDto,
-  ): Promise<UpdateResult> {
-    return await this.premiumPackageRepository.update(id, updatePremiumPackageDto);
+  ): Promise<PremiumPackage | null> {
+    await this.premiumPackageRepository.update(id, updatePremiumPackageDto);
+    return await this.findOne(id);
   }
 
-  async remove(id: string): Promise<DeleteResult> {
-    return await this.premiumPackageRepository.softDelete(id);
+  async remove(id: string): Promise<PremiumPackage | null> {
+    await this.premiumPackageRepository.softDelete(id);
+    return await this.premiumPackageRepository.findOne({
+      where: { id },
+      withDeleted: true,
+    });
   }
 }

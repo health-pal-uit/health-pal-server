@@ -1,5 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsUUID } from 'class-validator';
+import {
+  IsDateString,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsUUID,
+  Min,
+} from 'class-validator';
 import { ActivityLevel } from 'src/helpers/enums/activity-level.enum';
 import { BFPCalculatingMethod } from 'src/helpers/enums/bfp-calculating-method.enum';
 import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
@@ -8,11 +16,13 @@ export class CreateFitnessProfileDto {
   @ApiProperty({ description: 'Weight in kilograms' })
   @IsNotEmpty()
   @IsNumber()
+  @Min(0.1, { message: 'Weight must be positive' })
   weight_kg!: number;
 
   @ApiProperty({ description: 'Height in meters' })
   @IsNotEmpty()
   @IsNumber()
+  @Min(0.1, { message: 'Height must be positive' })
   height_m!: number;
 
   @ApiProperty({ description: 'Waist circumference in centimeters' })

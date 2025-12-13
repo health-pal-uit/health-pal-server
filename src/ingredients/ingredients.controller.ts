@@ -10,6 +10,8 @@ import {
   UseInterceptors,
   UploadedFile,
   Query,
+  NotFoundException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { IngredientsService } from './ingredients.service';
 import { CreateIngredientDto } from './dto/create-ingredient.dto';
@@ -50,7 +52,7 @@ export class IngredientsController {
   @Post('search')
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Search ingredients by name for users' })
-  @ApiResponse({ status: 200, description: 'List of matching ingredients' })
+  @ApiResponse({ status: 201, description: 'List of matching ingredients' })
   async searchIngredients(@Body('name') name: string, @Query() query: IngredientPaginationDto) {
     const { page = 1, limit = 10 } = query;
     return await this.ingredientsService.searchByName(name, page, limit);
@@ -83,11 +85,21 @@ export class IngredientsController {
   @ApiResponse({ status: 200, description: 'Ingredient details' })
   @ApiResponse({ status: 404, description: 'Ingredient not found' })
   async findOne(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
-    const isAdmin = user.role === 'admin';
-    if (!isAdmin) {
-      return await this.ingredientsService.findOneUser(id);
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(id)) {
+      throw new NotFoundException(`Ingredient with ID ${id} not found`);
     }
-    return await this.ingredientsService.findOne(id);
+
+    const isAdmin = user.role === 'admin';
+    const ingredient = isAdmin
+      ? await this.ingredientsService.findOne(id)
+      : await this.ingredientsService.findOneUser(id);
+
+    if (!ingredient) {
+      throw new NotFoundException(`Ingredient with ID ${id} not found`);
+    }
+    return ingredient;
   }
 
   // update ingredient admin
@@ -111,7 +123,7 @@ export class IngredientsController {
   ) {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
-      throw new Error('Go to contribution to update');
+      throw new ForbiddenException('Admin access required to update ingredients');
     }
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
@@ -120,6 +132,7 @@ export class IngredientsController {
 
   // admin delete
   @Delete(':id')
+  @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Admin deletes an ingredient (users must use contributions)' })
   @ApiParam({ name: 'id', type: String, description: 'Ingredient ID' })
   @ApiResponse({ status: 200, description: 'Ingredient deleted' })
@@ -128,9 +141,23 @@ export class IngredientsController {
     const isAdmin = user.role === 'admin';
     if (!isAdmin) {
       //return this.ingredientsService.removeUser(id, user.id);
-      throw new Error('Go to contribution to delete');
+      throw new ForbiddenException('Admin access required to delete ingredients');
     }
     return await this.ingredientsService.remove(id);
+  }
+
+  @Patch(':id/restore')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Admin restores a soft-deleted ingredient' })
+  @ApiParam({ name: 'id', type: String, description: 'Ingredient ID' })
+  @ApiResponse({ status: 200, description: 'Ingredient restored' })
+  @ApiResponse({ status: 403, description: 'Forbidden for non-admins' })
+  async restore(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
+    const isAdmin = user.role === 'admin';
+    if (!isAdmin) {
+      throw new ForbiddenException('Admin access required to restore ingredients');
+    }
+    return await this.ingredientsService.restore(id);
   }
 
   // // verify ingredient

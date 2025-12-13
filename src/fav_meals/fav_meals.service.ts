@@ -15,12 +15,18 @@ export class FavMealsService {
     @InjectRepository(User) private userRepository: Repository<User>,
   ) {}
 
-  async remove(id: string): Promise<DeleteResult> {
-    return await this.favMealRepository.delete(id);
+  async remove(id: string): Promise<FavMeal | null> {
+    const favMeal = await this.favMealRepository.findOne({ where: { id } });
+    await this.favMealRepository.delete(id);
+    return favMeal;
   }
 
-  async removeByUserAndMeal(userId: string, mealId: string): Promise<DeleteResult> {
-    return await this.favMealRepository.delete({ user: { id: userId }, meal: { id: mealId } });
+  async removeByUserAndMeal(userId: string, mealId: string): Promise<FavMeal | null> {
+    const favMeal = await this.favMealRepository.findOne({
+      where: { user: { id: userId }, meal: { id: mealId } },
+    });
+    await this.favMealRepository.delete({ user: { id: userId }, meal: { id: mealId } });
+    return favMeal;
   }
   async findAllOfUser(
     userId: string,

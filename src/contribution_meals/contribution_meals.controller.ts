@@ -191,7 +191,7 @@ export class ContributionMealsController {
 
   // admin approve
 
-  @Get('approve/:id') // admin => approve contribution
+  @Patch(':id/approve') // admin => approve contribution
   @UseGuards(AdminSupabaseGuard)
   @ApiOperation({ summary: 'Admin approves a meal contribution' })
   @ApiParam({ name: 'id', type: String })
@@ -206,13 +206,13 @@ export class ContributionMealsController {
   //   return this.contributionMealsService.adminApprove(id);
   // }
 
-  @Patch('reject/:id') // admin => reject contribution with reason
+  @Patch(':id/reject') // admin => reject contribution with reason
   @UseGuards(AdminSupabaseGuard)
   @ApiOperation({ summary: 'Admin rejects a meal contribution with a reason' })
   @ApiParam({ name: 'id', type: String })
-  @ApiBody({ schema: { properties: { reason: { type: 'string' } } } })
+  @ApiBody({ schema: { properties: { rejection_reason: { type: 'string' } } } })
   @ApiResponse({ status: 200, description: 'Contribution rejected' })
-  async reject(@Param('id') id: string, @Body('reason') reason: string) {
+  async reject(@Param('id') id: string, @Body('rejection_reason') reason: string) {
     return await this.contributionMealsService.adminReject(id, reason);
   }
 

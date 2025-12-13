@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 import { PostsService } from './posts.service';
@@ -18,6 +20,7 @@ import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { CreateCommentDto } from 'src/comments/dto/create-comment.dto';
 import { UpdateCommentDto } from 'src/comments/dto/update-comment.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiBearerAuth()
 @Controller('posts')
@@ -57,8 +60,22 @@ export class PostsController {
   @ApiOperation({ summary: 'Create a new post' })
   @ApiBody({ type: CreatePostDto })
   @ApiResponse({ status: 201, description: 'Post created' })
-  async create(@Body() createPostDto: CreatePostDto, @CurrentUser() user: any) {
+  @UseInterceptors(FileInterceptor('image'))
+  async create(
+    @Body() createPostDto: CreatePostDto,
+    @CurrentUser() user: any,
+    @UploadedFile() _image?: Express.Multer.File,
+  ) {
     return await this.postsService.create(createPostDto, user.id);
+  }
+
+  @Get('my-posts')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get posts created by the current user' })
+  @ApiResponse({ status: 200, description: "List of current user's posts" })
+  async findMine(@CurrentUser() user: any) {
+    const posts = await this.postsService.findByUser(user.id);
+    return posts.map((p) => ({ ...p, user_id: p.user?.id }));
   }
 
   @Get()
@@ -69,13 +86,29 @@ export class PostsController {
     return await this.postsService.findAll(page, limit);
   }
 
+  @Get(':id/likes')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get likes count for a post' })
+  @ApiParam({ name: 'id', description: 'Post ID' })
+  async likesCount(@Param('id') id: string) {
+    return await this.postsService.getLikesCount(id);
+  }
+
   @Get(':id')
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Get a specific post' })
   @ApiParam({ name: 'id', description: 'Post ID' })
   @ApiResponse({ status: 200, description: 'Post details' })
   async findOne(@Param('id') id: string) {
-    return await this.postsService.findOne(id);
+    const post = await this.postsService.findOne(id);
+    if (!post) {
+      return null;
+    }
+    return {
+      ...post,
+      id: post.id,
+      user_id: post.user?.id,
+    };
   }
 
   @Patch(':id')

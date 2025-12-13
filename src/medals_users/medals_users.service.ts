@@ -32,12 +32,15 @@ export class MedalsUsersService {
     return await this.medalsUsersRepository.findOneBy({ id: id });
   }
 
-  async update(id: string, updateMedalsUserDto: UpdateMedalsUserDto): Promise<UpdateResult> {
-    return await this.medalsUsersRepository.update(id, updateMedalsUserDto);
+  async update(id: string, updateMedalsUserDto: UpdateMedalsUserDto): Promise<MedalsUser | null> {
+    await this.medalsUsersRepository.update(id, updateMedalsUserDto);
+    return await this.findOne(id);
   }
 
-  async remove(id: string): Promise<DeleteResult> {
-    return await this.medalsUsersRepository.delete(id);
+  async remove(id: string): Promise<MedalsUser | null> {
+    const medalsUser = await this.findOne(id);
+    await this.medalsUsersRepository.delete(id);
+    return medalsUser;
   }
 
   async finishMedal(medalId: string, userId: string): Promise<MedalsUser> {

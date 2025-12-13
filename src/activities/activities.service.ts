@@ -51,7 +51,12 @@ export class ActivitiesService {
     if (!activity) {
       throw new NotFoundException('Activity not found');
     }
-    await this.activitiesRepository.softDelete(id);
-    return activity;
+    await this.activitiesRepository
+      .createQueryBuilder()
+      .update()
+      .set({ deleted_at: new Date() })
+      .where('id = :id', { id })
+      .execute();
+    return { ...activity, deleted_at: new Date() };
   }
 }

@@ -84,7 +84,6 @@ export class IngredientsService {
   async findOne(id: string) {
     return await this.ingredientRepository.findOne({
       where: { id },
-      relations: ['contribution_ingres', 'contribution_ingres.author'],
     });
   }
 
@@ -99,7 +98,7 @@ export class IngredientsService {
     updateIngredientDto: UpdateIngredientDto,
     imageBuffer?: Buffer,
     imageName?: string,
-  ): Promise<UpdateResult> {
+  ): Promise<Ingredient | null> {
     if (imageBuffer && imageName) {
       const bucketName =
         this.configService.get<string>('INGREDIENT_IMG_BUCKET_NAME') || 'ingredient-imgs';
@@ -110,7 +109,9 @@ export class IngredientsService {
       );
       updateIngredientDto.image_url = imagePath;
     }
-    return await this.ingredientRepository.update(id, updateIngredientDto);
+    await this.ingredientRepository.update(id, updateIngredientDto);
+    // Return with all fields
+    return await this.ingredientRepository.findOne({ where: { id } });
   }
 
   // async removeUser(id: string, userId: string) : Promise<any> {
@@ -119,7 +120,25 @@ export class IngredientsService {
   // async updateUser(id: string, updateIngredientDto: UpdateIngredientDto, userId: string) : Promise<any> {
   //   return await this.contributionIngresService.createUpdateContribution(id, updateIngredientDto, userId);
   // }
-  async remove(id: string): Promise<DeleteResult> {
-    return await this.ingredientRepository.delete(id);
+  async remove(id: string): Promise<Ingredient | null> {
+    const ingredient = await this.ingredientRepository.findOne({ where: { id } });
+    if (!ingredient) {
+      return null;
+    }
+    await this.ingredientRepository.softDelete(id);
+    // Query builder to get soft-deleted entity with all fields
+    const deleted = await this.ingredientRepository
+      .createQueryBuilder('ingredient')
+      .where('ingredient.id = :id', { id })
+      .withDeleted()
+      .getOne();
+    return deleted;
+  }
+
+  async restore(id: string): Promise<Ingredient | null> {
+    await this.ingredientRepository.restore(id);
+    return this.ingredientRepository.findOne({
+      where: { id },
+    });
   }
 }

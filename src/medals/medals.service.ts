@@ -71,7 +71,7 @@ export class MedalsService {
     updateMedalDto: UpdateMedalDto,
     imageBuffer?: Buffer,
     imageName?: string,
-  ): Promise<UpdateResult> {
+  ): Promise<Medal | null> {
     if (imageBuffer && imageName) {
       const medalImgBucketName =
         this.configService.get<string>('MEDAL_IMG_BUCKET_NAME') || 'medal-imgs';
@@ -91,10 +91,16 @@ export class MedalsService {
         medal_id: id,
       });
     }
-    return await this.medalsRepository.update(id, updateMedalDto);
+    await this.medalsRepository.update(id, updateMedalDto);
+    return await this.findOne(id);
   }
 
-  async remove(id: string): Promise<UpdateResult> {
-    return await this.medalsRepository.softDelete(id);
+  async remove(id: string): Promise<Medal | null> {
+    await this.medalsRepository.softDelete(id);
+    return await this.medalsRepository.findOne({
+      where: { id },
+      withDeleted: true,
+      relations: ['challenges'],
+    });
   }
 }

@@ -3,13 +3,14 @@ import { CreateMealDto } from './dto/create-meal.dto';
 import { UpdateMealDto } from './dto/update-meal.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Meal } from './entities/meal.entity';
-import { ILike, IsNull, Repository, UpdateResult } from 'typeorm';
+import { ILike, In, IsNull, Repository, UpdateResult } from 'typeorm';
 import { IngreMeal } from 'src/ingre_meals/entities/ingre_meal.entity';
 import { IngredientPayload } from './dto/ingredient-payload.type';
 import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
 import { calculateMacros } from 'src/helpers/functions/macro-calculator';
 import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
 import { ConfigService } from '@nestjs/config';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class MealsService {
@@ -116,10 +117,18 @@ export class MealsService {
     }
     const createdMeal = await this.create({ ...meal, is_verified: true }); // create meal first
     const savedMeal = await this.mealsRepository.save(createdMeal);
+
+    // Fetch all ingredients first to validate they exist
+    const ingredientIds = items.map((item) => item.ingredient_id);
+    const ingredients = await this.ingredientsRepository.find({
+      where: { id: In(ingredientIds) },
+    });
+    if (ingredients.length !== ingredientIds.length) {
+      throw new Error('One or more ingredients not found');
+    }
+
     const ingreMeals = items.map((item) => {
-      const ingredient = this.ingredientsRepository.create({
-        id: item.ingredient_id,
-      } as Ingredient);
+      const ingredient = ingredients.find((i) => i.id === item.ingredient_id);
       if (!ingredient) {
         throw new Error(`Ingredient with id ${item.ingredient_id} not found`);
       }
@@ -185,16 +194,20 @@ export class MealsService {
     page = 1,
     limit = 10,
   ): Promise<{ data: Meal[]; total: number; page: number; limit: number }> {
+    const safePage = page && page > 0 ? page : 1;
     const [data, total] = await this.mealsRepository.findAndCount({
       where: { is_verified: true, deleted_at: IsNull() },
       relations: ['ingre_meals', 'ingre_meals.ingredient'],
-      skip: (page - 1) * limit,
+      skip: (safePage - 1) * limit,
       take: limit,
       order: { created_at: 'DESC' },
     });
-    return { data, total, page, limit };
+    return { data, total, page: safePage, limit };
   }
   async findOne(id: string): Promise<Meal | null> {
+    if (!isUUID(id)) {
+      return null;
+    }
     return await this.mealsRepository.findOne({
       where: { id },
       relations: ['ingre_meals', 'ingre_meals.ingredient'],
@@ -202,17 +215,34 @@ export class MealsService {
   }
 
   async findOneUser(id: string): Promise<Meal | null> {
+    if (!isUUID(id)) {
+      return null;
+    }
     return await this.mealsRepository.findOne({
       where: { id, is_verified: true, deleted_at: IsNull() },
       relations: ['ingre_meals', 'ingre_meals.ingredient'],
     });
   }
 
-  async update(id: string, updateMealDto: UpdateMealDto): Promise<UpdateResult> {
-    return await this.mealsRepository.update(id, updateMealDto);
+  async update(id: string, updateMealDto: UpdateMealDto): Promise<Meal | null> {
+    await this.mealsRepository.update(id, updateMealDto);
+    // Return with all fields and relations
+    return await this.mealsRepository.findOne({
+      where: { id },
+      relations: ['ingre_meals', 'ingre_meals.ingredient'],
+    });
   }
 
-  async remove(id: string): Promise<UpdateResult> {
-    return await this.mealsRepository.softDelete(id);
+  async remove(id: string): Promise<Meal | null> {
+    await this.mealsRepository.softDelete(id);
+    // Query builder to get soft-deleted entity with all fields
+    const deleted = await this.mealsRepository
+      .createQueryBuilder('meal')
+      .leftJoinAndSelect('meal.ingre_meals', 'ingre_meals')
+      .leftJoinAndSelect('ingre_meals.ingredient', 'ingredient')
+      .where('meal.id = :id', { id })
+      .withDeleted()
+      .getOne();
+    return deleted;
   }
 }

@@ -84,7 +84,7 @@ export class PostsMediasService {
     fileBuffer?: Buffer,
     fileName?: string,
     userId?: string,
-  ): Promise<UpdateResult> {
+  ): Promise<PostsMedia | null> {
     const media = await this.postsMediasRepository.findOne({
       where: { id },
       relations: ['post', 'post.user'],
@@ -105,10 +105,14 @@ export class PostsMediasService {
       );
       updatePostsMediaDto.url = imageUrl || updatePostsMediaDto.url;
     }
-    return await this.postsMediasRepository.update(id, updatePostsMediaDto);
+    await this.postsMediasRepository.update(id, updatePostsMediaDto);
+    return await this.postsMediasRepository.findOne({
+      where: { id },
+      relations: ['post'],
+    });
   }
 
-  async remove(id: string, userId?: string): Promise<DeleteResult> {
+  async remove(id: string, userId?: string): Promise<PostsMedia | null> {
     const media = await this.postsMediasRepository.findOne({
       where: { id },
       relations: ['post', 'post.user'],
@@ -119,6 +123,7 @@ export class PostsMediasService {
     if (userId && media.post.user.id !== userId) {
       throw new Error('User does not own the post');
     }
-    return await this.postsMediasRepository.delete(id);
+    await this.postsMediasRepository.delete(id);
+    return media;
   }
 }

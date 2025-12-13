@@ -31,22 +31,22 @@ export class Ingredient {
   @Column({ type: 'float' })
   kcal_per_100gr: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   protein_per_100gr: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   fat_per_100gr: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   carbs_per_100gr: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   fiber_per_100gr: number;
 
   @Column({ type: 'text', nullable: true })
   notes: string;
 
-  @Column({ type: 'enum', enum: FoodType, array: true })
+  @Column({ type: 'enum', enum: FoodType, array: true, nullable: true, default: [] })
   tags: FoodType[];
 
   @Column({ type: 'boolean', default: false })
