@@ -18,7 +18,6 @@ import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
 
 export class CreatePostDto {
   @ApiProperty({ example: 'Post content', description: 'Content of the post' })
-  @ValidateIf((o) => o.attach_type !== 'none')
   @IsNotEmpty()
   content: string;
 
@@ -48,7 +47,7 @@ export class CreatePostDto {
     example: 'uuid',
     description: 'Unique identifier of the user who created the post',
   })
-  @IsNotEmpty()
+  @IsOptional()
   @IsUUID('4')
   user_id?: string;
 
@@ -81,7 +80,7 @@ export class CreatePostDto {
   media_ids?: string[];
 
   // if attach_type <> none => medias is required and must contain at least one item
-  @ValidateIf((dto) => dto.attach_type !== AttachType.NONE)
+  @ValidateIf((dto) => dto.attach_type && dto.attach_type !== AttachType.NONE)
   @IsUUID('4', { each: true })
   @IsArray()
   @ArrayNotEmpty({

@@ -7,6 +7,7 @@ import {
   IsNumber,
   IsOptional,
   IsUUID,
+  Min,
 } from 'class-validator';
 import { RecordType } from 'src/helpers/enums/record-type.enum';
 import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
@@ -15,11 +16,13 @@ export class CreateActivityRecordDto {
   @ApiProperty({ example: 10, description: 'Number of repetitions' })
   @IsOptional()
   @IsNumber()
+  @Min(0, { message: 'Repetitions must be positive' })
   reps?: number;
 
   @ApiProperty({ example: 1, description: 'Number of hours' })
   @IsOptional()
   @IsNumber()
+  @Min(0, { message: 'Duration must be positive' })
   hours?: number;
 
   @ApiProperty({ example: 100, description: 'Calories burned' })

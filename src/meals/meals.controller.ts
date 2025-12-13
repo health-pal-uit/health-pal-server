@@ -10,6 +10,7 @@ import {
   UseInterceptors,
   UploadedFile,
   Query,
+  NotFoundException,
 } from '@nestjs/common';
 import { MealsService } from './meals.service';
 import { CreateMealDto } from './dto/create-meal.dto';
@@ -75,7 +76,7 @@ export class MealsController {
   @Post('search')
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Search meals by name for users' })
-  @ApiResponse({ status: 200, description: 'List of matching meals' })
+  @ApiResponse({ status: 201, description: 'List of matching meals' })
   async searchMeals(@Body('name') name: string, @Query() query: MealPaginationDto) {
     const { page = 1, limit = 10 } = query;
     return await this.mealsService.searchByName(name, page, limit);
@@ -109,10 +110,14 @@ export class MealsController {
   @ApiResponse({ status: 404, description: 'Meal not found' })
   async findOne(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
     const isAdmin = user.role === 'admin';
-    if (!isAdmin) {
-      return await this.mealsService.findOneUser(id);
+    const meal = isAdmin
+      ? await this.mealsService.findOne(id)
+      : await this.mealsService.findOneUser(id);
+
+    if (!meal) {
+      throw new NotFoundException(`Meal with ID ${id} not found`);
     }
-    return await this.mealsService.findOne(id);
+    return meal;
   }
 
   @Patch(':id') // create update contribution -> if made from ingredients => whole another route, also need to distinguish between admin and user

@@ -36,7 +36,7 @@ export class Meal {
   @IsNumber()
   serving_gr?: number;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', nullable: true })
   kcal_per_100gr: number;
 
   @Column({ type: 'float', nullable: true })

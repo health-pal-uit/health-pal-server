@@ -44,7 +44,7 @@ export class CommentsController {
   async create(@Body() createCommentDto: CreateCommentDto, @CurrentUser() user: { id: string }) {
     if (!createCommentDto.post_id) throw new Error('post_id is required');
     const post = await this.postsService.findOne(createCommentDto.post_id);
-    if (!post) throw new Error('Post not found');
+    if (!post || !post.id) throw new Error('Post not found');
     const userEntity = await this.usersService.findOne(user.id);
     if (!userEntity) throw new Error('User not found');
     return await this.commentsService.create(post, createCommentDto, userEntity);
@@ -59,11 +59,13 @@ export class CommentsController {
   @ApiResponse({ status: 200, description: 'List of comments', type: [CreateCommentDto] })
   async findAll(
     @Query('postId') postId?: string,
+    @Query('post_id') post_id?: string,
     @Query('page') page: number = 1,
     @Query('limit') limit: number = 10,
   ) {
-    if (postId) {
-      return await this.commentsService.findByPost(postId, page, limit);
+    const targetPostId = postId || post_id;
+    if (targetPostId) {
+      return await this.commentsService.findByPost(targetPostId, page, limit);
     }
     return await this.commentsService.findAll(page, limit);
   }
@@ -99,9 +101,11 @@ export class CommentsController {
   async remove(
     @Param('id') id: string,
     @CurrentUser() user: { id: string },
-    @Query('postId') postId: string,
+    @Query('postId') postId?: string,
+    @Query('post_id') post_id?: string,
   ) {
-    if (!postId) throw new Error('postId is required');
-    return await this.commentsService.remove(postId, id, user.id);
+    const targetPostId = postId || post_id;
+    if (!targetPostId) throw new Error('postId is required');
+    return await this.commentsService.remove(targetPostId, id, user.id);
   }
 }

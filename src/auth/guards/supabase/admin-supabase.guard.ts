@@ -1,4 +1,10 @@
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
 
@@ -14,7 +20,7 @@ export class AdminSupabaseGuard extends AuthGuard('supabase') implements CanActi
     }
 
     if (user.role !== 'admin') {
-      throw new UnauthorizedException('Admin access required');
+      throw new ForbiddenException('Admin access required');
     }
 
     return user;

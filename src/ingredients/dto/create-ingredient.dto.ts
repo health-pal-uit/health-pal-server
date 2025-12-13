@@ -4,10 +4,12 @@ import {
   IsDateString,
   IsEnum,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsPositive,
   IsString,
   IsUrl,
+  Min,
 } from 'class-validator';
 import { FoodType } from 'src/helpers/enums/food-type.enum';
 import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
@@ -20,27 +22,32 @@ export class CreateIngredientDto {
 
   @ApiProperty({ example: 165, description: 'Calories per 100g' })
   @IsNotEmpty()
-  @IsPositive()
+  @IsNumber()
+  @Min(0)
   kcal_per_100gr!: number; // must be >= 0
 
   @ApiProperty({ example: 31, description: 'Protein per 100gr' })
   @IsOptional()
-  @IsPositive()
+  @IsNumber()
+  @Min(0)
   protein_per_100gr?: number; // calculate later
 
   @ApiProperty({ example: 5, description: 'Fat per 100gr' })
   @IsOptional()
-  @IsPositive()
+  @IsNumber()
+  @Min(0)
   fat_per_100gr?: number;
 
   @ApiProperty({ example: 0, description: 'Carbohydrates per 100gr' })
   @IsOptional()
-  @IsPositive()
+  @IsNumber()
+  @Min(0)
   carbs_per_100gr?: number;
 
   @ApiProperty({ example: 0, description: 'Fiber per 100gr' })
   @IsOptional()
-  @IsPositive()
+  @IsNumber()
+  @Min(0)
   fiber_per_100gr?: number;
 
   @ApiProperty({
@@ -52,9 +59,9 @@ export class CreateIngredientDto {
   notes?: string;
 
   @ApiProperty({ example: [FoodType.MEAT], description: 'Tags for the ingredient' })
-  @IsNotEmpty({ each: true })
+  @IsOptional()
   @IsEnum(FoodType, { each: true })
-  tags!: FoodType[];
+  tags?: FoodType[];
 
   @ApiProperty({ example: true, description: 'Indicates if the ingredient is verified' })
   @IsBoolean()

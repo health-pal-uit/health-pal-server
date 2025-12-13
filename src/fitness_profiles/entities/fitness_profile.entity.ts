@@ -36,7 +36,7 @@ export class FitnessProfile {
   @Column({ type: 'float', nullable: true })
   neck_cm: number;
 
-  @Column({ type: 'enum', enum: ActivityLevel })
+  @Column({ type: 'enum', enum: ActivityLevel, nullable: true })
   activity_level: ActivityLevel;
 
   @Column({ type: 'float', nullable: true })

@@ -9,6 +9,7 @@ import {
   IsOptional,
   IsString,
   IsUrl,
+  Min,
 } from 'class-validator';
 import { FoodType } from 'src/helpers/enums/food-type.enum';
 import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
@@ -27,26 +28,31 @@ export class CreateMealDto {
   @ApiProperty({ example: 250, description: 'Calories per 100g' })
   @IsOptional()
   @IsNumber()
+  @Min(0, { message: 'Calories must be positive' })
   kcal_per_100gr?: number; // cal later
 
   @ApiProperty({ example: 30, description: 'Protein per 100gr' })
   @IsOptional()
   @IsNumber()
+  @Min(0, { message: 'Protein cannot be negative' })
   protein_per_100gr?: number;
 
   @ApiProperty({ example: 10, description: 'Fat per 100gr' })
   @IsOptional()
   @IsNumber()
+  @Min(0, { message: 'Fat cannot be negative' })
   fat_per_100gr?: number;
 
   @ApiProperty({ example: 40, description: 'Carbohydrates per 100gr' })
   @IsOptional()
   @IsNumber()
+  @Min(0, { message: 'Carbs cannot be negative' })
   carbs_per_100gr?: number;
 
   @ApiProperty({ example: 5, description: 'Fiber per 100gr' })
   @IsOptional()
   @IsNumber()
+  @Min(0, { message: 'Fiber cannot be negative' })
   fiber_per_100gr?: number;
 
   @ApiProperty({ example: 4.5, description: 'Rating of the meal' })

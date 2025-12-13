@@ -1,20 +1,22 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
-import { DeleteResult, IsNull, Repository, UpdateResult } from 'typeorm';
+import { IsNull, Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Challenge } from 'src/challenges/entities/challenge.entity';
 import { Medal } from 'src/medals/entities/medal.entity';
 import { Meal } from 'src/meals/entities/meal.entity';
 import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
+import { AttachType } from 'src/helpers/enums/attach-type.enum';
 import { LikesService } from 'src/likes/likes.service';
 import { CommentsService } from 'src/comments/comments.service';
 import { Like } from 'src/likes/entities/like.entity';
 import { CreateCommentDto } from 'src/comments/dto/create-comment.dto';
 import { UpdateCommentDto } from 'src/comments/dto/update-comment.dto';
 import { Comment } from 'src/comments/entities/comment.entity';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class PostsService {
@@ -30,7 +32,10 @@ export class PostsService {
   ) {}
 
   async create(createPostDto: CreatePostDto, userId: string): Promise<Post> {
-    const post = this.postsRepository.create(createPostDto);
+    const post = this.postsRepository.create({
+      ...createPostDto,
+      attach_type: createPostDto.attach_type ?? AttachType.NONE,
+    });
     if (createPostDto.attach_type === 'challenge') {
       const challenge = await this.challengesRepository.findOneBy({ id: createPostDto.attach_id });
       if (!challenge) {
@@ -95,31 +100,49 @@ export class PostsService {
   }
 
   async findOne(id: string): Promise<Post | null> {
+    if (!isUUID(id)) {
+      throw new NotFoundException('Post not found');
+    }
     return this.postsRepository.findOne({ where: { id }, relations: ['user'] });
   }
 
-  async update(id: string, updatePostDto: UpdatePostDto, userId: string): Promise<UpdateResult> {
-    const post = await this.postsRepository.findOne({ where: { id, user: { id: userId } } });
-    if (!post) {
-      throw new Error('Post not found');
-    }
-    return this.postsRepository.update(id, updatePostDto);
+  async findByUser(userId: string): Promise<Post[]> {
+    return this.postsRepository.find({
+      where: { user: { id: userId }, deleted_at: IsNull() },
+      order: { created_at: 'DESC' },
+    });
   }
 
-  async remove(id: string, userId: string): Promise<UpdateResult> {
+  async update(id: string, updatePostDto: UpdatePostDto, userId: string): Promise<Post | null> {
     const post = await this.postsRepository.findOne({ where: { id, user: { id: userId } } });
     if (!post) {
-      throw new Error('Post not found');
+      throw new ForbiddenException('Post not found or access denied');
     }
-    return this.postsRepository.softDelete(id);
+    await this.postsRepository.update(id, updatePostDto);
+    return this.findOne(id);
   }
 
-  async adminRemove(id: string): Promise<UpdateResult> {
+  async remove(id: string, userId: string): Promise<Post | null> {
+    const post = await this.postsRepository.findOne({ where: { id, user: { id: userId } } });
+    if (!post) {
+      throw new ForbiddenException('Post not found or access denied');
+    }
+    await this.postsRepository.softDelete(id);
+    return this.postsRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.user', 'user')
+      .where('post.id = :id', { id })
+      .withDeleted()
+      .getOne();
+  }
+
+  async adminRemove(id: string): Promise<Post | null> {
     const post = await this.postsRepository.findOne({ where: { id } });
     if (!post) {
       throw new Error('Post not found');
     }
-    return this.postsRepository.softDelete(id);
+    await this.postsRepository.softDelete(id);
+    return this.postsRepository.findOne({ where: { id }, withDeleted: true, relations: ['user'] });
   }
 
   async report(id: string, userId: string): Promise<Post> {
@@ -179,7 +202,7 @@ export class PostsService {
     commentId: string,
     commentDto: UpdateCommentDto,
     userId: string,
-  ): Promise<UpdateResult> {
+  ): Promise<Comment | null> {
     // Implement update comment logic here
     const post = await this.postsRepository.findOne({
       where: { id: postId },
@@ -202,7 +225,7 @@ export class PostsService {
     return this.commentsService.update(comment.id, commentDto);
   }
 
-  async removeComment(postId: string, commentId: string, userId: string): Promise<UpdateResult> {
+  async removeComment(postId: string, commentId: string, userId: string): Promise<Comment | null> {
     // Implement remove comment logic here
 
     return await this.commentsService.remove(postId, commentId, userId);
@@ -230,7 +253,7 @@ export class PostsService {
     return await this.likesService.create(post, user);
   }
 
-  async unlikePost(id: string, userId: string): Promise<DeleteResult> {
+  async unlikePost(id: string, userId: string): Promise<Like | null> {
     // Implement unlike post logic here
     const post = await this.postsRepository.findOne({
       where: { id },
@@ -257,5 +280,9 @@ export class PostsService {
 
   async hasUserLiked(id: string, userId: string): Promise<boolean> {
     return await this.likesService.count(id, userId).then((count) => count > 0);
+  }
+
+  async getLikesCount(id: string): Promise<{ likes_count: number }> {
+    return { likes_count: await this.likesService.countByPost(id) };
   }
 }

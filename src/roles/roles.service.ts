@@ -36,12 +36,17 @@ export class RolesService {
     return await this.roleRepository.findOneBy({ id });
   }
 
-  async update(id: string, updateRoleDto: UpdateRoleDto): Promise<UpdateResult> {
-    return await this.roleRepository.update(id, updateRoleDto);
+  async update(id: string, updateRoleDto: UpdateRoleDto): Promise<Role | null> {
+    await this.roleRepository.update(id, updateRoleDto);
+    return await this.findOne(id);
   }
 
-  async remove(id: string): Promise<UpdateResult> {
-    return await this.roleRepository.softDelete(id);
+  async remove(id: string): Promise<Role | null> {
+    await this.roleRepository.softDelete(id);
+    return await this.roleRepository.findOne({
+      where: { id },
+      withDeleted: true,
+    });
   }
 
   async findByName(name: string): Promise<Role | null> {

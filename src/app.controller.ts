@@ -18,4 +18,12 @@ export class AppController {
   test(): string {
     return 'Test endpoint is working!';
   }
+
+  @Get('health')
+  health(): { status: string; timestamp: string } {
+    return {
+      status: 'ok',
+      timestamp: new Date().toISOString(),
+    };
+  }
 }

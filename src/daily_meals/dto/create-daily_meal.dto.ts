@@ -58,10 +58,10 @@ export class CreateDailyMealDto {
 
   // relations => 2
 
-  @ApiProperty({ example: 'uuid-of-meal', description: 'Meal ID' })
-  @IsNotEmpty()
+  @ApiProperty({ example: 'uuid-of-meal', description: 'Meal ID', required: false })
+  @IsOptional()
   @IsUUID('4')
-  meal_id!: string;
+  meal_id?: string;
 
   @ApiProperty({ example: 'uuid-of-daily-log', description: 'Daily Log ID' })
   @IsOptional()

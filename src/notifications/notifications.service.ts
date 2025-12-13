@@ -163,16 +163,24 @@ export class NotificationsService {
     await this.notificationRepository.save(notifications);
   }
 
-  async remove(id: string, userId: string): Promise<DeleteResult> {
+  async remove(id: string, userId: string): Promise<Notification | null> {
     const notification = await this.notificationRepository.findOne({
       where: { id, user: { id: userId } },
     });
     if (!notification) {
       throw new NotFoundException('Notification not found');
     }
-    return this.notificationRepository.softDelete(id);
+    await this.notificationRepository.softDelete(id);
+    return await this.notificationRepository.findOne({
+      where: { id },
+      withDeleted: true,
+    });
   }
-  async adminRemove(id: string): Promise<DeleteResult> {
-    return this.notificationRepository.delete(id);
+  async adminRemove(id: string): Promise<Notification | null> {
+    const notification = await this.notificationRepository.findOne({
+      where: { id },
+    });
+    await this.notificationRepository.delete(id);
+    return notification;
   }
 }

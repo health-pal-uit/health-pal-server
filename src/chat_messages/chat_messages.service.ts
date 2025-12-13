@@ -94,26 +94,41 @@ export class ChatMessagesService {
     updateChatMessageDto: UpdateChatMessageDto,
     imageBuffer?: Buffer,
     imageName?: string,
-  ): Promise<UpdateResult> {
-    const result = await this.chatMessagesRepository.update(id, updateChatMessageDto);
-    if (imageBuffer && imageName) {
-      const chatMessage = await this.chatMessagesRepository.findOne({ where: { id } });
-      if (chatMessage) {
-        const chatMessageBucket =
-          this.configService.get<string>('CHAT_IMG_BUCKET_NAME') || 'chat-imgs';
-        chatMessage.media_url =
-          (await this.supabaseStorageService.uploadImageFromBuffer(
-            imageBuffer,
-            imageName,
-            chatMessageBucket,
-          )) || chatMessage.media_url;
-        await this.chatMessagesRepository.save(chatMessage);
-      }
+  ): Promise<ChatMessage | null> {
+    const chatMessage = await this.chatMessagesRepository.findOne({ where: { id } });
+    if (!chatMessage) {
+      return null;
     }
-    return result;
+
+    const updated = this.chatMessagesRepository.merge(chatMessage, updateChatMessageDto);
+
+    if (imageBuffer && imageName) {
+      const chatMessageBucket =
+        this.configService.get<string>('CHAT_IMG_BUCKET_NAME') || 'chat-imgs';
+      updated.media_url =
+        (await this.supabaseStorageService.uploadImageFromBuffer(
+          imageBuffer,
+          imageName,
+          chatMessageBucket,
+        )) || updated.media_url;
+    }
+
+    return await this.chatMessagesRepository.save(updated);
   }
 
-  async remove(id: string): Promise<DeleteResult> {
-    return await this.chatMessagesRepository.delete(id);
+  async remove(id: string): Promise<ChatMessage | null> {
+    if (!id || id === 'undefined') {
+      return null;
+    }
+    const chatMessage = await this.chatMessagesRepository.findOne({ where: { id } });
+    if (!chatMessage) {
+      return null;
+    }
+    await this.chatMessagesRepository.softDelete(id);
+    return this.chatMessagesRepository
+      .createQueryBuilder('message')
+      .where('message.id = :id', { id })
+      .withDeleted()
+      .getOne();
   }
 }

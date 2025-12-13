@@ -37,7 +37,7 @@ export class FitnessGoal {
   @Column({ type: 'enum', enum: FitnessGoalType })
   goal_type: FitnessGoalType;
 
-  @Column({ type: 'float' })
+  @Column({ type: 'float', default: 0, nullable: true })
   water_drank_l: number;
 
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })

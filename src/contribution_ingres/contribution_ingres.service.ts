@@ -34,12 +34,15 @@ export class ContributionIngresService {
     return { data, total, page, limit };
   }
 
-  async adminReject(id: string, reason?: string): Promise<UpdateResult> {
-    return await this.contributionIngreRepository.update(id, {
-      status: ContributionStatus.REJECTED,
-      rejection_reason: reason || null,
-      reviewed_at: new Date(),
-    });
+  async adminReject(id: string, reason?: string): Promise<ContributionIngre> {
+    const contribution = await this.contributionIngreRepository.findOne({ where: { id } });
+    if (!contribution) {
+      throw new Error('Contribution not found');
+    }
+    contribution.status = ContributionStatus.REJECTED;
+    contribution.rejection_reason = reason || null;
+    contribution.reviewed_at = new Date();
+    return await this.contributionIngreRepository.save(contribution);
   }
   // user: get rejection reason/status for their own contribution
   async getRejectionInfo(id: string, userId: string) {
@@ -58,8 +61,7 @@ export class ContributionIngresService {
   }
 
   // convert to real ingredient
-  async adminApprove(id: string): Promise<Ingredient | UpdateResult> {
-    await this.contributionIngreRepository.update(id, { status: ContributionStatus.APPROVED });
+  async adminApprove(id: string): Promise<ContributionIngre> {
     const contribution = await this.contributionIngreRepository.findOne({ where: { id } });
     if (!contribution) {
       throw new Error('Contribution not found');
@@ -81,8 +83,8 @@ export class ContributionIngresService {
     contribution.ingredient = savedIngredient;
     contribution.updated_at = new Date();
     contribution.status = ContributionStatus.APPROVED;
-    await this.contributionIngreRepository.save(contribution);
-    return savedIngredient;
+    contribution.reviewed_at = new Date();
+    return await this.contributionIngreRepository.save(contribution);
     // if (contribution.opt === ContributionOptions.NEW) {
     //   // create new ingredient
 
@@ -116,16 +118,22 @@ export class ContributionIngresService {
   }
 
   async findAllUser(id: any): Promise<ContributionIngre[]> {
-    return await this.contributionIngreRepository.find({ where: { author: id } });
+    return await this.contributionIngreRepository.find({
+      where: { author: { id } },
+      relations: ['author'],
+    });
   }
 
   async findOneUser(id: string, userId: string): Promise<ContributionIngre | null> {
     // if its theirs
-    const contribution = await this.contributionIngreRepository.findOne({ where: { id } });
+    const contribution = await this.contributionIngreRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
     if (!contribution) {
       throw new Error('Contribution not found');
     }
-    if (contribution.user_id !== userId) {
+    if (contribution.author?.id !== userId) {
       throw new Error('You do not have access to this contribution');
     }
     return contribution;
@@ -138,11 +146,14 @@ export class ContributionIngresService {
     imageBuffer?: Buffer,
     imageName?: string,
   ): Promise<ContributionIngre> {
-    const existingContribution = await this.contributionIngreRepository.findOne({ where: { id } });
+    const existingContribution = await this.contributionIngreRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
     if (!existingContribution) {
       throw new Error('Contribution not found');
     }
-    if (existingContribution.user_id !== userId) {
+    if (existingContribution.author?.id !== userId) {
       throw new Error('You do not have access to this contribution');
     }
     if (existingContribution.status !== ContributionStatus.PENDING) {
@@ -165,11 +176,14 @@ export class ContributionIngresService {
   }
 
   async createDeleteContribution(id: string, userId: string): Promise<ContributionIngre> {
-    const existingContribution = await this.contributionIngreRepository.findOne({ where: { id } });
+    const existingContribution = await this.contributionIngreRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
     if (!existingContribution) {
       throw new Error('Contribution not found');
     }
-    if (existingContribution.user_id !== userId) {
+    if (existingContribution.author?.id !== userId) {
       throw new Error('You do not have access to this contribution');
     }
     if (existingContribution.status !== ContributionStatus.PENDING) {
@@ -187,7 +201,7 @@ export class ContributionIngresService {
   ): Promise<ContributionIngre> {
     const contributionIngre = this.contributionIngreRepository.create({
       ...createContributionIngreDto,
-      user_id: userId,
+      author: { id: userId } as any,
     });
     contributionIngre.opt = ContributionOptions.NEW;
     contributionIngre.status = ContributionStatus.PENDING;

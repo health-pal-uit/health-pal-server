@@ -49,8 +49,10 @@ export class SupabaseStrategy extends PassportStrategy(SupabaseAuthStrategy, 'su
 
     const { data, error } = await this.localSupabase.auth.getUser(token);
     if (error || !data?.user) return this.fail('Invalid token', 401);
+
     const userInDB = await this.usersService.findOneByEmail(data.user.email!);
     if (!userInDB) return this.fail('User not found in database', 401);
+
     const roleName = userInDB.role?.name || 'user';
 
     this.success({ id: data.user.id, email: data.user.email, role: roleName }, null); // this is ReqUserType

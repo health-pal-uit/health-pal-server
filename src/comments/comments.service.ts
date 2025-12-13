@@ -41,15 +41,16 @@ export class CommentsService {
     return await this.commentsRepository.findOneBy({ id: commentId });
   }
 
-  async update(commentId: string, updateCommentDto: UpdateCommentDto): Promise<UpdateResult> {
+  async update(commentId: string, updateCommentDto: UpdateCommentDto): Promise<Comment | null> {
     const comment = await this.commentsRepository.findOneBy({ id: commentId });
     if (!comment) {
       throw new Error('Comment not found');
     }
-    return this.commentsRepository.update(commentId, updateCommentDto);
+    await this.commentsRepository.update(commentId, updateCommentDto);
+    return await this.findOne(commentId);
   }
 
-  async remove(postId: string, commentId: string, userId: string): Promise<UpdateResult> {
+  async remove(postId: string, commentId: string, userId: string): Promise<Comment | null> {
     const comment = await this.commentsRepository.findOne({
       where: { id: commentId },
       relations: ['user', 'post'],
@@ -57,6 +58,10 @@ export class CommentsService {
     if (!comment) throw new Error('Comment not found');
     if (comment.post?.id !== postId) throw new Error('Comment does not belong to this post');
     if (comment.user?.id !== userId) throw new Error('You are not the owner of this comment');
-    return this.commentsRepository.softDelete(commentId);
+    await this.commentsRepository.softDelete(commentId);
+    return await this.commentsRepository.findOne({
+      where: { id: commentId },
+      withDeleted: true,
+    });
   }
 }

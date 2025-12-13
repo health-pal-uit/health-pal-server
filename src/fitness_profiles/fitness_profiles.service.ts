@@ -1,16 +1,22 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateFitnessProfileDto } from './dto/create-fitness_profile.dto';
 import { UpdateFitnessProfileDto } from './dto/update-fitness_profile.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { FitnessProfile } from './entities/fitness_profile.entity';
 import { IsNull, Repository, UpdateResult } from 'typeorm';
-import { ActivityLevel } from 'src/helpers/enums/activity-level.enum';
 import { User } from 'src/users/entities/user.entity';
 import { BFPCalculatingMethod } from 'src/helpers/enums/bfp-calculating-method.enum';
+import { ActivityLevel } from 'src/helpers/enums/activity-level.enum';
 import { BFFitnessProfileDto } from './dto/body-fat-fitness_profile.dto';
 import { calculateAge } from 'src/helpers/functions/age-calculator';
 import { cmToInch } from 'src/helpers/functions/cm-to-inch';
 import { kgToLb } from 'src/helpers/functions/kg-to-lb';
+import { isUUID } from 'class-validator';
 
 @Injectable()
 export class FitnessProfilesService {
@@ -35,6 +41,19 @@ export class FitnessProfilesService {
     createFitnessProfileDto: CreateFitnessProfileDto,
     userId: string,
   ): Promise<FitnessProfile> {
+    if (
+      createFitnessProfileDto.weight_kg === undefined ||
+      createFitnessProfileDto.height_m === undefined
+    ) {
+      throw new BadRequestException('Weight and height are required');
+    }
+    if (createFitnessProfileDto.weight_kg <= 0 || createFitnessProfileDto.height_m <= 0) {
+      throw new BadRequestException('Weight and height must be positive numbers');
+    }
+    if (createFitnessProfileDto.weight_kg > 400 || createFitnessProfileDto.height_m > 3) {
+      throw new BadRequestException('Weight or height is out of supported range');
+    }
+
     const fitnessProfile = this.fitnessProfileRepository.create(createFitnessProfileDto);
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
@@ -65,6 +84,9 @@ export class FitnessProfilesService {
   }
 
   async findOne(userId: string): Promise<FitnessProfile | null> {
+    if (!isUUID(userId)) {
+      throw new NotFoundException('Fitness profile not found');
+    }
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
       throw new Error('User not found');
@@ -79,10 +101,10 @@ export class FitnessProfilesService {
   async update(
     updateFitnessProfileDto: UpdateFitnessProfileDto,
     userId: string,
-  ): Promise<UpdateResult> {
+  ): Promise<FitnessProfile | null> {
     const user = await this.userRepository.findOne({
       where: { id: userId },
-      relations: ['fitnessProfiles'],
+      relations: ['fitness_profiles'],
     });
     const fitnessProfileId = user?.fitness_profiles?.[0]?.id;
     if (!user) {
@@ -115,7 +137,11 @@ export class FitnessProfilesService {
     updateFitnessProfileDto.bmi = fitnessProfile.bmi;
     updateFitnessProfileDto.tdee_kcal = fitnessProfile.tdee_kcal;
 
-    return await this.fitnessProfileRepository.update(fitnessProfileId!, updateFitnessProfileDto);
+    await this.fitnessProfileRepository.update(fitnessProfileId!, updateFitnessProfileDto);
+    return this.fitnessProfileRepository.findOne({
+      where: { id: fitnessProfileId },
+      relations: ['user', 'diet_type'],
+    });
   }
 
   async findAllForUser(userId: string): Promise<FitnessProfile[]> {
@@ -136,7 +162,7 @@ export class FitnessProfilesService {
       .getMany();
   }
 
-  async restore(id: string, userId: string): Promise<UpdateResult> {
+  async restore(id: string, userId: string): Promise<FitnessProfile | null> {
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
       throw new Error('User not found');
@@ -152,10 +178,14 @@ export class FitnessProfilesService {
     if (profile.user.id !== userId) {
       throw new UnauthorizedException('You do not have access to restore this fitness profile');
     }
-    return await this.fitnessProfileRepository.restore(id);
+    await this.fitnessProfileRepository.restore(id);
+    return this.fitnessProfileRepository.findOne({
+      where: { id },
+      relations: ['user', 'diet_type'],
+    });
   }
 
-  async remove(id: string, userId: string): Promise<UpdateResult> {
+  async remove(id: string, userId: string): Promise<FitnessProfile | null> {
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
       throw new Error('User not found');
@@ -164,7 +194,12 @@ export class FitnessProfilesService {
     if (!fitnessProfile) {
       throw new UnauthorizedException('You do not have access to this fitness profile');
     }
-    return await this.fitnessProfileRepository.softDelete(id);
+    await this.fitnessProfileRepository.softDelete(id);
+    return this.fitnessProfileRepository.findOne({
+      where: { id },
+      withDeleted: true,
+      relations: ['user', 'diet_type'],
+    });
   }
 
   calculateBMR(fitnessProfile: FitnessProfile) {
