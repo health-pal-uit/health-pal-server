@@ -3,7 +3,7 @@ import { CreateMealDto } from './dto/create-meal.dto';
 import { UpdateMealDto } from './dto/update-meal.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Meal } from './entities/meal.entity';
-import { IsNull, Repository, UpdateResult } from 'typeorm';
+import { ILike, IsNull, Repository, UpdateResult } from 'typeorm';
 import { IngreMeal } from 'src/ingre_meals/entities/ingre_meal.entity';
 import { IngredientPayload } from './dto/ingredient-payload.type';
 import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
@@ -20,6 +20,25 @@ export class MealsService {
     private readonly supabaseStorageService: SupabaseStorageService,
     private readonly configService: ConfigService,
   ) {}
+
+  async searchByName(
+    name: string,
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: Meal[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.mealsRepository.findAndCount({
+      where: {
+        name: ILike(`%${name}%`),
+        is_verified: true,
+        deleted_at: IsNull(),
+      },
+      relations: ['ingre_meals', 'ingre_meals.ingredient'],
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: 'DESC' },
+    });
+    return { data, total, page, limit };
+  }
 
   async updateFromIngredients(
     id: string,
