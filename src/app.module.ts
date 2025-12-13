@@ -45,6 +45,7 @@ import { GoogleFitModule } from './google-fit/google-fit.module';
 import { AdminReportsModule } from './admin-reports/admin-reports.module';
 import { ChatAiModule } from './chat-ai/chat-ai.module';
 import { RecommendationsModule } from './recommendations/recommendations.module';
+import { FoodVisionModule } from './food-vision/food-vision.module';
 import configuration from './config/configuration';
 import * as joi from 'joi';
 
@@ -104,6 +105,7 @@ import * as joi from 'joi';
     AdminReportsModule,
     ChatAiModule,
     RecommendationsModule,
+    FoodVisionModule,
   ],
   controllers: [AppController],
   providers: [AppService],
