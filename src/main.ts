@@ -23,7 +23,7 @@ async function bootstrap() {
 
   // cors
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:8081'], // web and mobile
+    origin: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:5000'], // web and mobile
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     //preflightContinue: false,
     //optionsSuccessStatus: 204,
