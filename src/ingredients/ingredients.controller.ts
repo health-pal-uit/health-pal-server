@@ -47,6 +47,15 @@ export class IngredientsController {
     return await this.ingredientsService.create(createIngredientDto, imageBuffer, imageName);
   }
 
+  @Post('search')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Search ingredients by name for users' })
+  @ApiResponse({ status: 200, description: 'List of matching ingredients' })
+  async searchIngredients(@Body('name') name: string, @Query() query: IngredientPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.ingredientsService.searchByName(name, page, limit);
+  }
+
   // get all admin
   @Get('admin')
   @UseGuards(AdminSupabaseGuard)

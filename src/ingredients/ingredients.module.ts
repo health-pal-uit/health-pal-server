@@ -14,5 +14,6 @@ import { SupabaseStorageModule } from 'src/supabase-storage/supabase-storage.mod
   ],
   controllers: [IngredientsController],
   providers: [IngredientsService],
+  exports: [IngredientsService],
 })
 export class IngredientsModule {}

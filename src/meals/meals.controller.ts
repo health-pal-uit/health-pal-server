@@ -72,6 +72,15 @@ export class MealsController {
     );
   }
 
+  @Post('search')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Search meals by name for users' })
+  @ApiResponse({ status: 200, description: 'List of matching meals' })
+  async searchMeals(@Body('name') name: string, @Query() query: MealPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.mealsService.searchByName(name, page, limit);
+  }
+
   // admin find all
   @Get('admin')
   @UseGuards(AdminSupabaseGuard)

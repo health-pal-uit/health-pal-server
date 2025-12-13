@@ -3,7 +3,7 @@ import { CreateIngredientDto } from './dto/create-ingredient.dto';
 import { UpdateIngredientDto } from './dto/update-ingredient.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Ingredient } from './entities/ingredient.entity';
-import { IsNull, Repository } from 'typeorm';
+import { ILike, IsNull, Repository } from 'typeorm';
 import { DeleteResult } from 'typeorm';
 import { UpdateResult } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
@@ -17,6 +17,24 @@ export class IngredientsService {
     private supabaseStorageService: SupabaseStorageService,
     private configService: ConfigService,
   ) {}
+  async searchByName(
+    name: string,
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: Ingredient[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.ingredientRepository.findAndCount({
+      where: {
+        name: ILike(`%${name}%`),
+        is_verified: true,
+        deleted_at: IsNull(),
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { created_at: 'DESC' },
+    });
+    return { data, total, page, limit };
+  }
+
   // admin create
   async create(
     createIngredientDto: CreateIngredientDto,
