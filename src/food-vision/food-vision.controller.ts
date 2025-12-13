@@ -7,7 +7,7 @@ export class FoodVisionController {
   constructor(private readonly foodVisionService: FoodVisionService) {}
 
   @Post('analyze')
-  @UseInterceptors(FileInterceptor('image'))
+  @UseInterceptors(FileInterceptor('file'))
   async analyzeFoodImage(@UploadedFile() image: Express.Multer.File) {
     return this.foodVisionService.analyzeFoodImage(image);
   }

@@ -396,6 +396,45 @@ async function seedNutritionContents(manager: EntityManager, opts: { users: User
 
   const ingredients = await manager.getRepository(Ingredient).save(ingredientsData);
 
+  // Load food-vision data from JSON
+  const foodVisionPath = path.join(
+    __dirname,
+    '..',
+    '..',
+    '..',
+    'database',
+    'data',
+    'food',
+    'food-vision-dataset.json',
+  );
+  const foodVisionData = JSON.parse(fs.readFileSync(foodVisionPath, 'utf-8'));
+
+  const existingFoodVisionIngredient = await manager.getRepository(Ingredient).findOne({
+    where: { notes: 'From food vision dataset' },
+  });
+
+  // Add food-vision ingredients only if they don't exist
+  if (!existingFoodVisionIngredient) {
+    const foodVisionIngredients: Partial<Ingredient>[] = foodVisionData.food.map((item: any) => ({
+      name: item.name,
+      kcal_per_100gr: item.nutrients.calories,
+      protein_per_100gr: item.nutrients.protein,
+      fat_per_100gr: item.nutrients.fat,
+      carbs_per_100gr: item.nutrients.carbs,
+      fiber_per_100gr: item.nutrients.fiber,
+      user: null, // System-verified ingredients
+      notes: 'From food vision dataset',
+      tags: [ingreTags],
+      is_verified: true,
+      image_url: null,
+    }));
+
+    await manager.getRepository(Ingredient).save(foodVisionIngredients);
+    console.log(`Seeded ${foodVisionIngredients.length} food-vision ingredients`);
+  } else {
+    console.log('Food-vision ingredients already exist, skipping...');
+  }
+
   // Load meals from CSV
   const mealsPath = path.join(
     __dirname,
@@ -427,6 +466,35 @@ async function seedNutritionContents(manager: EntityManager, opts: { users: User
   }));
 
   const savedMeals = await manager.getRepository(Meal).save(mealsData);
+
+  // Check if food-vision meals already exist
+  const existingFoodVisionMeal = await manager.getRepository(Meal).findOne({
+    where: { notes: 'From food vision dataset' },
+  });
+
+  // Add food-vision meals only if they don't exist
+  if (!existingFoodVisionMeal) {
+    const foodVisionMeals: Partial<Meal>[] = foodVisionData.food.map((item: any) => ({
+      name: item.name,
+      kcal_per_100gr: item.nutrients.calories,
+      protein_per_100gr: item.nutrients.protein,
+      fat_per_100gr: item.nutrients.fat,
+      carbs_per_100gr: item.nutrients.carbs,
+      fiber_per_100gr: item.nutrients.fiber,
+      user: null, // System-verified meals
+      made_from_ingredients: false,
+      rating: faker.number.float({ min: 3.5, max: 5, multipleOf: 0.1 }),
+      notes: 'From food vision dataset',
+      tags: [mealTags],
+      is_verified: true,
+      image_url: null,
+    }));
+
+    const savedFoodVisionMeals = await manager.getRepository(Meal).save(foodVisionMeals);
+    console.log(`Seeded ${savedFoodVisionMeals.length} food-vision meals`);
+  } else {
+    console.log('Food-vision meals already exist, skipping...');
+  }
 
   return { ingredients, meals: savedMeals };
 }

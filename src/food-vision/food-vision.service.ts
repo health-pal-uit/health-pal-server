@@ -12,7 +12,7 @@ export class FoodVisionService {
 
   async analyzeFoodImage(image: Express.Multer.File) {
     const formData = new FormData();
-    formData.append('image', image.buffer, {
+    formData.append('file', image.buffer, {
       filename: image.originalname,
       contentType: image.mimetype,
     });
@@ -21,6 +21,6 @@ export class FoodVisionService {
         ...formData.getHeaders(),
       },
     });
-    return response.data;
+    return response.data.labels;
   }
 }
