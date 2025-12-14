@@ -8,6 +8,7 @@ import {
   Delete,
   UseGuards,
   Query,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ActivityRecordsService } from './activity_records.service';
@@ -34,6 +35,9 @@ export class ActivityRecordsController {
   @ApiResponse({ status: 404, description: 'Challenge not found' })
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async checkProgress(@Param('challengeId') challengeId: string, @CurrentUser() user: any) {
+    if (!user || !user.id) {
+      throw new UnauthorizedException('User not authenticated');
+    }
     const progress_percent = await this.activityRecordsService.recalculateProgressChallengesForUser(
       challengeId,
       user.id,

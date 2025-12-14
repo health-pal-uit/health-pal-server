@@ -9,7 +9,7 @@ export const responseHelper = <T>({
   data?: T;
   message?: string;
   error?: string | string[];
-  statusCode?: number | string;
+  statusCode?: number;
 }): IBackendRes<T> => {
   return {
     data,
