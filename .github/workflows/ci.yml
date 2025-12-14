@@ -49,12 +49,12 @@ jobs:
       TEST_ADMIN_EMAIL: khonghuynhngochan@gmail.com
       TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
       # Firebase/Google Cloud credentials (optional for tests - will disable push notifications if not set)
-      PROJECT_ID: ${{ secrets.PROJECT_ID }}
-      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
-      CLIENT_EMAIL: ${{ secrets.CLIENT_EMAIL }}
-      # Google OAuth credentials (optional for tests)
-      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      PROJECT_ID: ${{ secrets.PROJECT_ID || '' }}
+      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY || '' }}
+      CLIENT_EMAIL: ${{ secrets.CLIENT_EMAIL || '' }}
+      # Google OAuth credentials (optional for tests - dummy values will be used if not set)
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID || 'dummy-client-id' }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET || 'dummy-secret' }}
       GOOGLE_CALLBACK_URL: http://localhost:3001/auth/google/callback
       GOOGLE_FIT_CALLBACK_URL: http://localhost:3001/google-fit/callback
       # Supabase Storage buckets (optional for tests)
