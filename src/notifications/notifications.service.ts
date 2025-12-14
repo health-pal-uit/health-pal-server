@@ -14,12 +14,17 @@ export class NotificationsService {
     @InjectRepository(Notification) private notificationRepository: Repository<Notification>,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Device) private deviceRepository: Repository<Device>,
-    @Inject('FIREBASE_ADMIN') private firebaseAdmin: admin.app.App,
+    @Inject('FIREBASE_ADMIN') private firebaseAdmin: admin.app.App | null,
   ) {}
 
   async sendPushNotificationToDevice(push_tokens: string[], title: string, message: string) {
     if (push_tokens.length === 0) {
       console.log('No push tokens available to send notification.');
+      return;
+    }
+
+    if (!this.firebaseAdmin) {
+      console.warn('Firebase Admin not initialized. Skipping push notification.');
       return;
     }
 

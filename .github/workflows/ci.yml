@@ -42,21 +42,41 @@ jobs:
       DB_PORT: 5432
       SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
       SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       TEST_USER_EMAIL: hankhongg@gmail.com
       TEST_USER_PASSWORD: ${{ secrets.TEST_USER_PASSWORD }}
       TEST_ADMIN_EMAIL: khonghuynhngochan@gmail.com
       TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
+      # Firebase/Google Cloud credentials (optional for tests - will disable push notifications if not set)
+      PROJECT_ID: ${{ secrets.PROJECT_ID }}
+      PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+      CLIENT_EMAIL: ${{ secrets.CLIENT_EMAIL }}
+      # Google OAuth credentials (optional for tests)
+      GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      GOOGLE_CALLBACK_URL: http://localhost:3001/auth/google/callback
+      GOOGLE_FIT_CALLBACK_URL: http://localhost:3001/google-fit/callback
+      # Supabase Storage buckets (optional for tests)
+      AVATAR_BUCKET_NAME: avatars
+      POST_IMG_BUCKET_NAME: post-images
+      POST_VIDEO_BUCKET_NAME: post-videos
+      CHAT_IMG_BUCKET_NAME: chat-images
+      CHALLENGE_IMG_BUCKET_NAME: challenge-images
+      MEDAL_IMG_BUCKET_NAME: medal-images
+      MEAL_IMG_BUCKET_NAME: meal-images
+      INGREDIENT_IMG_BUCKET_NAME: ingredient-images
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 20
       - name: Start PostgreSQL with Docker Compose
-        run: docker compose up health-pal-db -d
+        run: docker compose -f compose.ci.yaml up -d
       - name: Wait for PostgreSQL to be ready
         run: |
-          timeout 60 bash -c 'until docker compose exec -T health-pal-db pg_isready -U postgres; do sleep 2; done'
+          timeout 60 bash -c 'until docker compose -f compose.ci.yaml exec -T health-pal-db pg_isready -U postgres; do echo "Waiting for PostgreSQL..."; sleep 2; done'
+          echo "PostgreSQL is ready!"
       - run: npm ci
       - name: Seed test users in Supabase
         run: npm run seed-test-users
@@ -65,7 +85,7 @@ jobs:
       - run: npm run test:e2e
       - name: Stop Docker Compose services
         if: always()
-        run: docker compose down -v
+        run: docker compose -f compose.ci.yaml down -v
 
   build:
     name: Build
