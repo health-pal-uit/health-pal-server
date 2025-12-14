@@ -34,6 +34,12 @@ jobs:
     name: Unit Tests
     runs-on: ubuntu-latest
     needs: [lint, prettier_check] # keep original order: only run tests if lint+prettier pass
+    env:
+      DB_DATABASE: health-pal-db
+      DB_USERNAME: postgres
+      DB_PASSWORD: 135792468
+      DB_HOST: localhost
+      DB_PORT: 5432
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
