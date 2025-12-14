@@ -1,0 +1,165 @@
+#!/usr/bin/env ts-node
+/**
+ * Script to refresh test tokens for CI/CD
+ *
+ * This script logs into Supabase with test user credentials and updates
+ * the hardcoded tokens in test/helpers/auth.helper.ts
+ *
+ * Usage:
+ *   npm run refresh-tokens
+ *   or
+ *   ts-node scripts/refresh-test-tokens.ts
+ */
+
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_ANON_KEY = process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
+
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.error('❌ Missing required environment variables:');
+  if (!SUPABASE_URL) console.error('  - SUPABASE_URL');
+  if (!SUPABASE_ANON_KEY) console.error('  - SUPABASE_KEY');
+  process.exit(1);
+}
+
+// Test user credentials from environment
+const TEST_USER = {
+  email: process.env.TEST_USER_EMAIL || 'hankhongg@gmail.com',
+  password: process.env.TEST_USER_PASSWORD,
+};
+
+const TEST_ADMIN = {
+  email: process.env.TEST_ADMIN_EMAIL || 'khonghuynhngochan@gmail.com',
+  password: process.env.TEST_ADMIN_PASSWORD,
+};
+
+if (!TEST_USER.password || !TEST_ADMIN.password) {
+  console.error('❌ Missing required environment variables:');
+  if (!TEST_USER.password) console.error('  - TEST_USER_PASSWORD');
+  if (!TEST_ADMIN.password) console.error('  - TEST_ADMIN_PASSWORD');
+  process.exit(1);
+}
+
+interface AuthResponse {
+  access_token: string;
+  user: {
+    id: string;
+    email: string;
+  };
+}
+
+async function loginToSupabase(email: string, password: string): Promise<AuthResponse> {
+  const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      apikey: SUPABASE_ANON_KEY!,
+    },
+    body: JSON.stringify({
+      email,
+      password,
+    }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(`Login failed for ${email}: ${response.status} - ${error}`);
+  }
+
+  return response.json();
+}
+
+async function refreshTokens() {
+  console.log('🔄 Refreshing test tokens...\n');
+
+  // Login both users
+  console.log('📝 Logging in test user...');
+  const userAuth = await loginToSupabase(TEST_USER.email, TEST_USER.password!);
+  console.log(`✅ User token obtained for ${userAuth.user.email}`);
+
+  console.log('📝 Logging in test admin...');
+  const adminAuth = await loginToSupabase(TEST_ADMIN.email, TEST_ADMIN.password!);
+  console.log(`✅ Admin token obtained for ${adminAuth.user.email}\n`);
+
+  // Read the auth.helper.ts file
+  const authHelperPath = join(__dirname, '..', 'test', 'helpers', 'auth.helper.ts');
+  let content = readFileSync(authHelperPath, 'utf-8');
+
+  const now = new Date();
+  const timestamp = now.toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+
+  // Decode tokens to get expiry time
+  const userPayload = JSON.parse(
+    Buffer.from(userAuth.access_token.split('.')[1], 'base64').toString(),
+  );
+  const adminPayload = JSON.parse(
+    Buffer.from(adminAuth.access_token.split('.')[1], 'base64').toString(),
+  );
+
+  const userExpiry = new Date(userPayload.exp * 1000).toLocaleString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+  const adminExpiry = new Date(adminPayload.exp * 1000).toLocaleString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
+
+  // Replace user token section
+  content = content.replace(
+    /\/\/ Regular user token - refreshed [^\n]*\nconst HARDCODED_USER_TOKEN =\s*'[^']*';/,
+    `// Regular user token - refreshed ${timestamp} (expires ${userExpiry})\nconst HARDCODED_USER_TOKEN =\n  '${userAuth.access_token}';`,
+  );
+
+  content = content.replace(
+    /const HARDCODED_USER_ID = '[^']*';/,
+    `const HARDCODED_USER_ID = '${userAuth.user.id}';`,
+  );
+
+  content = content.replace(
+    /const HARDCODED_USER_EMAIL = '[^']*';/,
+    `const HARDCODED_USER_EMAIL = '${userAuth.user.email}';`,
+  );
+
+  // Replace admin token section
+  content = content.replace(
+    /\/\/ Admin user token - refreshed [^\n]*\nconst HARDCODED_ADMIN_TOKEN =\s*'[^']*';/,
+    `// Admin user token - refreshed ${timestamp} (expires ${adminExpiry})\nconst HARDCODED_ADMIN_TOKEN =\n  '${adminAuth.access_token}';`,
+  );
+
+  content = content.replace(
+    /const HARDCODED_ADMIN_ID = '[^']*';/,
+    `const HARDCODED_ADMIN_ID = '${adminAuth.user.id}';`,
+  );
+
+  content = content.replace(
+    /const HARDCODED_ADMIN_EMAIL = '[^']*';/,
+    `const HARDCODED_ADMIN_EMAIL = '${adminAuth.user.email}';`,
+  );
+
+  // Write back to file
+  writeFileSync(authHelperPath, content, 'utf-8');
+
+  console.log('✨ Tokens refreshed successfully!');
+  console.log(`📄 Updated file: ${authHelperPath}`);
+  console.log(`\n⏰ User token expires: ${userExpiry}`);
+  console.log(`⏰ Admin token expires: ${adminExpiry}`);
+  console.log('\n💡 Tokens will be valid for approximately 1 hour.');
+}
+
+// Run the script
+refreshTokens().catch((error) => {
+  console.error('❌ Error refreshing tokens:', error);
+  process.exit(1);
+});
