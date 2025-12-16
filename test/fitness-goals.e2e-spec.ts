@@ -4,7 +4,7 @@ import { AppModule } from '../src/app.module';
 import { AuthHelper, TestUser } from './helpers/auth.helper';
 import { DatabaseHelper } from './helpers/database.helper';
 
-describe('Fitness Goals (BACKEND_GOALS_001 - BACKEND_GOALS_013)', () => {
+describe('Fitness Goals (BACKEND_GOALS_001 - BACKEND_GOALS_050)', () => {
   let app: INestApplication;
   let authHelper: AuthHelper;
   let dbHelper: DatabaseHelper;
@@ -128,7 +128,7 @@ describe('Fitness Goals (BACKEND_GOALS_001 - BACKEND_GOALS_013)', () => {
 
   // BACKEND_GOALS_005 - Test removed: API doesn't validate negative values (known limitation)
 
-  describe('BACKEND_GOALS_005 - Retrieve active goal', () => {
+  describe('BACKEND_GOALS_010 - Retrieve active goal', () => {
     it('should return current active goal (using /user endpoint)', async () => {
       const response = await authHelper
         .authenticatedRequest(testUser)
@@ -141,7 +141,7 @@ describe('Fitness Goals (BACKEND_GOALS_001 - BACKEND_GOALS_013)', () => {
     });
   });
 
-  describe('BACKEND_GOALS_006 - Retrieve goal by ID', () => {
+  describe('BACKEND_GOALS_011 - Retrieve goal by ID', () => {
     it('should return goal details', async () => {
       const response = await authHelper
         .authenticatedRequest(testUser)
@@ -152,7 +152,7 @@ describe('Fitness Goals (BACKEND_GOALS_001 - BACKEND_GOALS_013)', () => {
     });
   });
 
-  describe('BACKEND_GOALS_007 - Retrieve goal history with pagination', () => {
+  describe('BACKEND_GOALS_012 - Retrieve goal history with pagination', () => {
     it('should return user goals (pagination requires admin)', async () => {
       const response = await authHelper
         .authenticatedRequest(testUser)
@@ -164,7 +164,7 @@ describe('Fitness Goals (BACKEND_GOALS_001 - BACKEND_GOALS_013)', () => {
     });
   });
 
-  describe('BACKEND_GOALS_008 - Update goal target calories', () => {
+  describe('BACKEND_GOALS_020 - Update goal target calories', () => {
     it('should update calorie target', async () => {
       await authHelper
         .authenticatedRequest(testUser)
@@ -181,7 +181,7 @@ describe('Fitness Goals (BACKEND_GOALS_001 - BACKEND_GOALS_013)', () => {
     });
   });
 
-  describe('BACKEND_GOALS_009 - Update goal target macros', () => {
+  describe('BACKEND_GOALS_021 - Update goal target macros', () => {
     it('should update macro targets', async () => {
       await authHelper
         .authenticatedRequest(testUser)
@@ -202,7 +202,7 @@ describe('Fitness Goals (BACKEND_GOALS_001 - BACKEND_GOALS_013)', () => {
     });
   });
 
-  describe('BACKEND_GOALS_010 - Track goal progress', () => {
+  describe('BACKEND_GOALS_030 - Track goal progress', () => {
     it.skip('should calculate progress percentage (endpoint not implemented)', async () => {
       // Endpoint /fitness-goals/:id/progress doesn't exist
       const response = await authHelper
@@ -215,7 +215,7 @@ describe('Fitness Goals (BACKEND_GOALS_001 - BACKEND_GOALS_013)', () => {
     });
   });
 
-  describe('BACKEND_GOALS_011 - Mark goal as completed', () => {
+  describe('BACKEND_GOALS_040 - Mark goal as completed', () => {
     it.skip('should set is_completed to true (endpoint not implemented)', async () => {
       // Endpoint /fitness-goals/:id/complete doesn't exist
       // Entity doesn't have is_completed field
@@ -228,7 +228,7 @@ describe('Fitness Goals (BACKEND_GOALS_001 - BACKEND_GOALS_013)', () => {
     });
   });
 
-  describe('BACKEND_GOALS_012 - Mark goal as abandoned', () => {
+  describe('BACKEND_GOALS_041 - Mark goal as abandoned', () => {
     it.skip('should set is_active to false (endpoint not implemented)', async () => {
       // Endpoint /fitness-goals/:id/abandon doesn't exist
       // Entity doesn't have is_active field
@@ -252,7 +252,7 @@ describe('Fitness Goals (BACKEND_GOALS_001 - BACKEND_GOALS_013)', () => {
     });
   });
 
-  describe('BACKEND_GOALS_013 - Delete goal', () => {
+  describe('BACKEND_GOALS_050 - Delete goal', () => {
     it('should soft delete goal', async () => {
       const response = await authHelper
         .authenticatedRequest(testUser)

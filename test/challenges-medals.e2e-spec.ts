@@ -4,7 +4,7 @@ import { AppModule } from '../src/app.module';
 import { AuthHelper, TestUser } from './helpers/auth.helper';
 import { DatabaseHelper } from './helpers/database.helper';
 
-describe('Challenges & Medals (BACKEND_CHALLENGE_001 - BACKEND_CHALLENGE_006)', () => {
+describe('Challenges & Medals (BACKEND_CHALLENGE_001 - BACKEND_CHALLENGE_080)', () => {
   let app: INestApplication;
   let authHelper: AuthHelper;
   let dbHelper: DatabaseHelper;
@@ -104,7 +104,7 @@ describe('Challenges & Medals (BACKEND_CHALLENGE_001 - BACKEND_CHALLENGE_006)', 
   //   });
   // });
 
-  describe('BACKEND_CHALLENGE_003 - Check challenge progress for user', () => {
+  describe('BACKEND_CHALLENGE_033 - Check challenge progress for user', () => {
     it('should return progress percentage', async () => {
       const response = await authHelper
         .authenticatedRequest(regularUser)
@@ -115,7 +115,7 @@ describe('Challenges & Medals (BACKEND_CHALLENGE_001 - BACKEND_CHALLENGE_006)', 
     });
   });
 
-  describe('BACKEND_CHALLENGE_004 - Check activity log progress within challenge', () => {
+  describe('BACKEND_CHALLENGE_034 - Check activity log progress within challenge', () => {
     it('should return progress for specific activity record', async () => {
       // Get activity record ID from challenge
       const challengeData = await authHelper
@@ -136,7 +136,7 @@ describe('Challenges & Medals (BACKEND_CHALLENGE_001 - BACKEND_CHALLENGE_006)', 
   });
 
   // Medal tests
-  describe('BACKEND_CHALLENGE_005 - Admin creates medal', () => {
+  describe('BACKEND_CHALLENGE_051 - Admin creates medal', () => {
     it('should create medal with icon', async () => {
       const medalData = {
         name: 'Bronze Step Master',
@@ -155,7 +155,7 @@ describe('Challenges & Medals (BACKEND_CHALLENGE_001 - BACKEND_CHALLENGE_006)', 
     });
   });
 
-  describe('BACKEND_CHALLENGE_006 - Retrieve all medals', () => {
+  describe('BACKEND_CHALLENGE_056 - Retrieve all medals', () => {
     it('should return all medals', async () => {
       const response = await authHelper
         .authenticatedRequest(regularUser)

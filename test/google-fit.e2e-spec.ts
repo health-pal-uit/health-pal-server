@@ -4,7 +4,7 @@ import { AppModule } from '../src/app.module';
 import { AuthHelper, TestUser } from './helpers/auth.helper';
 import { DatabaseHelper } from './helpers/database.helper';
 
-describe('Google Fit Integration (BACKEND_GFIT_001 - BACKEND_GFIT_003)', () => {
+describe('Google Fit Integration (BACKEND_GFIT_001 - BACKEND_GFIT_010)', () => {
   let app: INestApplication;
   let authHelper: AuthHelper;
   let dbHelper: DatabaseHelper;

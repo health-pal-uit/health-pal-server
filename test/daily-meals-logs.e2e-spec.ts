@@ -5,7 +5,7 @@ import { AppModule } from '../src/app.module';
 import { AuthHelper, TestUser } from './helpers/auth.helper';
 import { DatabaseHelper } from './helpers/database.helper';
 
-describe('Daily Meals & Logs (BACKEND_LOGS_001 - BACKEND_LOGS_007)', () => {
+describe('Daily Meals & Logs (BACKEND_LOGS_001 - BACKEND_LOGS_050)', () => {
   let app: INestApplication;
   let authHelper: AuthHelper;
   let dbHelper: DatabaseHelper;
@@ -80,13 +80,13 @@ describe('Daily Meals & Logs (BACKEND_LOGS_001 - BACKEND_LOGS_007)', () => {
   //   });
   // });
 
-  describe('BACKEND_LOGS_001 - NO POST /daily-logs endpoint exists (FAIL)', () => {
+  describe('BACKEND_LOGS_002 - NO POST /daily-logs endpoint exists (FAIL)', () => {
     it('should return 404 when trying to POST directly to /daily-logs', async () => {
       await authHelper.authenticatedRequest(testUser).post('/daily-logs').send({}).expect(404);
     });
   });
 
-  describe('BACKEND_LOGS_002 - Add multiple food items to log', () => {
+  describe('BACKEND_LOGS_003 - Add multiple food items to log', () => {
     it('should add multiple meals and recalculate totals', async () => {
       const meals = [
         {
@@ -114,7 +114,7 @@ describe('Daily Meals & Logs (BACKEND_LOGS_001 - BACKEND_LOGS_007)', () => {
     });
   });
 
-  describe('BACKEND_LOGS_003 - Retrieve specific daily log by ID', () => {
+  describe('BACKEND_LOGS_016 - Retrieve specific daily log by ID', () => {
     it('should return log details with meals', async () => {
       // Get user's logs
       const logsResponse = await authHelper
@@ -136,7 +136,7 @@ describe('Daily Meals & Logs (BACKEND_LOGS_001 - BACKEND_LOGS_007)', () => {
     });
   });
 
-  describe("BACKEND_LOGS_004 - Retrieve user's log history with pagination", () => {
+  describe("BACKEND_LOGS_017 - Retrieve user's log history with pagination", () => {
     it('should return paginated logs', async () => {
       const response = await authHelper
         .authenticatedRequest(testUser)
@@ -148,7 +148,7 @@ describe('Daily Meals & Logs (BACKEND_LOGS_001 - BACKEND_LOGS_007)', () => {
     });
   });
 
-  describe('BACKEND_LOGS_005 - Update daily log fields', () => {
+  describe('BACKEND_LOGS_018 - Update daily log fields', () => {
     it('should update water, steps, sleep', async () => {
       // Get a log first
       const logsResponse = await authHelper
@@ -177,7 +177,7 @@ describe('Daily Meals & Logs (BACKEND_LOGS_001 - BACKEND_LOGS_007)', () => {
     });
   });
 
-  describe("BACKEND_LOGS_006 - Cannot modify another user's log (FAIL)", () => {
+  describe("BACKEND_LOGS_030 - Cannot modify another user's log (FAIL)", () => {
     it("should return 403 when trying to modify another user's log", async () => {
       const otherUser = await authHelper.createTestUser('other-log@example.com');
 
@@ -204,7 +204,7 @@ describe('Daily Meals & Logs (BACKEND_LOGS_001 - BACKEND_LOGS_007)', () => {
     });
   });
 
-  describe("BACKEND_LOGS_007 - Cannot delete another user's food entry (FAIL)", () => {
+  describe("BACKEND_LOGS_031 - Cannot delete another user's food entry (FAIL)", () => {
     it("should return 403 when trying to delete another user's daily meal", async () => {
       const otherUser = await authHelper.createTestUser('other-meal@example.com');
 

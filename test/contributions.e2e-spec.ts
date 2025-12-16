@@ -4,7 +4,7 @@ import { AppModule } from '../src/app.module';
 import { AuthHelper, TestUser } from './helpers/auth.helper';
 import { DatabaseHelper } from './helpers/database.helper';
 
-describe('Contributions (BACKEND_CONTRIB_001 - BACKEND_CONTRIB_008)', () => {
+describe('Contributions (BACKEND_CONTRIB_001 - BACKEND_CONTRIB_080)', () => {
   let app: INestApplication;
   let authHelper: AuthHelper;
   let dbHelper: DatabaseHelper;
@@ -61,7 +61,7 @@ describe('Contributions (BACKEND_CONTRIB_001 - BACKEND_CONTRIB_008)', () => {
     });
   });
 
-  describe('BACKEND_CONTRIB_002 - User retrieves own contributions only', () => {
+  describe('BACKEND_CONTRIB_013 - User retrieves own contributions only', () => {
     it("should return only user's contributions", async () => {
       const response = await authHelper
         .authenticatedRequest(regularUser)
@@ -76,7 +76,7 @@ describe('Contributions (BACKEND_CONTRIB_001 - BACKEND_CONTRIB_008)', () => {
     });
   });
 
-  describe('BACKEND_CONTRIB_003 - Admin retrieves all contributions with pagination', () => {
+  describe('BACKEND_CONTRIB_014 - Admin retrieves all contributions with pagination', () => {
     it('should return all contributions for admin', async () => {
       const response = await authHelper
         .authenticatedRequest(adminUser)
@@ -89,7 +89,7 @@ describe('Contributions (BACKEND_CONTRIB_001 - BACKEND_CONTRIB_008)', () => {
     });
   });
 
-  describe('BACKEND_CONTRIB_004 - Update own PENDING contribution', () => {
+  describe('BACKEND_CONTRIB_015 - Update own PENDING contribution', () => {
     it('should update contribution data', async () => {
       // Create contribution first
       const created = await authHelper
@@ -111,7 +111,7 @@ describe('Contributions (BACKEND_CONTRIB_001 - BACKEND_CONTRIB_008)', () => {
     });
   });
 
-  describe('BACKEND_CONTRIB_005 - Admin approves ingredient contribution', () => {
+  describe('BACKEND_CONTRIB_025 - Admin approves ingredient contribution', () => {
     it('should change status to APPROVED and create ingredient', async () => {
       // Create contribution
       const created = await authHelper
@@ -132,7 +132,7 @@ describe('Contributions (BACKEND_CONTRIB_001 - BACKEND_CONTRIB_008)', () => {
     });
   });
 
-  describe('BACKEND_CONTRIB_006 - Admin rejects ingredient contribution', () => {
+  describe('BACKEND_CONTRIB_030 - Admin rejects ingredient contribution', () => {
     it('should change status to REJECTED with reason', async () => {
       // Create contribution
       const created = await authHelper
@@ -155,7 +155,7 @@ describe('Contributions (BACKEND_CONTRIB_001 - BACKEND_CONTRIB_008)', () => {
     });
   });
 
-  describe('BACKEND_CONTRIB_007 - Contribution name required', () => {
+  describe('BACKEND_CONTRIB_003 - Contribution name required', () => {
     it('should return 400 without name', async () => {
       await authHelper
         .authenticatedRequest(regularUser)
@@ -165,7 +165,7 @@ describe('Contributions (BACKEND_CONTRIB_001 - BACKEND_CONTRIB_008)', () => {
     });
   });
 
-  describe('BACKEND_CONTRIB_008 - Contribution kcal must be positive', () => {
+  describe('BACKEND_CONTRIB_004 - Contribution kcal must be positive', () => {
     it('should return 400 for negative calories', async () => {
       await authHelper
         .authenticatedRequest(regularUser)

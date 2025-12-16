@@ -4,7 +4,7 @@ import { AppModule } from '../src/app.module';
 import { AuthHelper, TestUser } from './helpers/auth.helper';
 import { DatabaseHelper } from './helpers/database.helper';
 
-describe('Ingredients (BACKEND_INGRED_001 - BACKEND_INGRED_011)', () => {
+describe('Ingredients (BACKEND_INGRED_001 - BACKEND_INGRED_050)', () => {
   let app: INestApplication;
   let authHelper: AuthHelper;
   let dbHelper: DatabaseHelper;
@@ -102,7 +102,7 @@ describe('Ingredients (BACKEND_INGRED_001 - BACKEND_INGRED_011)', () => {
     });
   });
 
-  describe('BACKEND_INGRED_005 - Search ingredients by name', () => {
+  describe('BACKEND_INGRED_010 - Search ingredients by name', () => {
     it('should return ingredients matching query', async () => {
       const response = await authHelper
         .authenticatedRequest(regularUser)
@@ -116,7 +116,7 @@ describe('Ingredients (BACKEND_INGRED_001 - BACKEND_INGRED_011)', () => {
     });
   });
 
-  describe('BACKEND_INGRED_006 - Search ingredients with pagination', () => {
+  describe('BACKEND_INGRED_011 - Search ingredients with pagination', () => {
     it('should return paginated results', async () => {
       const response = await authHelper
         .authenticatedRequest(regularUser)
@@ -150,7 +150,7 @@ describe('Ingredients (BACKEND_INGRED_001 - BACKEND_INGRED_011)', () => {
   //   });
   // });
 
-  describe('BACKEND_INGRED_007 - Get ingredient with invalid UUID', () => {
+  describe('BACKEND_INGRED_013 - Get ingredient with invalid UUID', () => {
     it('should return 404', async () => {
       await authHelper
         .authenticatedRequest(regularUser)
@@ -172,7 +172,7 @@ describe('Ingredients (BACKEND_INGRED_001 - BACKEND_INGRED_011)', () => {
   //   });
   // });
 
-  describe('BACKEND_INGRED_008 - User cannot update ingredient (FAIL)', () => {
+  describe('BACKEND_INGRED_021 - User cannot update ingredient (FAIL)', () => {
     it('should return 403 for non-admin', async () => {
       await authHelper
         .authenticatedRequest(regularUser)
@@ -198,7 +198,7 @@ describe('Ingredients (BACKEND_INGRED_001 - BACKEND_INGRED_011)', () => {
   //   });
   // });
 
-  describe("BACKEND_INGRED_009 - Retrieve user's favorite ingredients", () => {
+  describe("BACKEND_INGRED_031 - Retrieve user's favorite ingredients", () => {
     it('should return favorites list', async () => {
       const response = await authHelper
         .authenticatedRequest(regularUser)
@@ -211,7 +211,7 @@ describe('Ingredients (BACKEND_INGRED_001 - BACKEND_INGRED_011)', () => {
     });
   });
 
-  describe('BACKEND_INGRED_010 - Remove ingredient from favorites', () => {
+  describe('BACKEND_INGRED_032 - Remove ingredient from favorites', () => {
     it('should delete favorite', async () => {
       // Get favorite ID
       const favorites = await authHelper.authenticatedRequest(regularUser).get('/fav-ingres/user');
@@ -237,7 +237,7 @@ describe('Ingredients (BACKEND_INGRED_001 - BACKEND_INGRED_011)', () => {
   //   });
   // });
 
-  describe('BACKEND_INGRED_011 - User cannot delete ingredient (FAIL)', () => {
+  describe('BACKEND_INGRED_041 - User cannot delete ingredient (FAIL)', () => {
     it('should return 403 for non-admin', async () => {
       // Create new ingredient to delete
       const newIngredient = await authHelper

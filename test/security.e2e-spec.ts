@@ -4,7 +4,7 @@ import { AppModule } from '../src/app.module';
 import { AuthHelper, TestUser } from './helpers/auth.helper';
 import { DatabaseHelper } from './helpers/database.helper';
 
-describe('Security Tests (BACKEND_SEC_001 - BACKEND_SEC_009)', () => {
+describe('Security Tests (BACKEND_SEC_001 - BACKEND_SEC_068)', () => {
   let app: INestApplication;
   let authHelper: AuthHelper;
   let dbHelper: DatabaseHelper;
@@ -52,19 +52,19 @@ describe('Security Tests (BACKEND_SEC_001 - BACKEND_SEC_009)', () => {
   });
 
   //
-  describe('BACKEND_SEC_003 - User cannot access admin-only endpoint', () => {
+  describe('BACKEND_SEC_010 - User cannot access admin-only endpoint', () => {
     it('should return 403 for user accessing admin route', async () => {
       await authHelper.authenticatedRequest(testUser).get('/admin-reports/users').expect(404);
     });
   });
   //
-  describe('BACKEND_SEC_004 - Admin can access admin-only endpoint', () => {
+  describe('BACKEND_SEC_011 - Admin can access admin-only endpoint', () => {
     it('should allow admin to access admin route', async () => {
       await authHelper.authenticatedRequest(adminUser).get('/admin-reports/users').expect(404);
     });
   });
   //
-  describe("BACKEND_SEC_005 - User cannot access other user's data", () => {
+  describe("BACKEND_SEC_020 - User cannot access other user's data", () => {
     it('should return 403 when accessing other user resources', async () => {
       const otherUser = await authHelper.createTestUser('other@example.com');
 
@@ -100,7 +100,7 @@ describe('Security Tests (BACKEND_SEC_001 - BACKEND_SEC_009)', () => {
   //   });
   // });
 
-  describe('BACKEND_SEC_006 - Password not exposed in API responses', () => {
+  describe('BACKEND_SEC_050 - Password not exposed in API responses', () => {
     it('should not return password field', async () => {
       const response = await authHelper.authenticatedRequest(testUser).get('/users/me').expect(200);
 
@@ -109,7 +109,7 @@ describe('Security Tests (BACKEND_SEC_001 - BACKEND_SEC_009)', () => {
     });
   });
   //
-  describe('BACKEND_SEC_007 - File upload validation', () => {
+  describe('BACKEND_SEC_060 - File upload validation', () => {
     it('should reject non-image files', async () => {
       await authHelper
         .authenticatedRequest(testUser)
@@ -121,7 +121,7 @@ describe('Security Tests (BACKEND_SEC_001 - BACKEND_SEC_009)', () => {
     });
   });
   //
-  describe('BACKEND_SEC_008 - File size limit enforced', () => {
+  describe('BACKEND_SEC_061 - File size limit enforced', () => {
     it('should reject oversized files', async () => {
       const largeFile = Buffer.alloc(20 * 1024 * 1024); // 20MB
       await authHelper
@@ -134,7 +134,7 @@ describe('Security Tests (BACKEND_SEC_001 - BACKEND_SEC_009)', () => {
     });
   });
   //
-  describe('BACKEND_SEC_009 - API versioning header required', () => {
+  describe('BACKEND_SEC_068 - API versioning header required', () => {
     it('should handle API version in header', async () => {
       const request = authHelper.getApp();
       await request.get('/health').set('X-API-Version', 'v1').expect(200);

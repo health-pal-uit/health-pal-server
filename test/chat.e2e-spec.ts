@@ -4,7 +4,7 @@ import { AppModule } from '../src/app.module';
 import { AuthHelper, TestUser } from './helpers/auth.helper';
 import { DatabaseHelper } from './helpers/database.helper';
 
-describe('Chat & Messaging (BACKEND_CHAT_001 - BACKEND_CHAT_010)', () => {
+describe('Chat & Messaging (BACKEND_CHAT_001 - BACKEND_CHAT_060)', () => {
   let app: INestApplication;
   let authHelper: AuthHelper;
   let dbHelper: DatabaseHelper;
@@ -84,7 +84,7 @@ describe('Chat & Messaging (BACKEND_CHAT_001 - BACKEND_CHAT_010)', () => {
     });
   });
 
-  describe("BACKEND_CHAT_004 - Retrieve user's chat sessions", () => {
+  describe("BACKEND_CHAT_007 - Retrieve user's chat sessions", () => {
     it('should return sessions for user', async () => {
       const response = await authHelper
         .authenticatedRequest(user1)
@@ -95,7 +95,7 @@ describe('Chat & Messaging (BACKEND_CHAT_001 - BACKEND_CHAT_010)', () => {
     });
   });
 
-  describe('BACKEND_CHAT_005 - Send text message in session', () => {
+  describe('BACKEND_CHAT_014 - Send text message in session', () => {
     it('should create message', async () => {
       const response = await authHelper
         .authenticatedRequest(user1)
@@ -112,7 +112,7 @@ describe('Chat & Messaging (BACKEND_CHAT_001 - BACKEND_CHAT_010)', () => {
     });
   });
 
-  describe('BACKEND_CHAT_006 - Message content required (FAIL)', () => {
+  describe('BACKEND_CHAT_015 - Message content required (FAIL)', () => {
     it('should return 400 without content', async () => {
       await authHelper
         .authenticatedRequest(user1)
@@ -126,7 +126,7 @@ describe('Chat & Messaging (BACKEND_CHAT_001 - BACKEND_CHAT_010)', () => {
     });
   });
 
-  describe('BACKEND_CHAT_007 - Send message with image attachment', () => {
+  describe('BACKEND_CHAT_017 - Send message with image attachment', () => {
     it('should upload image and create message', async () => {
       const response = await authHelper
         .authenticatedRequest(user1)
@@ -141,7 +141,7 @@ describe('Chat & Messaging (BACKEND_CHAT_001 - BACKEND_CHAT_010)', () => {
     });
   });
 
-  describe('BACKEND_CHAT_008 - Retrieve messages for session', () => {
+  describe('BACKEND_CHAT_020 - Retrieve messages for session', () => {
     it('should return messages with pagination', async () => {
       const response = await authHelper
         .authenticatedRequest(user1)
@@ -152,7 +152,7 @@ describe('Chat & Messaging (BACKEND_CHAT_001 - BACKEND_CHAT_010)', () => {
     });
   });
 
-  describe('BACKEND_CHAT_009 - Messages paginated', () => {
+  describe('BACKEND_CHAT_021 - Messages paginated', () => {
     it('should return paginated messages', async () => {
       const response = await authHelper
         .authenticatedRequest(user1)
@@ -163,7 +163,7 @@ describe('Chat & Messaging (BACKEND_CHAT_001 - BACKEND_CHAT_010)', () => {
     });
   });
 
-  describe('BACKEND_CHAT_010 - Update sent message (edit)', () => {
+  describe('BACKEND_CHAT_027 - Update sent message (edit)', () => {
     it('should edit message content', async () => {
       // Send message first
       const sent = await authHelper.authenticatedRequest(user1).post('/chat-messages').send({

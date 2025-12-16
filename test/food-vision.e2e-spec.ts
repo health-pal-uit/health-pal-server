@@ -4,7 +4,7 @@ import { AppModule } from '../src/app.module';
 import { AuthHelper } from './helpers/auth.helper';
 import { DatabaseHelper } from './helpers/database.helper';
 
-describe('Food Vision AI (BACKEND_VISION_001 - BACKEND_VISION_002)', () => {
+describe('Food Vision AI (BACKEND_VISION_001 - BACKEND_VISION_010)', () => {
   let app: INestApplication;
   let authHelper: AuthHelper;
   let dbHelper: DatabaseHelper;
