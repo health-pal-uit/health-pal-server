@@ -82,6 +82,8 @@ jobs:
         run: npm run seed-test-users
       - name: Get fresh tokens and add to .env.test
         run: |
+          echo "🔄 Fetching fresh tokens..."
+
           USER_RESPONSE=$(curl -s -X POST "${{ secrets.SUPABASE_URL }}/auth/v1/token?grant_type=password" \
             -H "Content-Type: application/json" \
             -H "apikey: ${{ secrets.SUPABASE_KEY }}" \
@@ -95,11 +97,25 @@ jobs:
           USER_TOKEN=$(echo $USER_RESPONSE | jq -r '.access_token')
           ADMIN_TOKEN=$(echo $ADMIN_RESPONSE | jq -r '.access_token')
 
+          if [ "$USER_TOKEN" == "null" ] || [ -z "$USER_TOKEN" ]; then
+            echo "❌ Failed to get user token"
+            echo "Response: $USER_RESPONSE"
+            exit 1
+          fi
+
+          if [ "$ADMIN_TOKEN" == "null" ] || [ -z "$ADMIN_TOKEN" ]; then
+            echo "❌ Failed to get admin token"
+            echo "Response: $ADMIN_RESPONSE"
+            exit 1
+          fi
+
           echo "" >> .env.test
           echo "TEST_USER_TOKEN=$USER_TOKEN" >> .env.test
           echo "TEST_ADMIN_TOKEN=$ADMIN_TOKEN" >> .env.test
 
           echo "✅ Fresh tokens written to .env.test"
+          echo "📝 User token: ${USER_TOKEN:0:20}..."
+          echo "📝 Admin token: ${ADMIN_TOKEN:0:20}..."
       - run: npm run test:e2e
       - name: Stop Docker Compose services
         if: always()
