@@ -80,8 +80,26 @@ jobs:
       - run: npm ci
       - name: Seed test users in Supabase
         run: npm run seed-test-users
-      - name: Refresh test tokens
-        run: npm run refresh-tokens
+      - name: Get fresh tokens and add to .env.test
+        run: |
+          USER_RESPONSE=$(curl -s -X POST "${{ secrets.SUPABASE_URL }}/auth/v1/token?grant_type=password" \
+            -H "Content-Type: application/json" \
+            -H "apikey: ${{ secrets.SUPABASE_KEY }}" \
+            -d "{\"email\":\"$TEST_USER_EMAIL\",\"password\":\"$TEST_USER_PASSWORD\"}")
+
+          ADMIN_RESPONSE=$(curl -s -X POST "${{ secrets.SUPABASE_URL }}/auth/v1/token?grant_type=password" \
+            -H "Content-Type: application/json" \
+            -H "apikey: ${{ secrets.SUPABASE_KEY }}" \
+            -d "{\"email\":\"$TEST_ADMIN_EMAIL\",\"password\":\"$TEST_ADMIN_PASSWORD\"}")
+
+          USER_TOKEN=$(echo $USER_RESPONSE | jq -r '.access_token')
+          ADMIN_TOKEN=$(echo $ADMIN_RESPONSE | jq -r '.access_token')
+
+          echo "" >> .env.test
+          echo "TEST_USER_TOKEN=$USER_TOKEN" >> .env.test
+          echo "TEST_ADMIN_TOKEN=$ADMIN_TOKEN" >> .env.test
+
+          echo "✅ Fresh tokens written to .env.test"
       - run: npm run test:e2e
       - name: Stop Docker Compose services
         if: always()
