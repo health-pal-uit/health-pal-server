@@ -11,6 +11,19 @@ export interface TestUser {
 // ========================================
 // TOKEN CONFIGURATION - Env vars take priority over hardcoded tokens
 // ========================================
+// Debug: Log if env tokens are available
+if (process.env.TEST_USER_TOKEN) {
+  console.log('✅ Using TEST_USER_TOKEN from environment');
+} else {
+  console.log('⚠️  TEST_USER_TOKEN not found, using hardcoded fallback (may be expired)');
+}
+
+if (process.env.TEST_ADMIN_TOKEN) {
+  console.log('✅ Using TEST_ADMIN_TOKEN from environment');
+} else {
+  console.log('⚠️  TEST_ADMIN_TOKEN not found, using hardcoded fallback (may be expired)');
+}
+
 // Regular user token - fallback: refreshed Dec 14, 2025 02:40 AM (expires 03:40 AM)
 const HARDCODED_USER_TOKEN =
   process.env.TEST_USER_TOKEN ||
