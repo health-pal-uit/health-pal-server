@@ -78,6 +78,14 @@ export class PostsController {
     return posts.map((p) => ({ ...p, user_id: p.user?.id }));
   }
 
+  @Get('deleted-posts')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get deleted posts with pagination' })
+  @ApiResponse({ status: 200, description: 'List of deleted posts' })
+  async findDeleted(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
+    return await this.postsService.findDeleted(page, limit);
+  }
+
   @Get()
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Get all posts with pagination' })

@@ -23,6 +23,17 @@ export class ActivitiesService {
     });
   }
 
+  async searchByName(name: string, page: number = 1, limit: number = 10): Promise<Activity[]> {
+    const skip = (page - 1) * limit;
+    return await this.activitiesRepository
+      .createQueryBuilder('activity')
+      .where('activity.name ILIKE :name', { name: `%${name}%` })
+      .andWhere('activity.deleted_at IS NULL')
+      .skip(skip)
+      .take(limit)
+      .getMany();
+  }
+
   async findOne(id: string): Promise<Activity> {
     const activity = await this.activitiesRepository.findOne({
       where: { id, deleted_at: IsNull() },

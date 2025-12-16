@@ -4,7 +4,7 @@ import { AppModule } from '../src/app.module';
 import { AuthHelper, TestUser } from './helpers/auth.helper';
 import { DatabaseHelper } from './helpers/database.helper';
 
-describe('Social Features - Posts (BACKEND_SOCIAL_001 - BACKEND_SOCIAL_050)', () => {
+describe('Social Features - Posts (BACKEND_SOCIAL_001 - BACKEND_SOCIAL_011)', () => {
   let app: INestApplication;
   let authHelper: AuthHelper;
   let dbHelper: DatabaseHelper;
@@ -85,7 +85,7 @@ describe('Social Features - Posts (BACKEND_SOCIAL_001 - BACKEND_SOCIAL_050)', ()
     });
   });
 
-  describe('BACKEND_SOCIAL_010 - Retrieve feed posts with pagination', () => {
+  describe('BACKEND_SOCIAL_004 - Retrieve feed posts with pagination', () => {
     it('should return posts', async () => {
       const response = await authHelper
         .authenticatedRequest(user1)
@@ -96,7 +96,7 @@ describe('Social Features - Posts (BACKEND_SOCIAL_001 - BACKEND_SOCIAL_050)', ()
     });
   });
 
-  describe("BACKEND_SOCIAL_011 - Retrieve user's own posts", () => {
+  describe("BACKEND_SOCIAL_005 - Retrieve user's own posts", () => {
     it("should return only user's posts", async () => {
       const response = await authHelper
         .authenticatedRequest(user1)
@@ -162,7 +162,7 @@ describe('Social Features - Posts (BACKEND_SOCIAL_001 - BACKEND_SOCIAL_050)', ()
   //   });
   // });
 
-  describe('BACKEND_SOCIAL_031 - User unlikes post', () => {
+  describe('BACKEND_SOCIAL_006 - User unlikes post', () => {
     it('should remove like', async () => {
       // Get like ID
       const likes = await authHelper.authenticatedRequest(user2).get(`/likes?post_id=${postId}`);
@@ -173,7 +173,7 @@ describe('Social Features - Posts (BACKEND_SOCIAL_001 - BACKEND_SOCIAL_050)', ()
     });
   });
 
-  describe('BACKEND_SOCIAL_032 - Get likes count for post', () => {
+  describe('BACKEND_SOCIAL_007 - Get likes count for post', () => {
     it('should return likes count', async () => {
       const response = await authHelper
         .authenticatedRequest(user1)
@@ -184,7 +184,7 @@ describe('Social Features - Posts (BACKEND_SOCIAL_001 - BACKEND_SOCIAL_050)', ()
     });
   });
 
-  describe('BACKEND_SOCIAL_040 - User comments on post', () => {
+  describe('BACKEND_SOCIAL_008 - User comments on post', () => {
     it('should create comment', async () => {
       const response = await authHelper
         .authenticatedRequest(user2)
@@ -200,7 +200,7 @@ describe('Social Features - Posts (BACKEND_SOCIAL_001 - BACKEND_SOCIAL_050)', ()
     });
   });
 
-  describe('BACKEND_SOCIAL_041 - Comment content required (FAIL)', () => {
+  describe('BACKEND_SOCIAL_009 - Comment content required (FAIL)', () => {
     it('should return 400 without content', async () => {
       await authHelper
         .authenticatedRequest(user2)
@@ -213,7 +213,7 @@ describe('Social Features - Posts (BACKEND_SOCIAL_001 - BACKEND_SOCIAL_050)', ()
     });
   });
 
-  describe('BACKEND_SOCIAL_042 - Get comments for post', () => {
+  describe('BACKEND_SOCIAL_010 - Get comments for post', () => {
     it('should return comments', async () => {
       const response = await authHelper
         .authenticatedRequest(user1)
@@ -224,7 +224,7 @@ describe('Social Features - Posts (BACKEND_SOCIAL_001 - BACKEND_SOCIAL_050)', ()
     });
   });
 
-  describe('BACKEND_SOCIAL_050 - Delete own post', () => {
+  describe('BACKEND_SOCIAL_011 - Delete own post', () => {
     it('should soft delete post', async () => {
       const response = await authHelper
         .authenticatedRequest(user1)

@@ -113,7 +113,13 @@ export class UsersService {
   }
 
   async remove(id: string) {
-    return await this.userRepository.delete(id);
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    user.deactivated_at = new Date();
+    await this.userRepository.save(user);
+    return user;
   }
 
   async getUserMedals(userId: string) {

@@ -4,7 +4,7 @@ import { AppModule } from '../src/app.module';
 import { AuthHelper, TestUser } from './helpers/auth.helper';
 import { DatabaseHelper } from './helpers/database.helper';
 
-describe('Meals Management (BACKEND_MEALS_001 - BACKEND_MEALS_050)', () => {
+describe('Meals Management (BACKEND_MEALS_001 - BACKEND_MEALS_009)', () => {
   let app: INestApplication;
   let authHelper: AuthHelper;
   let dbHelper: DatabaseHelper;
@@ -133,7 +133,7 @@ describe('Meals Management (BACKEND_MEALS_001 - BACKEND_MEALS_050)', () => {
   //   });
   // });
 
-  describe('BACKEND_MEALS_006 - Retrieve meal by ID', () => {
+  describe('BACKEND_MEALS_002 - Retrieve meal by ID', () => {
     it('should return meal details', async () => {
       const created = await authHelper.authenticatedRequest(adminUser).post('/meals').send({
         name: 'Test Meal',
@@ -154,7 +154,7 @@ describe('Meals Management (BACKEND_MEALS_001 - BACKEND_MEALS_050)', () => {
     });
   });
 
-  describe('BACKEND_MEALS_007 - 404 for non-existent meal', () => {
+  describe('BACKEND_MEALS_003 - 404 for non-existent meal', () => {
     it('should return 404 for invalid UUID', async () => {
       await authHelper
         .authenticatedRequest(regularUser)
@@ -163,7 +163,7 @@ describe('Meals Management (BACKEND_MEALS_001 - BACKEND_MEALS_050)', () => {
     });
   });
 
-  describe('BACKEND_MEALS_008 - Admin updates meal nutrition', () => {
+  describe('BACKEND_MEALS_004 - Admin updates meal nutrition', () => {
     it('should update meal nutrition data', async () => {
       const created = await authHelper.authenticatedRequest(adminUser).post('/meals').send({
         name: 'Updatable Meal',
@@ -183,7 +183,7 @@ describe('Meals Management (BACKEND_MEALS_001 - BACKEND_MEALS_050)', () => {
     });
   });
 
-  describe('BACKEND_MEALS_009 - User cannot create meal (FAIL)', () => {
+  describe('BACKEND_MEALS_005 - User cannot create meal (FAIL)', () => {
     it('should return 403 for non-admin user', async () => {
       const mealData = {
         name: 'Unauthorized Meal',
@@ -220,7 +220,7 @@ describe('Meals Management (BACKEND_MEALS_001 - BACKEND_MEALS_050)', () => {
   //   });
   // });
 
-  describe('BACKEND_MEALS_011 - User cannot delete meal (FAIL)', () => {
+  describe('BACKEND_MEALS_006 - User cannot delete meal (FAIL)', () => {
     it('should return 403 for non-admin user', async () => {
       const created = await authHelper.authenticatedRequest(adminUser).post('/meals').send({
         name: 'Protected Meal',
@@ -237,7 +237,7 @@ describe('Meals Management (BACKEND_MEALS_001 - BACKEND_MEALS_050)', () => {
     });
   });
 
-  describe('BACKEND_MEALS_012 - Meal name required validation', () => {
+  describe('BACKEND_MEALS_007 - Meal name required validation', () => {
     it('should return 400 without name', async () => {
       const invalidData = {
         // name missing
@@ -251,7 +251,7 @@ describe('Meals Management (BACKEND_MEALS_001 - BACKEND_MEALS_050)', () => {
     });
   });
 
-  describe('BACKEND_MEALS_013 - Meal kcal must be positive', () => {
+  describe('BACKEND_MEALS_008 - Meal kcal must be positive', () => {
     it('should return 400 for negative calories', async () => {
       const invalidData = {
         name: 'Invalid Meal',
@@ -272,7 +272,7 @@ describe('Meals Management (BACKEND_MEALS_001 - BACKEND_MEALS_050)', () => {
   });
 
   // Add pagination tests
-  describe('BACKEND_MEALS_005 - Meal pagination', () => {
+  describe('BACKEND_MEALS_009 - Meal pagination', () => {
     it('should return paginated meals', async () => {
       const response = await authHelper
         .authenticatedRequest(regularUser)

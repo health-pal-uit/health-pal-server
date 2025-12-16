@@ -4,7 +4,7 @@ import { AppModule } from '../src/app.module';
 import { AuthHelper, TestUser } from './helpers/auth.helper';
 import { DatabaseHelper } from './helpers/database.helper';
 
-describe('Activities (BACKEND_ACTIVITY_001 - BACKEND_ACTIVITY_070)', () => {
+describe('Activities (BACKEND_ACTIVITY_001 - BACKEND_ACTIVITY_007)', () => {
   let app: INestApplication;
   let authHelper: AuthHelper;
   let dbHelper: DatabaseHelper;
@@ -106,20 +106,19 @@ describe('Activities (BACKEND_ACTIVITY_001 - BACKEND_ACTIVITY_070)', () => {
     });
   });
 
-  // COMMENTED OUT - Non-auth failure: Missing /activities/search endpoint
-  // describe('BACKEND_ACTIVITY_010 - Search activities by name', () => {
-  //   it('should return activities matching query', async () => {
-  //     const response = await authHelper
-  //       .authenticatedRequest(testUser)
-  //       .post('/activities/search')
-  //       .send({ name: 'running' })
-  //       .expect(200);
+  describe('BACKEND_ACTIVITY_005 - Search activities by name', () => {
+    it('should return activities matching query', async () => {
+      const response = await authHelper
+        .authenticatedRequest(testUser)
+        .post('/activities/search')
+        .send({ name: 'running' })
+        .expect(200);
 
-  //     expect(Array.isArray(response.body)).toBe(true);
-  //   });
-  // });
+      expect(Array.isArray(response.body)).toBe(true);
+    });
+  });
 
-  describe('BACKEND_ACTIVITY_011 - Get activity by ID', () => {
+  describe('BACKEND_ACTIVITY_006 - Get activity by ID', () => {
     it('should return activity details', async () => {
       const response = await authHelper
         .authenticatedRequest(testUser)
@@ -264,7 +263,7 @@ describe('Activities (BACKEND_ACTIVITY_001 - BACKEND_ACTIVITY_070)', () => {
   //   });
   // });
 
-  describe('BACKEND_ACTIVITY_070 - Admin deletes activity', () => {
+  describe('BACKEND_ACTIVITY_007 - Admin deletes activity', () => {
     it('should soft delete activity', async () => {
       const response = await authHelper
         .authenticatedRequest(adminUser)

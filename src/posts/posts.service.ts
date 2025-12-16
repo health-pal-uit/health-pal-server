@@ -3,7 +3,7 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Post } from './entities/post.entity';
-import { IsNull, Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Challenge } from 'src/challenges/entities/challenge.entity';
 import { Medal } from 'src/medals/entities/medal.entity';
@@ -251,6 +251,22 @@ export class PostsService {
       throw new Error('User has already liked this post');
     }
     return await this.likesService.create(post, user);
+  }
+
+  async findDeleted(
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Post[]; total: number; page: number; limit: number }> {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.postsRepository.findAndCount({
+      where: { deleted_at: Not(IsNull()) },
+      relations: ['user'],
+      skip,
+      take: limit,
+      withDeleted: true,
+      order: { deleted_at: 'DESC' },
+    });
+    return { data, total, page, limit };
   }
 
   async unlikePost(id: string, userId: string): Promise<Like | null> {

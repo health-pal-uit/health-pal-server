@@ -6,7 +6,7 @@ import { AuthHelper, TestUser } from './helpers/auth.helper';
 import { DatabaseHelper } from './helpers/database.helper';
 import { TestDataHelper } from './helpers/test-data.helper';
 
-describe('Fitness Profiles (BACKEND_FITNESS_001 - BACKEND_FITNESS_050)', () => {
+describe('Fitness Profiles (BACKEND_FITNESS_001 - BACKEND_FITNESS_023)', () => {
   let app: INestApplication;
   let authHelper: AuthHelper;
   let dbHelper: DatabaseHelper;

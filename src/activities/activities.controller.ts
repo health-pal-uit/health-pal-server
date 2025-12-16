@@ -35,6 +35,22 @@ export class ActivitiesController {
     return await this.activitiesService.create(createActivityDto);
   }
 
+  @Post('search')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({
+    summary: 'Search activities',
+    description: 'Searches for activities by name with pagination',
+  })
+  @ApiResponse({ status: 200, description: 'List of matching activities retrieved successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async search(
+    @Body('name') name: string,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return await this.activitiesService.searchByName(name, page, limit);
+  }
+
   @Get()
   @UseGuards(SupabaseGuard)
   @ApiOperation({
