@@ -80,24 +80,9 @@ jobs:
       - run: npm ci
       - name: Seed test users in Supabase
         run: npm run seed-test-users
-      - name: Refresh test tokens and run tests
-        run: |
-          # Get fresh tokens via login
-          USER_RESPONSE=$(curl -s -X POST "${{ secrets.SUPABASE_URL }}/auth/v1/token?grant_type=password" \
-            -H "Content-Type: application/json" \
-            -H "apikey: ${{ secrets.SUPABASE_KEY }}" \
-            -d "{\"email\":\"$TEST_USER_EMAIL\",\"password\":\"$TEST_USER_PASSWORD\"}")
-
-          ADMIN_RESPONSE=$(curl -s -X POST "${{ secrets.SUPABASE_URL }}/auth/v1/token?grant_type=password" \
-            -H "Content-Type: application/json" \
-            -H "apikey: ${{ secrets.SUPABASE_KEY }}" \
-            -d "{\"email\":\"$TEST_ADMIN_EMAIL\",\"password\":\"$TEST_ADMIN_PASSWORD\"}")
-
-          export TEST_USER_TOKEN=$(echo $USER_RESPONSE | jq -r '.access_token')
-          export TEST_ADMIN_TOKEN=$(echo $ADMIN_RESPONSE | jq -r '.access_token')
-
-          echo "✅ Tokens refreshed and exported"
-          npm run test:e2e
+      - name: Refresh test tokens
+        run: npm run refresh-tokens
+      - run: npm run test:e2e
       - name: Stop Docker Compose services
         if: always()
         run: docker compose -f compose.ci.yaml down -v
