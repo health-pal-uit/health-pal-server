@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, IsUrl, Min } from 'class-validator';
 import { FoodType } from 'src/helpers/enums/food-type.enum';
 
@@ -50,6 +50,14 @@ export class CreateContributionIngreDto {
 
   @ApiProperty({ example: [FoodType.MEAT], required: false, isArray: true, enum: FoodType })
   @IsOptional()
+  @Transform(({ value }) => {
+    if (!value) return value;
+    // Handle both string and array inputs from multipart form data
+    if (typeof value === 'string') {
+      return [value];
+    }
+    return value;
+  })
   @IsEnum(FoodType, { each: true })
   tags?: FoodType[];
 

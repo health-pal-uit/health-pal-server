@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsBoolean,
   IsDateString,
@@ -60,6 +61,14 @@ export class CreateIngredientDto {
 
   @ApiProperty({ example: [FoodType.MEAT], description: 'Tags for the ingredient' })
   @IsOptional()
+  @Transform(({ value }) => {
+    if (!value) return value;
+    // Handle both string and array inputs from multipart form data
+    if (typeof value === 'string') {
+      return [value];
+    }
+    return value;
+  })
   @IsEnum(FoodType, { each: true })
   tags?: FoodType[];
 
