@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsBoolean, IsDateString, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
 
@@ -9,6 +10,11 @@ export class CreateCommentDto {
   content!: string;
 
   @ApiProperty({ example: true, description: 'Indicates if the comment is approved' })
+  @Transform(({ value }) => {
+    if (value === 'true' || value === true) return true;
+    if (value === 'false' || value === false) return false;
+    return value;
+  })
   @IsBoolean()
   @IsOptional()
   is_approved?: boolean | null;

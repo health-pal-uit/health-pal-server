@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsDateString,
   IsEnum,
@@ -15,28 +16,33 @@ import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
 export class CreateFitnessProfileDto {
   @ApiProperty({ description: 'Weight in kilograms' })
   @IsNotEmpty()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @Min(0.1, { message: 'Weight must be positive' })
   weight_kg!: number;
 
   @ApiProperty({ description: 'Height in meters' })
   @IsNotEmpty()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @Min(0.1, { message: 'Height must be positive' })
   height_m!: number;
 
   @ApiProperty({ description: 'Waist circumference in centimeters' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   waist_cm?: number;
 
   @ApiProperty({ description: 'Hip circumference in centimeters' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   hip_cm?: number;
 
   @ApiProperty({ description: 'Neck circumference in centimeters' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   neck_cm?: number;
 
@@ -46,6 +52,7 @@ export class CreateFitnessProfileDto {
   activity_level!: ActivityLevel;
 
   @ApiProperty({ description: 'Body fat percentage' })
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @IsOptional()
   body_fat_percentages?: number;
@@ -56,11 +63,13 @@ export class CreateFitnessProfileDto {
   body_fat_calculating_method?: BFPCalculatingMethod;
 
   @ApiProperty({ description: 'Basal metabolic rate' })
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @IsOptional()
   bmr?: number;
 
   @ApiProperty({ description: 'Body mass index' })
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @IsOptional()
   bmi?: number;
@@ -72,6 +81,7 @@ export class CreateFitnessProfileDto {
   created_at?: Date;
 
   @ApiProperty({ description: 'Total Daily Energy Expenditure' })
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @IsOptional()
   tdee_kcal?: number; // cal later

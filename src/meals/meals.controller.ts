@@ -33,12 +33,15 @@ export class MealsController {
   // create meal - whole
   @Post()
   @UseGuards(AdminSupabaseGuard) // only admin
+  @UseInterceptors(FileInterceptor('image'))
   @ApiOperation({ summary: 'Admin creates a new meal with pre-calculated nutrition' })
   @ApiBody({ type: CreateMealDto })
   @ApiResponse({ status: 201, description: 'Meal created' })
   @ApiResponse({ status: 403, description: 'Forbidden for non-admins' })
-  async create(@Body() createMealDto: CreateMealDto) {
-    return await this.mealsService.create(createMealDto);
+  async create(@Body() createMealDto: CreateMealDto, @UploadedFile() file?: Express.Multer.File) {
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
+    return await this.mealsService.create(createMealDto, imageBuffer, imageName);
   }
 
   // create meal - from ingredients

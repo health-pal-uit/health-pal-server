@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsDateString, IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
 
@@ -10,11 +11,13 @@ export class CreatePremiumPackageDto {
 
   @ApiProperty({ example: 100, description: 'Expert fee for the premium package' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   expert_fee?: number; // would use later after update
 
   @ApiProperty({ example: 200, description: 'Price of the premium package' })
   @IsNotEmpty()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   price!: number;
 

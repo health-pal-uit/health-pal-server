@@ -23,30 +23,35 @@ export class CreateIngredientDto {
 
   @ApiProperty({ example: 165, description: 'Calories per 100g' })
   @IsNotEmpty()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @Min(0)
   kcal_per_100gr!: number; // must be >= 0
 
   @ApiProperty({ example: 31, description: 'Protein per 100gr' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @Min(0)
   protein_per_100gr?: number; // calculate later
 
   @ApiProperty({ example: 5, description: 'Fat per 100gr' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @Min(0)
   fat_per_100gr?: number;
 
   @ApiProperty({ example: 0, description: 'Carbohydrates per 100gr' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @Min(0)
   carbs_per_100gr?: number;
 
   @ApiProperty({ example: 0, description: 'Fiber per 100gr' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @Min(0)
   fiber_per_100gr?: number;
@@ -73,6 +78,11 @@ export class CreateIngredientDto {
   tags?: FoodType[];
 
   @ApiProperty({ example: true, description: 'Indicates if the ingredient is verified' })
+  @Transform(({ value }) => {
+    if (value === 'true' || value === true) return true;
+    if (value === 'false' || value === false) return false;
+    return value;
+  })
   @IsBoolean()
   @IsOptional()
   is_verified?: boolean;

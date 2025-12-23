@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { ActivityType } from 'src/helpers/enums/activity-type.enum';
 
@@ -10,6 +11,7 @@ export class CreateActivityDto {
 
   @ApiProperty({ example: 8, description: 'Metabolic equivalent of task (MET) value' })
   @IsNotEmpty()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @Min(0, { message: 'MET value must be positive' })
   met_value: number;

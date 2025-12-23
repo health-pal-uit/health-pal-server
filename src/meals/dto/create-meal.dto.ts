@@ -23,41 +23,48 @@ export class CreateMealDto {
 
   @ApiProperty({ example: 100, description: 'Serving size in grams' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   serving_gr?: number;
 
   @ApiProperty({ example: 250, description: 'Calories per 100g' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @Min(0, { message: 'Calories must be positive' })
   kcal_per_100gr?: number; // cal later
 
   @ApiProperty({ example: 30, description: 'Protein per 100gr' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @Min(0, { message: 'Protein cannot be negative' })
   protein_per_100gr?: number;
 
   @ApiProperty({ example: 10, description: 'Fat per 100gr' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @Min(0, { message: 'Fat cannot be negative' })
   fat_per_100gr?: number;
 
   @ApiProperty({ example: 40, description: 'Carbohydrates per 100gr' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @Min(0, { message: 'Carbs cannot be negative' })
   carbs_per_100gr?: number;
 
   @ApiProperty({ example: 5, description: 'Fiber per 100gr' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @Min(0, { message: 'Fiber cannot be negative' })
   fiber_per_100gr?: number;
 
   @ApiProperty({ example: 4.5, description: 'Rating of the meal' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   rating?: number;
 
@@ -87,6 +94,11 @@ export class CreateMealDto {
 
   @ApiProperty({ example: true, description: 'Indicates if the meal is verified' })
   @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true' || value === true) return true;
+    if (value === 'false' || value === false) return false;
+    return value;
+  })
   @IsBoolean()
   is_verified?: boolean;
 
@@ -101,6 +113,11 @@ export class CreateMealDto {
   deleted_at?: Date | null;
 
   @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true' || value === true) return true;
+    if (value === 'false' || value === false) return false;
+    return value;
+  })
   @IsBoolean()
   made_from_ingredients?: boolean;
 }

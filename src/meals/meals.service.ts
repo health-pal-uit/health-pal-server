@@ -170,7 +170,20 @@ export class MealsService {
     });
   }
 
-  async create(createMealDto: CreateMealDto): Promise<Meal> {
+  async create(
+    createMealDto: CreateMealDto,
+    imageBuffer?: Buffer,
+    imageName?: string,
+  ): Promise<Meal> {
+    if (imageBuffer && imageName) {
+      const bucketName = this.configService.get<string>('MEAL_IMG_BUCKET_NAME') || 'meal-imgs';
+      const imagePath = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        bucketName,
+      );
+      createMealDto.image_url = imagePath;
+    }
     const meal = this.mealsRepository.create(createMealDto);
     return await this.mealsRepository.save(meal);
   }

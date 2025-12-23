@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsUUID } from 'class-validator';
 import { ActivityLevel } from 'src/helpers/enums/activity-level.enum';
 import { BFPCalculatingMethod } from 'src/helpers/enums/bfp-calculating-method.enum';
@@ -7,20 +8,24 @@ import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
 export class BFFitnessProfileDto {
   @ApiProperty({ description: 'Waist circumference in centimeters' })
   @IsNotEmpty()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   waist_cm!: number;
 
   @ApiProperty({ description: 'Hip circumference in centimeters' })
   @IsNotEmpty()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   hip_cm!: number;
 
   @ApiProperty({ description: 'Neck circumference in centimeters' })
   @IsNotEmpty()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   neck_cm!: number;
 
   @ApiProperty({ description: 'Body fat percentage' })
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   @IsOptional()
   body_fat_percentages?: number;

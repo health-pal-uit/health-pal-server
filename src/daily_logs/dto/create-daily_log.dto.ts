@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsDateString, IsNotEmpty, IsNumber, isNumber, IsOptional, IsUUID } from 'class-validator';
 import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
 
@@ -10,31 +11,37 @@ export class CreateDailyLogDto {
 
   @ApiProperty({ description: 'Total calories consumed on the daily log' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   total_kcal?: number;
 
   @ApiProperty({ description: 'Total protein consumed on the daily log' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   total_protein_gr?: number;
 
   @ApiProperty({ description: 'Total fat consumed on the daily log' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   total_fat_gr?: number;
 
   @ApiProperty({ description: 'Total carbohydrates consumed on the daily log' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   total_carbs_gr?: number;
 
   @ApiProperty({ description: 'Total fiber consumed on the daily log' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   total_fiber_gr?: number;
 
   @ApiProperty({ description: 'Total water consumed on the daily log' })
   @IsOptional()
+  @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
   water_drank_l?: number;
 

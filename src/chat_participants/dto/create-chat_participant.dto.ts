@@ -1,10 +1,16 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsBoolean, IsDateString, IsNotEmpty, IsOptional, IsUUID } from 'class-validator';
 import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
 
 export class CreateChatParticipantDto {
   @ApiProperty({ description: 'is admin?', default: false })
   @IsOptional()
+  @Transform(({ value }) => {
+    if (value === 'true' || value === true) return true;
+    if (value === 'false' || value === false) return false;
+    return value;
+  })
   @IsBoolean()
   is_admin?: boolean;
 
