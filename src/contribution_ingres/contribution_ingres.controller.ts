@@ -64,6 +64,34 @@ export class ContributionIngresController {
     );
   }
 
+  @Get('pending') // admin => get all pending contributions
+  @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Admin gets all pending contributions' })
+  @ApiResponse({ status: 200, description: 'List of pending contributions' })
+  async pending(@Query() query: ContributionIngrePaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.contributionIngresService.findAllPending(page, limit);
+  }
+
+  @Get('rejected') // admin => get all rejected contributions
+  @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Admin gets all rejected ingredient contributions' })
+  @ApiResponse({ status: 200, description: 'List of rejected contributions' })
+  async rejected(@Query() query: ContributionIngrePaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.contributionIngresService.findAllRejected(page, limit);
+  }
+
+  @Get('rejection-info/:id')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'User gets rejection reason/status for their own contribution' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 200, description: 'Rejection info' })
+  async getRejectionInfo(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
+    // Only allow user to see their own contribution's rejection info
+    return await this.contributionIngresService.getRejectionInfo(id, user.id);
+  }
+
   @Get()
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'List all contributions (admin) or user contributions (user)' })
@@ -157,25 +185,5 @@ export class ContributionIngresController {
   @ApiResponse({ status: 200, description: 'Contribution rejected' })
   async reject(@Param('id') id: string, @Body('rejection_reason') reason: string) {
     return await this.contributionIngresService.adminReject(id, reason);
-  }
-
-  // user: get rejection reason/status for their own contribution
-  @Get('rejection-info/:id')
-  @UseGuards(SupabaseGuard)
-  @ApiOperation({ summary: 'User gets rejection reason/status for their own contribution' })
-  @ApiParam({ name: 'id', type: String })
-  @ApiResponse({ status: 200, description: 'Rejection info' })
-  async getRejectionInfo(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
-    // Only allow user to see their own contribution's rejection info
-    return await this.contributionIngresService.getRejectionInfo(id, user.id);
-  }
-
-  @Get('pending') // admin => get all pending contributions
-  @UseGuards(AdminSupabaseGuard)
-  @ApiOperation({ summary: 'Admin gets all pending contributions' })
-  @ApiResponse({ status: 200, description: 'List of pending contributions' })
-  async pending(@Query() query: ContributionIngrePaginationDto) {
-    const { page = 1, limit = 10 } = query;
-    return await this.contributionIngresService.findAllPending(page, limit);
   }
 }

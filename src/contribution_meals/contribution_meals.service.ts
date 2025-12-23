@@ -39,6 +39,20 @@ export class ContributionMealsService {
     return { data, total, page, limit };
   }
 
+  async findAllRejected(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: ContributionMeal[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.contributionMealRepository.findAndCount({
+      where: { status: ContributionStatus.REJECTED, deleted_at: IsNull() },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { reviewed_at: 'DESC' },
+      relations: ['author'],
+    });
+    return { data, total, page, limit };
+  }
+
   async createFromIngredients(
     dto: CreateContributionMealDto,
     ingredients: IngredientPayload[],

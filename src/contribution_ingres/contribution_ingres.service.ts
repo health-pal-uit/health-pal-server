@@ -34,6 +34,20 @@ export class ContributionIngresService {
     return { data, total, page, limit };
   }
 
+  async findAllRejected(
+    page = 1,
+    limit = 10,
+  ): Promise<{ data: ContributionIngre[]; total: number; page: number; limit: number }> {
+    const [data, total] = await this.contributionIngreRepository.findAndCount({
+      where: { status: ContributionStatus.REJECTED },
+      skip: (page - 1) * limit,
+      take: limit,
+      order: { reviewed_at: 'DESC' },
+      relations: ['author'],
+    });
+    return { data, total, page, limit };
+  }
+
   async adminReject(id: string, reason?: string): Promise<ContributionIngre> {
     const contribution = await this.contributionIngreRepository.findOne({ where: { id } });
     if (!contribution) {

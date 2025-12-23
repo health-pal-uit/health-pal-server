@@ -100,6 +100,15 @@ export class ContributionMealsController {
     return await this.contributionMealsService.findAllPending(page, limit);
   }
 
+  @Get('rejected') // admin => get all rejected contributions
+  @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Admin gets all rejected meal contributions' })
+  @ApiResponse({ status: 200, description: 'List of rejected contributions' })
+  async rejected(@Query() query: ContributionMealPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.contributionMealsService.findAllRejected(page, limit);
+  }
+
   @Get('rejection-info/:id')
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'User gets rejection reason/status for their own meal contribution' })
