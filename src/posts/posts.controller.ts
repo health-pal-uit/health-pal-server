@@ -78,6 +78,16 @@ export class PostsController {
     return posts.map((p) => ({ ...p, user_id: p.user?.id }));
   }
 
+  @Get('user/:userId')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get all posts by a specific user' })
+  @ApiParam({ name: 'userId', description: 'User ID' })
+  @ApiResponse({ status: 200, description: 'List of posts by the user' })
+  async findByUserId(@Param('userId') userId: string) {
+    const posts = await this.postsService.findByUser(userId);
+    return posts.map((p) => ({ ...p, user_id: p.user?.id }));
+  }
+
   @Get('deleted-posts')
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Get deleted posts with pagination' })
