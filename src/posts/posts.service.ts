@@ -91,26 +91,38 @@ export class PostsService {
 
   async findAll(page: number = 1, limit: number = 10): Promise<Post[]> {
     const skip = (page - 1) * limit;
-    return this.postsRepository.find({
-      relations: ['user'],
-      where: { deleted_at: IsNull() },
-      skip,
-      take: limit,
-    });
+    return this.postsRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.user', 'user')
+      .loadRelationCountAndMap('post.like_count', 'post.likes')
+      .where('post.deleted_at IS NULL')
+      .skip(skip)
+      .take(limit)
+      .orderBy('post.created_at', 'DESC')
+      .getMany();
   }
 
   async findOne(id: string): Promise<Post | null> {
     if (!isUUID(id)) {
       throw new NotFoundException('Post not found');
     }
-    return this.postsRepository.findOne({ where: { id }, relations: ['user'] });
+    return this.postsRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.user', 'user')
+      .loadRelationCountAndMap('post.like_count', 'post.likes')
+      .where('post.id = :id', { id })
+      .getOne();
   }
 
   async findByUser(userId: string): Promise<Post[]> {
-    return this.postsRepository.find({
-      where: { user: { id: userId }, deleted_at: IsNull() },
-      order: { created_at: 'DESC' },
-    });
+    return this.postsRepository
+      .createQueryBuilder('post')
+      .leftJoinAndSelect('post.user', 'user')
+      .loadRelationCountAndMap('post.like_count', 'post.likes')
+      .where('post.user.id = :userId', { userId })
+      .andWhere('post.deleted_at IS NULL')
+      .orderBy('post.created_at', 'DESC')
+      .getMany();
   }
 
   async update(id: string, updatePostDto: UpdatePostDto, userId: string): Promise<Post | null> {

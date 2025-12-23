@@ -85,4 +85,7 @@ export class Post {
 
   @ManyToOne(() => Ingredient, (ingredient) => ingredient.posts, { nullable: true })
   attach_ingredient: Ingredient | null;
+
+  // Virtual property for like count
+  like_count?: number;
 }
