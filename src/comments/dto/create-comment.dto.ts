@@ -32,6 +32,6 @@ export class CreateCommentDto {
 
   @ApiProperty({ example: 'uuid', description: 'Unique identifier for the post' })
   @IsUUID('4')
-  @IsNotEmpty()
+  @IsOptional()
   post_id?: string;
 }
