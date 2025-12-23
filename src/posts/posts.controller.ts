@@ -88,10 +88,14 @@ export class PostsController {
 
   @Get()
   @UseGuards(SupabaseGuard)
-  @ApiOperation({ summary: 'Get all posts with pagination' })
+  @ApiOperation({ summary: 'Get all posts with pagination, user specific' })
   @ApiResponse({ status: 200, description: 'List of posts' })
-  async findAll(@Query('page') page: number = 1, @Query('limit') limit: number = 10) {
-    return await this.postsService.findAll(page, limit);
+  async findAll(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @CurrentUser() user: any,
+  ) {
+    return await this.postsService.findAll(page, limit, user.id);
   }
 
   @Get(':id/likes')

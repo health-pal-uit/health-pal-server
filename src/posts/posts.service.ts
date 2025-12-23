@@ -89,40 +89,90 @@ export class PostsService {
     return this.postsRepository.save(post);
   }
 
-  async findAll(page: number = 1, limit: number = 10): Promise<Post[]> {
+  async findAll(page: number = 1, limit: number = 10, userId: string): Promise<Post[]> {
     const skip = (page - 1) * limit;
-    return this.postsRepository
+    const posts = await this.postsRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user')
       .loadRelationCountAndMap('post.like_count', 'post.likes')
+      .leftJoin('post.likes', 'like', 'like.user.id = :userId', { userId })
+      .addSelect('CASE WHEN like.id IS NOT NULL THEN true ELSE false END', 'post_is_liked_by_user')
       .where('post.deleted_at IS NULL')
       .skip(skip)
       .take(limit)
       .orderBy('post.created_at', 'DESC')
-      .getMany();
+      .getRawAndEntities();
+
+    // Map the is_liked_by_user field to each post
+    return posts.entities.map((post, index) => ({
+      ...post,
+      is_liked_by_user:
+        posts.raw[index].post_is_liked_by_user === 'true' ||
+        posts.raw[index].post_is_liked_by_user === true,
+    }));
   }
 
-  async findOne(id: string): Promise<Post | null> {
+  async findOne(id: string, userId?: string): Promise<Post | null> {
     if (!isUUID(id)) {
       throw new NotFoundException('Post not found');
     }
-    return this.postsRepository
+
+    const queryBuilder = this.postsRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user')
       .loadRelationCountAndMap('post.like_count', 'post.likes')
-      .where('post.id = :id', { id })
-      .getOne();
+      .where('post.id = :id', { id });
+
+    if (userId) {
+      queryBuilder
+        .leftJoin('post.likes', 'like', 'like.user.id = :userId', { userId })
+        .addSelect(
+          'CASE WHEN like.id IS NOT NULL THEN true ELSE false END',
+          'post_is_liked_by_user',
+        );
+
+      const result = await queryBuilder.getRawAndEntities();
+      if (result.entities.length === 0) return null;
+
+      return {
+        ...result.entities[0],
+        is_liked_by_user:
+          result.raw[0].post_is_liked_by_user === 'true' ||
+          result.raw[0].post_is_liked_by_user === true,
+      };
+    }
+
+    return queryBuilder.getOne();
   }
 
-  async findByUser(userId: string): Promise<Post[]> {
-    return this.postsRepository
+  async findByUser(userId: string, currentUserId?: string): Promise<Post[]> {
+    const queryBuilder = this.postsRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user')
       .loadRelationCountAndMap('post.like_count', 'post.likes')
       .where('post.user.id = :userId', { userId })
       .andWhere('post.deleted_at IS NULL')
-      .orderBy('post.created_at', 'DESC')
-      .getMany();
+      .orderBy('post.created_at', 'DESC');
+
+    if (currentUserId) {
+      queryBuilder
+        .leftJoin('post.likes', 'like', 'like.user.id = :currentUserId', { currentUserId })
+        .addSelect(
+          'CASE WHEN like.id IS NOT NULL THEN true ELSE false END',
+          'post_is_liked_by_user',
+        );
+
+      const posts = await queryBuilder.getRawAndEntities();
+
+      return posts.entities.map((post, index) => ({
+        ...post,
+        is_liked_by_user:
+          posts.raw[index].post_is_liked_by_user === 'true' ||
+          posts.raw[index].post_is_liked_by_user === true,
+      }));
+    }
+
+    return queryBuilder.getMany();
   }
 
   async update(id: string, updatePostDto: UpdatePostDto, userId: string): Promise<Post | null> {
