@@ -91,6 +91,25 @@ export class ContributionMealsController {
     );
   }
 
+  @Get('pending') // admin => get all pending contributions
+  @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({ summary: 'Admin gets all pending meal contributions' })
+  @ApiResponse({ status: 200, description: 'List of pending contributions' })
+  async pending(@Query() query: ContributionMealPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.contributionMealsService.findAllPending(page, limit);
+  }
+
+  @Get('rejection-info/:id')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'User gets rejection reason/status for their own meal contribution' })
+  @ApiParam({ name: 'id', type: String })
+  @ApiResponse({ status: 200, description: 'Rejection info' })
+  async getRejectionInfo(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
+    // Only allow user to see their own contribution's rejection info
+    return await this.contributionMealsService.getRejectionInfo(id, user.id);
+  }
+
   @Get() // admin
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'List all contributions (admin) or user contributions (user)' })
@@ -214,26 +233,6 @@ export class ContributionMealsController {
   @ApiResponse({ status: 200, description: 'Contribution rejected' })
   async reject(@Param('id') id: string, @Body('rejection_reason') reason: string) {
     return await this.contributionMealsService.adminReject(id, reason);
-  }
-
-  // user: get rejection reason/status for their own contribution
-  @Get('rejection-info/:id')
-  @UseGuards(SupabaseGuard)
-  @ApiOperation({ summary: 'User gets rejection reason/status for their own meal contribution' })
-  @ApiParam({ name: 'id', type: String })
-  @ApiResponse({ status: 200, description: 'Rejection info' })
-  async getRejectionInfo(@Param('id') id: string, @CurrentUser() user: ReqUserType) {
-    // Only allow user to see their own contribution's rejection info
-    return await this.contributionMealsService.getRejectionInfo(id, user.id);
-  }
-
-  @Get('pending') // admin => get all pending contributions
-  @UseGuards(AdminSupabaseGuard)
-  @ApiOperation({ summary: 'Admin gets all pending meal contributions' })
-  @ApiResponse({ status: 200, description: 'List of pending contributions' })
-  async pending(@Query() query: ContributionMealPaginationDto) {
-    const { page = 1, limit = 10 } = query;
-    return await this.contributionMealsService.findAllPending(page, limit);
   }
 
   // @Post()
