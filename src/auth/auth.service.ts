@@ -76,6 +76,7 @@ export class AuthService {
     return { user: data.user };
   }
 
+  //
   async checkVerification(email: string) {
     const { data: usersList } = await this.supabase.auth.admin.listUsers();
     const supabaseUser = usersList.users.find((u: User) => u.email === email);
