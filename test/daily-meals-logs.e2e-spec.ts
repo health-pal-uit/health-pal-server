@@ -150,7 +150,6 @@ describe('Daily Meals & Logs (BACKEND_LOGS_001 - BACKEND_LOGS_050)', () => {
 
   describe('BACKEND_LOGS_018 - Update daily log fields', () => {
     it('should update water, steps, sleep', async () => {
-      // Get a log first
       const logsResponse = await authHelper
         .authenticatedRequest(testUser)
         .get('/daily-logs?page=1&limit=1');
