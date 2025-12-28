@@ -60,8 +60,8 @@ export class AuthController {
   })
   @ApiResponse({ status: 200, description: 'Login successful. Returns access token.' })
   @ApiResponse({ status: 401, description: 'Invalid credentials' })
-  async login(@Body() loginDto: LoginDto) {
-    const result = await this.authService.login(loginDto);
+  async signIn(@Body() loginDto: LoginDto) {
+    const result = await this.authService.signIn(loginDto);
     return responseHelper({
       data: result,
       message: 'Login successful',

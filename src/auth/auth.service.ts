@@ -89,7 +89,7 @@ export class AuthService {
     return { isVerified: !!supabaseUser.confirmed_at };
   }
 
-  async login(loginDto: LoginDto): Promise<{ token: string }> {
+  async signIn(loginDto: LoginDto): Promise<{ token: string }> {
     const { email, password } = loginDto;
     const { data, error } = await this.supabase.auth.signInWithPassword({
       email,

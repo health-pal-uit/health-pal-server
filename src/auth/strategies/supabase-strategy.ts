@@ -26,6 +26,13 @@ export class SupabaseStrategy extends PassportStrategy(SupabaseAuthStrategy, 'su
     this.localSupabase = createClient(
       this.configService.get('SUPABASE_URL')!,
       this.configService.get('SUPABASE_KEY')!,
+      {
+        auth: {
+          autoRefreshToken: true,
+          persistSession: true,
+          detectSessionInUrl: false,
+        },
+      },
     );
   }
 
