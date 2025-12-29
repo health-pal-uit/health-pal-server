@@ -88,12 +88,12 @@ export class CreateFitnessProfileDto {
 
   // relations => 2
   @ApiProperty({ description: 'User ID' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsUUID('4')
-  user_id!: string;
+  user_id?: string;
 
   @ApiProperty({ description: 'Diet type ID' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsUUID('4')
   diet_type_id?: string;
 }
