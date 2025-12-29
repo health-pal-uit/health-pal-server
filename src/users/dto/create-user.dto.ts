@@ -51,7 +51,7 @@ export class CreateUserDto {
   @IsOptional()
   @IsDateString()
   @TransformToISODate()
-  birth_date?: Date;
+  birth_date!: Date;
 
   @ApiProperty({ type: String, nullable: true, description: 'Avatar URL' })
   @IsUrl()
