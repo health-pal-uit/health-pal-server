@@ -48,7 +48,7 @@ export class CreateUserDto {
   gender?: boolean;
 
   @ApiProperty({ type: Date, description: 'Birth Date' })
-  @IsOptional()
+  @IsNotEmpty()
   @IsDateString()
   @TransformToISODate()
   birth_date!: Date;
