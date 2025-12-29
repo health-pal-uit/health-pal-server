@@ -38,22 +38,25 @@ export class DailyLogsController {
   @ApiParam({
     name: 'date',
     type: String,
-    description: 'Date in dd/MM/yyyy format (e.g., 29/12/2025)',
-    example: '29/12/2025',
+    description: 'Date in dd-MM-yyyy format (e.g., 29-12-2025)',
+    example: '29-12-2025',
   })
   @ApiResponse({
     status: 200,
     description: 'Daily log for the specified date (creates if not exists)',
   })
   async getDailyLogByDate(@Param('date') date: string, @CurrentUser() user: ReqUserType) {
-    const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+    // Validate date format dd-MM-yyyy
+    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
     if (!dateRegex.test(date)) {
-      throw new ForbiddenException('Invalid date format. Use dd/MM/yyyy (e.g., 29/12/2025)');
+      throw new ForbiddenException('Invalid date format. Use dd-MM-yyyy (e.g., 29-12-2025)');
     }
 
-    const [day, month, year] = date.split('/');
+    // Parse dd-MM-yyyy to YYYY-MM-DD format for the service
+    const [day, month, year] = date.split('-');
     const isoDate = `${year}-${month}-${day}`;
 
+    // Validate that the date is a valid date
     const parsedDate = new Date(isoDate);
     if (isNaN(parsedDate.getTime())) {
       throw new ForbiddenException('Invalid date');
