@@ -34,7 +34,9 @@ export class DailyLogsController {
   }
 
   @Get('date/:date')
-  @ApiOperation({ summary: 'Get or create daily log by date for the current user' })
+  @ApiOperation({
+    summary: 'Get or create daily log by date for the current user (sorted by meal type)',
+  })
   @ApiParam({
     name: 'date',
     type: String,
@@ -43,26 +45,42 @@ export class DailyLogsController {
   })
   @ApiResponse({
     status: 200,
-    description: 'Daily log for the specified date (creates if not exists)',
+    description:
+      'Daily log for the specified date (creates if not exists), sorted by meal type (breakfast, lunch, dinner, snack)',
   })
   async getDailyLogByDate(@Param('date') date: string, @CurrentUser() user: ReqUserType) {
-    // Validate date format dd-MM-yyyy
     const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
     if (!dateRegex.test(date)) {
       throw new ForbiddenException('Invalid date format. Use dd-MM-yyyy (e.g., 29-12-2025)');
     }
 
-    // Parse dd-MM-yyyy to YYYY-MM-DD format for the service
     const [day, month, year] = date.split('-');
     const isoDate = `${year}-${month}-${day}`;
 
-    // Validate that the date is a valid date
     const parsedDate = new Date(isoDate);
     if (isNaN(parsedDate.getTime())) {
       throw new ForbiddenException('Invalid date');
     }
 
-    return await this.dailyLogsService.getOrCreateDailyLog(user.id, isoDate);
+    const dailyLog = await this.dailyLogsService.getOrCreateDailyLog(user.id, isoDate);
+
+    if (dailyLog) {
+      const mealTypeOrder = { breakfast: 0, lunch: 1, dinner: 2, snack: 3 };
+
+      dailyLog.daily_ingres?.sort((a, b) => {
+        const typeComparison = mealTypeOrder[a.meal_type] - mealTypeOrder[b.meal_type];
+        if (typeComparison !== 0) return typeComparison;
+        return new Date(a.logged_at).getTime() - new Date(b.logged_at).getTime();
+      });
+
+      dailyLog.daily_meals?.sort((a, b) => {
+        const typeComparison = mealTypeOrder[a.meal_type] - mealTypeOrder[b.meal_type];
+        if (typeComparison !== 0) return typeComparison;
+        return new Date(a.logged_at).getTime() - new Date(b.logged_at).getTime();
+      });
+    }
+
+    return dailyLog;
   }
 
   @Get(':id')
