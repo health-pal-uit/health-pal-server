@@ -36,7 +36,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
         username: profile.displayName,
         email: profile.email,
         avatar_url: profile.picture,
-        password: '', // Password will not be used for Google-authenticated users
+        password: '', // Password will not be used for Google-authenticated users,
+        birth_date: profile.birthday,
       });
       if (!user) {
         return done(new Error('User validation failed'));
