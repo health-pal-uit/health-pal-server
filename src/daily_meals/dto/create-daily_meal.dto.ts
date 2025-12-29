@@ -59,10 +59,10 @@ export class CreateDailyMealDto {
   meal_type!: MealType;
 
   @ApiProperty({ example: '2023-01-01T00:00:00Z', description: 'Logged at' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsDateString()
   @TransformToISODate()
-  logged_at!: Date;
+  logged_at?: Date;
 
   // relations => 2
 

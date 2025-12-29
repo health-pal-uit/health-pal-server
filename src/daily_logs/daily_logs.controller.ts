@@ -33,6 +33,35 @@ export class DailyLogsController {
     return await this.dailyLogsService.findAllByUser(user.id, page, limit);
   }
 
+  @Get('date/:date')
+  @ApiOperation({ summary: 'Get or create daily log by date for the current user' })
+  @ApiParam({
+    name: 'date',
+    type: String,
+    description: 'Date in dd/MM/yyyy format (e.g., 29/12/2025)',
+    example: '29/12/2025',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Daily log for the specified date (creates if not exists)',
+  })
+  async getDailyLogByDate(@Param('date') date: string, @CurrentUser() user: ReqUserType) {
+    const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+    if (!dateRegex.test(date)) {
+      throw new ForbiddenException('Invalid date format. Use dd/MM/yyyy (e.g., 29/12/2025)');
+    }
+
+    const [day, month, year] = date.split('/');
+    const isoDate = `${year}-${month}-${day}`;
+
+    const parsedDate = new Date(isoDate);
+    if (isNaN(parsedDate.getTime())) {
+      throw new ForbiddenException('Invalid date');
+    }
+
+    return await this.dailyLogsService.getOrCreateDailyLog(user.id, isoDate);
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get a daily log by id (user: own only, admin: any)' })
   @ApiParam({ name: 'id', type: String })
