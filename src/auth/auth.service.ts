@@ -149,11 +149,18 @@ export class AuthService {
   }
 
   async deleteUser(id: string): Promise<{ message: string }> {
+    // delete from database first
+    const user = await this.usersService.findOne(id);
+    if (user) {
+      await this.usersService.hardDelete(id);
+    }
+
+    // then delete from Supabase Auth
     const { error } = await this.supabase.auth.admin.deleteUser(id);
     if (error) {
       throw new BadRequestException(error.message);
     }
-    return { message: 'User deleted successfully' };
+    return { message: 'User permanently deleted from both database and authentication system' };
   }
 
   async validateGoogleUser(googleUser: CreateUserDto): Promise<UserEntity> {

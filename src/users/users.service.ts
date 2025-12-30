@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +8,8 @@ import { RolesService } from 'src/roles/roles.service';
 import { Role } from 'src/roles/entities/role.entity';
 import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
 import { ConfigService } from '@nestjs/config';
+import { SupabaseClient } from '@supabase/supabase-js';
+import { SUPABASE_ADMIN } from 'src/supabase/supabase-admin.provider';
 
 @Injectable()
 export class UsersService {
@@ -17,6 +19,7 @@ export class UsersService {
     private readonly rolesService: RolesService,
     private readonly supabaseStorageService: SupabaseStorageService,
     private readonly configService: ConfigService,
+    @Inject(SUPABASE_ADMIN) private readonly supabase: SupabaseClient,
   ) {}
 
   async createFromSupabase(
@@ -117,9 +120,28 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
+    // nullify email and username
+    const timestamp = Date.now();
+    user.email = `deleted_${timestamp}_${user.email}`;
+    user.username = `deleted_${timestamp}_${user.username}`;
     user.deactivated_at = new Date();
+
     await this.userRepository.save(user);
+
+    // also delete from supabase auth
+    await this.supabase.auth.admin.deleteUser(id);
+
     return user;
+  }
+
+  async hardDelete(id: string) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    await this.userRepository.remove(user);
+    return { message: 'User deleted from database' };
   }
 
   async getUserMedals(userId: string) {
