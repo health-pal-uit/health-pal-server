@@ -13,10 +13,11 @@ import { User } from 'src/users/entities/user.entity';
 import { DailyLogsService } from 'src/daily_logs/daily_logs.service';
 import { Activity } from 'src/activities/entities/activity.entity';
 import { Challenge } from 'src/challenges/entities/challenge.entity';
-import { calcKcalSimple } from 'src/helpers/functions/kcal-burned-cal';
+import { calcKcal } from 'src/helpers/functions/kcal-burned-cal';
 import { makeProgressAccumulator } from 'src/helpers/functions/progress-calculator';
 import { ChallengesUsersService } from 'src/challenges_users/challenges_users.service';
 import { RecordType } from 'src/helpers/enums/record-type.enum';
+import { FitnessProfile } from 'src/fitness_profiles/entities/fitness_profile.entity';
 
 @Injectable()
 export class ActivityRecordsService {
@@ -25,6 +26,7 @@ export class ActivityRecordsService {
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Activity) private activityRepository: Repository<Activity>,
     @InjectRepository(Challenge) private challengesRepository: Repository<Challenge>,
+    @InjectRepository(FitnessProfile) private fitnessProfileRepository: Repository<FitnessProfile>,
     private challengesUsersService: ChallengesUsersService,
     private dailyLogsService: DailyLogsService,
   ) {}
@@ -48,11 +50,11 @@ export class ActivityRecordsService {
       throw new NotFoundException('Challenge not found');
     }
 
-    createActivityRecordDto.user_owned = false;
-    createActivityRecordDto.type = RecordType.CHALLENGE;
-
     const activityRecord = this.activityRecordRepository.create({
-      ...createActivityRecordDto,
+      duration_minutes: createActivityRecordDto.duration_minutes,
+      intensity_level: createActivityRecordDto.intensity_level,
+      user_owned: false,
+      type: RecordType.CHALLENGE,
       activity,
       challenge,
     });
@@ -92,16 +94,47 @@ export class ActivityRecordsService {
       throw new NotFoundException('Daily log not found or could not be created');
     }
 
-    createActivityRecordDto.user_owned = true;
-    createActivityRecordDto.type = RecordType.DAILY;
+    // get user's latest fitness profile for weight
+    const fitnessProfile = await this.fitnessProfileRepository.findOne({
+      where: { user: { id: userId }, deleted_at: IsNull() },
+      order: { created_at: 'DESC' },
+      relations: ['user'],
+    });
+
+    const userWeight = fitnessProfile?.weight_kg || 70; // fallback to 70kg
+
+    // calculate user age from birth_date
+    let userAge = 25; // default
+    if (fitnessProfile?.user?.birth_date) {
+      const birthDate = new Date(fitnessProfile.user.birth_date);
+      const today = new Date();
+      userAge = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        userAge--;
+      }
+    }
 
     const activityRecord = this.activityRecordRepository.create({
-      ...createActivityRecordDto,
+      duration_minutes: createActivityRecordDto.duration_minutes,
+      intensity_level: createActivityRecordDto.intensity_level || 3,
+      rhr: createActivityRecordDto.rhr,
+      ahr: createActivityRecordDto.ahr,
+      type: RecordType.DAILY,
+      user_owned: true,
       activity,
       daily_log: dailyLog,
     });
 
-    const { kcal } = calcKcalSimple(activityRecord, activity);
+    const kcal = calcKcal(
+      createActivityRecordDto.duration_minutes,
+      activity.met_value,
+      userWeight,
+      createActivityRecordDto.intensity_level || 3,
+      createActivityRecordDto.ahr,
+      createActivityRecordDto.rhr,
+      userAge,
+    );
     activityRecord.kcal_burned = kcal;
 
     dailyLog.total_kcal_burned += kcal;
@@ -219,15 +252,55 @@ export class ActivityRecordsService {
       throw new NotFoundException('Related daily log or activity not found');
     }
 
+    // get user's latest fitness profile for weight
+    const fitnessProfile = await this.fitnessProfileRepository.findOne({
+      where: { user: { id: userId }, deleted_at: IsNull() },
+      order: { created_at: 'DESC' },
+      relations: ['user'],
+    });
+
+    const userWeight = fitnessProfile?.weight_kg || 70; // fallback to 70kg
+
+    // calculate user age from birth_date
+    let userAge = 25; // default
+    if (fitnessProfile?.user?.birth_date) {
+      const birthDate = new Date(fitnessProfile.user.birth_date);
+      const today = new Date();
+      userAge = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        userAge--;
+      }
+    }
+
     // subtract old calories from daily log
     dailyLog.total_kcal_burned -= activityRecord.kcal_burned || 0;
     await this.dailyLogsService.save(dailyLog);
 
     // apply updates from DTO to the entity
-    Object.assign(activityRecord, updateActivityRecordDto);
+    if (updateActivityRecordDto.duration_minutes !== undefined) {
+      activityRecord.duration_minutes = updateActivityRecordDto.duration_minutes;
+    }
+    if (updateActivityRecordDto.intensity_level !== undefined) {
+      activityRecord.intensity_level = updateActivityRecordDto.intensity_level;
+    }
+    if (updateActivityRecordDto.rhr !== undefined) {
+      activityRecord.rhr = updateActivityRecordDto.rhr;
+    }
+    if (updateActivityRecordDto.ahr !== undefined) {
+      activityRecord.ahr = updateActivityRecordDto.ahr;
+    }
 
     // recalculate calories with updated values
-    const { kcal } = calcKcalSimple(activityRecord, activity);
+    const kcal = calcKcal(
+      activityRecord.duration_minutes || 0,
+      activity.met_value,
+      userWeight,
+      activityRecord.intensity_level || 3,
+      activityRecord.ahr,
+      activityRecord.rhr,
+      userAge,
+    );
     activityRecord.kcal_burned = kcal;
 
     // add new calories to daily log
@@ -257,7 +330,6 @@ export class ActivityRecordsService {
 
     // Prevent updating fields that shouldn't be changed
     const {
-      user_owned: _user_owned,
       type: _type,
       daily_log_id: _daily_log_id,
       challenge_id: _challenge_id,

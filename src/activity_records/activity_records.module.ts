@@ -8,10 +8,11 @@ import { DailyLogsModule } from 'src/daily_logs/daily_logs.module';
 import { Activity } from 'src/activities/entities/activity.entity';
 import { ChallengesUsersModule } from 'src/challenges_users/challenges_users.module';
 import { Challenge } from 'src/challenges/entities/challenge.entity';
+import { FitnessProfile } from 'src/fitness_profiles/entities/fitness_profile.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([ActivityRecord, User, Activity, Challenge]),
+    TypeOrmModule.forFeature([ActivityRecord, User, Activity, Challenge, FitnessProfile]),
     DailyLogsModule,
     ChallengesUsersModule,
   ],

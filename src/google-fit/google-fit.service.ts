@@ -358,14 +358,16 @@ export class GoogleFitService {
       return null;
     }
 
-    // Create activity record with reps and weight
+    // Create activity record with duration
     const activityRecord = this.activityRecordRepo.create();
     activityRecord.user_owned = false;
     activityRecord.type = RecordType.DAILY;
     activityRecord.activity = activity;
     activityRecord.daily_log = dailyLog;
-    activityRecord.reps = reps;
-    activityRecord.load_kg = resistanceKg > 0 ? resistanceKg : undefined;
+
+    // Google Fit doesn't provide reps/load, so we estimate duration from session length
+    const durationMs = parseInt(session.endTimeMillis) - parseInt(session.startTimeMillis);
+    activityRecord.duration_minutes = durationMs / (1000 * 60);
 
     // Calculate calories if available
     const sessionCalories = session.calories || 0;
@@ -410,14 +412,14 @@ export class GoogleFitService {
     }
 
     const durationMs = parseInt(session.endTimeMillis) - parseInt(session.startTimeMillis);
-    const hours = durationMs / (1000 * 60 * 60);
+    const durationMinutes = durationMs / (1000 * 60);
 
     const activityRecord = this.activityRecordRepo.create();
     activityRecord.user_owned = false;
     activityRecord.type = RecordType.DAILY;
     activityRecord.activity = activity;
     activityRecord.daily_log = dailyLog;
-    activityRecord.hours = hours;
+    activityRecord.duration_minutes = durationMinutes;
 
     const sessionCalories = session.calories || 0;
     if (sessionCalories > 0) {
@@ -432,7 +434,9 @@ export class GoogleFitService {
       await this.dailyLogsService.recalculateTotalKcal(dailyLog.id);
     }
 
-    Logger.log(`Saved generic Google Fit strength training session: ${hours.toFixed(2)}h`);
+    Logger.log(
+      `Saved generic Google Fit strength training session: ${durationMinutes.toFixed(1)} min`,
+    );
 
     return savedRecord;
   }
@@ -556,11 +560,11 @@ export class GoogleFitService {
     // estimate calories based on activity if Google Fit calories seem unrealistic
     // Google Fit often includes BMR in calories.expended, making values very high
     let estimatedCalories = kcal_burned;
-    if (activity.met_value && hours) {
+    const durationMinutes = hours * 60;
+    if (activity.met_value && durationMinutes) {
       // formula: calories = MET × 3.5 × weight(kg) / 200 × time(minutes)
       // assume average weight of 70kg if user weight not available
-      const timeMinutes = hours * 60;
-      const estimatedFromMET = ((activity.met_value * 3.5 * 70) / 200) * timeMinutes;
+      const estimatedFromMET = ((activity.met_value * 3.5 * 70) / 200) * durationMinutes;
 
       // if Google Fit calories are more than 3x the MET estimate, use MET estimate instead
       if (kcal_burned > estimatedFromMET * 3) {
@@ -577,13 +581,12 @@ export class GoogleFitService {
     activityRecord.type = RecordType.DAILY;
     activityRecord.activity = activity;
     activityRecord.daily_log = dailyLog;
-    activityRecord.hours = hours;
+    activityRecord.duration_minutes = durationMinutes;
     activityRecord.kcal_burned = estimatedCalories;
-    activityRecord.distance_km = distance_km;
     if (ahr > 0) {
       activityRecord.ahr = ahr;
     }
-    // reps, load_kg, user_weight_kg, rhr, intensity_level remain undefined (Google Fit doesn't track these)
+    // rhr, intensity_level remain undefined (Google Fit doesn't track these)
 
     dailyLog.total_kcal_burned += estimatedCalories;
     await this.dailyLogsService.save(dailyLog);
@@ -594,7 +597,7 @@ export class GoogleFitService {
     await this.dailyLogsService.recalculateTotalKcal(dailyLog.id);
 
     Logger.log(
-      `Saved Google Fit activity: ${hours.toFixed(2)}h, ${estimatedCalories.toFixed(0)} kcal${estimatedCalories !== kcal_burned ? ` (corrected from ${kcal_burned.toFixed(0)})` : ''}, ${distance_km.toFixed(2)} km`,
+      `Saved Google Fit activity: ${durationMinutes.toFixed(1)} min, ${estimatedCalories.toFixed(0)} kcal${estimatedCalories !== kcal_burned ? ` (corrected from ${kcal_burned.toFixed(0)})` : ''}`,
     );
 
     return savedRecord;
@@ -617,11 +620,11 @@ export class GoogleFitService {
             break;
 
           case 'com.google.distance.delta':
-            record.distance_km = point.value[0].fpVal / 1000; // meters to km
+            // note: we no longer store distance, but keep this for potential future use
             break;
 
           case 'com.google.active_minutes':
-            record.hours = point.value[0].intVal / 60; // minutes to hours
+            record.duration_minutes = point.value[0].intVal; // already in minutes
             break;
 
           case 'com.google.heart_rate.bpm':

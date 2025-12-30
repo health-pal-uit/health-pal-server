@@ -108,7 +108,7 @@ import { FavMeal } from 'src/fav_meals/entities/fav_meal.entity';
 import { ChallengesUser } from 'src/challenges_users/entities/challenges_user.entity';
 import { MedalsUser } from 'src/medals_users/entities/medals_user.entity';
 import { MealType } from 'src/helpers/enums/meal-type.enum';
-import { calcKcalSimple } from 'src/helpers/functions/kcal-burned-cal';
+import { calcKcal } from 'src/helpers/functions/kcal-burned-cal';
 
 export async function seedData(manager: EntityManager) {
   faker.seed(40);
@@ -627,26 +627,34 @@ async function seedDailyLogs(
     // activity_records (snapshots)
     const acts = faker.helpers.arrayElements(opts.activities, faker.number.int({ min: 0, max: 2 }));
     for (const a of acts) {
+      const durationMinutes = faker.number.float({ min: 15, max: 90, multipleOf: 5 });
+      const intensityLevel = faker.number.int({ min: 1, max: 5 });
+      const userWeightKg = faker.number.float({ min: 45, max: 85, multipleOf: 0.1 });
+      const rhr = faker.number.int({ min: 55, max: 75 });
+      const ahr = faker.number.int({ min: 90, max: 150 });
+
       const record: Partial<ActivityRecord> = {
         activity: a,
         daily_log: log,
-        challenge: null, // Must be null when daily_log is set
-        user_owned: true, // Required field
-        hours: faker.number.float({ min: 0.3, max: 1.5, multipleOf: 0.1 }),
-        reps: undefined, // Either reps OR hours (not both) - use undefined for optional fields
-        load_kg: undefined,
-        distance_km: faker.datatype.boolean()
-          ? faker.number.float({ min: 1, max: 6, multipleOf: 0.1 })
-          : undefined,
-        user_weight_kg: faker.number.float({ min: 45, max: 85, multipleOf: 0.1 }),
-        rhr: faker.number.int({ min: 55, max: 75 }),
-        ahr: faker.number.int({ min: 90, max: 150 }),
-        type: RecordType.DAILY, // Use enum instead of string
-        intensity_level: faker.number.int({ min: 1, max: 5 }),
+        challenge: null,
+        user_owned: true,
+        duration_minutes: durationMinutes,
+        rhr: rhr,
+        ahr: ahr,
+        type: RecordType.DAILY,
+        intensity_level: intensityLevel,
       };
 
-      // Calculate kcal_burned using the same logic as the service
-      const { kcal } = calcKcalSimple(record as ActivityRecord, a);
+      // calculate kcal_burned
+      const kcal = calcKcal(
+        durationMinutes,
+        a.met_value,
+        userWeightKg,
+        intensityLevel,
+        ahr,
+        rhr,
+        25,
+      );
       record.kcal_burned = kcal;
 
       await manager.getRepository(ActivityRecord).save(record);

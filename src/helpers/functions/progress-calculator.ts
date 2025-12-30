@@ -1,11 +1,11 @@
 import { ActivityRecord } from 'src/activity_records/entities/activity_record.entity';
 
-// ---- Helper: tạo bộ cộng dồn & tính % theo template ----
+// progress accumulator for challenge activity records
 export function makeProgressAccumulator(template: ActivityRecord) {
-  type MetricKey = 'reps' | 'hours' | 'distance_km' | 'kcal_burned' | 'load_kg';
+  type MetricKey = 'duration_minutes' | 'kcal_burned';
 
-  // 1) Lấy các chỉ số mà template có yêu cầu (target > 0)
-  const metrics: MetricKey[] = ['reps', 'hours', 'distance_km', 'kcal_burned', 'load_kg'];
+  // get metrics that template requires (target > 0)
+  const metrics: MetricKey[] = ['duration_minutes', 'kcal_burned'];
   const targets: Partial<Record<MetricKey, number>> = {};
   for (const m of metrics) {
     const v = (template as any)[m];
@@ -15,18 +15,18 @@ export function makeProgressAccumulator(template: ActivityRecord) {
   }
   const targetKeys = Object.keys(targets) as MetricKey[];
   if (targetKeys.length === 0) {
-    // Không có chỉ số nào được yêu cầu → coi như 0%
+    // no metrics required → 0%
     return {
       add: (_ar: ActivityRecord) => {},
       percent: () => 0,
     };
   }
 
-  // 2) Khởi tạo tổng của user cho từng metric
+  // initialize sums for each metric
   const sums: Partial<Record<MetricKey, number>> = {};
   for (const k of targetKeys) sums[k] = 0;
 
-  // 3) API cộng dồn từng AR của user (chỉ cộng metric có giá trị)
+  // add user's activity record values
   function add(ar: ActivityRecord) {
     for (const k of targetKeys) {
       const val = (ar as any)[k];
@@ -36,7 +36,7 @@ export function makeProgressAccumulator(template: ActivityRecord) {
     }
   }
 
-  // 4) Tính % theo AND logic: phải đạt tất cả chỉ số → lấy min(%)
+  // calculate percentage - use min(%) to require all metrics met
   function percent(): number {
     let minPct = 100;
     for (const k of targetKeys) {
@@ -46,7 +46,7 @@ export function makeProgressAccumulator(template: ActivityRecord) {
       if (!isFinite(pct)) return 0;
       if (pct < minPct) minPct = pct;
     }
-    return Math.round(minPct * 10) / 10; // làm tròn 0.1%
+    return Math.round(minPct * 10) / 10; // round to 0.1%
   }
 
   return { add, percent };
