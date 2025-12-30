@@ -32,15 +32,15 @@ export class FoodVisionService {
     return response.data.labels;
   }
 
-  async getIngredientOrMealByName(name: string) {
+  async getIngredientOrMealByName(name: string, page: number, limit: number) {
     this.logger.log(`Searching for ingredient or meal by name: ${name}`);
     // search ingredient first
-    const ingredientResult = await this.ingredientsService.searchByName(name, 1, 1);
+    const ingredientResult = await this.ingredientsService.searchByName(name, page, limit);
     if (ingredientResult.total > 0) {
       return { type: 'ingredient', data: ingredientResult.data[0] };
     }
     // search meal next
-    const mealResult = await this.mealsService.searchByName(name, 1, 1);
+    const mealResult = await this.mealsService.searchByName(name, page, limit);
     if (mealResult.total > 0) {
       return { type: 'meal', data: mealResult.data[0] };
     }

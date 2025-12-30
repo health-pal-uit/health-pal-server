@@ -30,7 +30,10 @@ export class FitnessProfilesService {
     if (!user) {
       throw new Error('User not found');
     }
-    const fitnessProfile = await this.fitnessProfileRepository.findOne({ where: { user } });
+    const fitnessProfile = await this.fitnessProfileRepository.findOne({
+      where: { user: { id: userId }, deleted_at: IsNull() },
+      order: { created_at: 'DESC' },
+    });
     if (!fitnessProfile) {
       throw new UnauthorizedException('You do not have access to this fitness profile');
     }
@@ -54,11 +57,20 @@ export class FitnessProfilesService {
       throw new BadRequestException('Weight or height is out of supported range');
     }
 
-    const fitnessProfile = this.fitnessProfileRepository.create(createFitnessProfileDto);
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
       throw new Error('User not found');
     }
+
+    // check if user already has a fitness profile
+    const existingProfile = await this.fitnessProfileRepository.findOne({
+      where: { user: { id: userId }, deleted_at: IsNull() },
+    });
+    if (existingProfile) {
+      throw new BadRequestException('User already has a fitness profile. Use update instead.');
+    }
+
+    const fitnessProfile = this.fitnessProfileRepository.create(createFitnessProfileDto);
     fitnessProfile.user = user;
 
     // Calculate BMR, BMI, TDEE
@@ -91,7 +103,10 @@ export class FitnessProfilesService {
     if (!user) {
       throw new Error('User not found');
     }
-    const fitnessProfile = await this.fitnessProfileRepository.findOne({ where: { user } });
+    const fitnessProfile = await this.fitnessProfileRepository.findOne({
+      where: { user: { id: userId }, deleted_at: IsNull() },
+      order: { created_at: 'DESC' },
+    });
     if (!fitnessProfile) {
       throw new UnauthorizedException('You do not have access to this fitness profile');
     }
@@ -102,16 +117,15 @@ export class FitnessProfilesService {
     updateFitnessProfileDto: UpdateFitnessProfileDto,
     userId: string,
   ): Promise<FitnessProfile | null> {
-    const user = await this.userRepository.findOne({
-      where: { id: userId },
-      relations: ['fitness_profiles'],
-    });
-    const fitnessProfileId = user?.fitness_profiles?.[0]?.id;
+    const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
       throw new Error('User not found');
     }
+
+    // get the latest fitness profile
     const fitnessProfile = await this.fitnessProfileRepository.findOne({
-      where: { id: fitnessProfileId, user },
+      where: { user: { id: userId }, deleted_at: IsNull() },
+      order: { created_at: 'DESC' },
     });
     if (!fitnessProfile) {
       throw new UnauthorizedException('You do not have access to this fitness profile');
@@ -137,9 +151,9 @@ export class FitnessProfilesService {
     updateFitnessProfileDto.bmi = fitnessProfile.bmi;
     updateFitnessProfileDto.tdee_kcal = fitnessProfile.tdee_kcal;
 
-    await this.fitnessProfileRepository.update(fitnessProfileId!, updateFitnessProfileDto);
+    await this.fitnessProfileRepository.update(fitnessProfile.id, updateFitnessProfileDto);
     return this.fitnessProfileRepository.findOne({
-      where: { id: fitnessProfileId },
+      where: { id: fitnessProfile.id },
       relations: ['user', 'diet_type'],
     });
   }
@@ -270,16 +284,15 @@ export class FitnessProfilesService {
     if (!user) {
       throw new Error('User not found');
     }
-    const fitnessProfile = await this.fitnessProfileRepository.findOne({ where: { user } });
-    if (!fitnessProfile) {
-      throw new Error('Fitness profile not found for the user');
-    }
+
+    // get the latest fitness profile
     const fitnessProfileEntity = await this.fitnessProfileRepository.findOne({
-      where: { id: fitnessProfile.id },
+      where: { user: { id: userId }, deleted_at: IsNull() },
+      order: { created_at: 'DESC' },
       relations: ['user'],
     });
     if (!fitnessProfileEntity) {
-      throw new Error('Fitness profile not found');
+      throw new Error('Fitness profile not found for the user');
     }
     fitnessProfileEntity.hip_cm = bFFitnessProfileDto.hip_cm;
     fitnessProfileEntity.waist_cm = bFFitnessProfileDto.waist_cm;
