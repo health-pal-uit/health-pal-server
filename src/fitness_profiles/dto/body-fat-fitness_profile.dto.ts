@@ -1,9 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsDateString, IsEnum, IsNotEmpty, IsNumber, IsOptional, IsUUID } from 'class-validator';
-import { ActivityLevel } from 'src/helpers/enums/activity-level.enum';
+import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsUUID } from 'class-validator';
 import { BFPCalculatingMethod } from 'src/helpers/enums/bfp-calculating-method.enum';
-import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
 
 export class BFFitnessProfileDto {
   @ApiProperty({ description: 'Waist circumference in centimeters' })
@@ -36,10 +34,10 @@ export class BFFitnessProfileDto {
   body_fat_calculating_method?: BFPCalculatingMethod;
 
   // relations => 2
-  @ApiProperty({ description: 'User ID' })
-  @IsNotEmpty()
+  @ApiProperty({ description: 'User ID', required: false })
+  @IsOptional()
   @IsUUID('4')
-  user_id!: string;
+  user_id?: string;
 
   @ApiProperty({ description: 'Diet type ID' })
   @IsNotEmpty()

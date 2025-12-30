@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsDate, IsDateString, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
+import { IsDateString, IsNotEmpty, IsOptional, IsString, IsUUID } from 'class-validator';
 import { TransformToISODate } from 'src/helpers/transformers/date.transformer';
 
 export class CreateDeviceDto {
@@ -26,8 +26,12 @@ export class CreateDeviceDto {
   created_at?: Date;
 
   // relations => 1
-  @ApiProperty({ example: 'user-uuid', description: 'ID of the user owning the device' })
-  @IsNotEmpty()
+  @ApiProperty({
+    example: 'user-uuid',
+    description: 'ID of the user owning the device',
+    required: false,
+  })
+  @IsOptional()
   @IsUUID('4')
-  user_id!: string;
+  user_id?: string;
 }
