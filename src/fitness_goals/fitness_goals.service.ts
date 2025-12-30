@@ -36,10 +36,10 @@ export class FitnessGoalsService {
       throw new Error('User not found');
     }
 
-    // get user's fitness profile to access TDEE
     const fitnessProfile = await this.fitnessProfileRepository.findOne({
       where: { user: { id: userId }, deleted_at: IsNull() },
       order: { created_at: 'DESC' },
+      relations: ['diet_type'],
     });
 
     let calculatedTargets: {
@@ -50,15 +50,13 @@ export class FitnessGoalsService {
       target_fiber_gr: number;
     };
 
-    // if fitness profile exists, calculate targets based on TDEE and goal type
     if (fitnessProfile && fitnessProfile.tdee_kcal) {
       calculatedTargets = this.calculateTargetsFromTDEE(
         fitnessProfile.tdee_kcal,
         createFitnessGoalDto.goal_type,
-        fitnessProfile.weight_kg,
+        fitnessProfile.diet_type,
       );
     } else {
-      // fallback to 0 if no fitness profile exists
       calculatedTargets = {
         target_kcal: 0,
         target_protein_gr: 0,
@@ -82,11 +80,10 @@ export class FitnessGoalsService {
     return await this.fitnessGoalRepository.save(fitnessGoal);
   }
 
-  // calculate fitness goal targets based on TDEE and goal type
   private calculateTargetsFromTDEE(
     tdee: number,
     goalType: FitnessGoalType,
-    weightKg: number,
+    dietType: any,
   ): {
     target_kcal: number;
     target_protein_gr: number;
@@ -95,62 +92,44 @@ export class FitnessGoalsService {
     target_fiber_gr: number;
   } {
     let targetKcal: number;
-    let proteinGrPerKg: number;
-    let fatPercentage: number;
 
     switch (goalType) {
       case FitnessGoalType.CUT:
-        // deficit of 500 kcal for weight loss
         targetKcal = tdee - 500;
-        proteinGrPerKg = 2.2; // high protein to preserve muscle
-        fatPercentage = 0.25; // 25% of calories from fat
         break;
-
       case FitnessGoalType.BULK:
       case FitnessGoalType.GAIN_MUSCLES:
-        // surplus of 300-500 kcal for muscle gain
         targetKcal = tdee + 400;
-        proteinGrPerKg = 2.0; // high protein for muscle building
-        fatPercentage = 0.25; // 25% of calories from fat
         break;
-
       case FitnessGoalType.MAINTAIN:
-        // maintenance calories
         targetKcal = tdee;
-        proteinGrPerKg = 1.8; // moderate protein
-        fatPercentage = 0.3; // 30% of calories from fat
         break;
-
       case FitnessGoalType.RECOVERY:
-        // slight surplus for recovery
         targetKcal = tdee + 200;
-        proteinGrPerKg = 2.0; // high protein for recovery
-        fatPercentage = 0.3; // 30% of calories from fat
         break;
-
       default:
-        // fallback to maintenance
         targetKcal = tdee;
-        proteinGrPerKg = 1.8;
-        fatPercentage = 0.3;
     }
 
-    // ensure target_kcal doesn't go below 1200 (safe minimum)
     targetKcal = Math.max(1200, targetKcal);
 
-    // calculate protein in grams (4 kcal per gram)
-    const targetProteinGr = Math.round(weightKg * proteinGrPerKg);
-    const proteinKcal = targetProteinGr * 4;
+    let proteinPercentage: number;
+    let fatPercentage: number;
+    let carbsPercentage: number;
 
-    // calculate fat in grams (9 kcal per gram)
-    const fatKcal = targetKcal * fatPercentage;
-    const targetFatGr = Math.round(fatKcal / 9);
+    if (dietType) {
+      proteinPercentage = dietType.protein_percentages / 100;
+      fatPercentage = dietType.fat_percentages / 100;
+      carbsPercentage = dietType.carbs_percentages / 100;
+    } else {
+      proteinPercentage = 0.3;
+      fatPercentage = 0.25;
+      carbsPercentage = 0.45;
+    }
 
-    // remaining calories go to carbs (4 kcal per gram)
-    const remainingKcal = targetKcal - proteinKcal - fatKcal;
-    const targetCarbsGr = Math.round(Math.max(0, remainingKcal / 4));
-
-    // fiber target: 14g per 1000 kcal (general recommendation)
+    const targetProteinGr = Math.round((targetKcal * proteinPercentage) / 4);
+    const targetFatGr = Math.round((targetKcal * fatPercentage) / 9);
+    const targetCarbsGr = Math.round((targetKcal * carbsPercentage) / 4);
     const targetFiberGr = Math.round((targetKcal / 1000) * 14);
 
     return {
@@ -212,19 +191,18 @@ export class FitnessGoalsService {
         updateFitnessGoalDto.target_carbs_gr !== undefined ||
         updateFitnessGoalDto.target_fiber_gr !== undefined;
 
-      // only recalculate if no manual targets are provided
       if (!hasManualTargets) {
-        // get user's fitness profile to access TDEE
         const fitnessProfile = await this.fitnessProfileRepository.findOne({
           where: { user: { id: userId }, deleted_at: IsNull() },
           order: { created_at: 'DESC' },
+          relations: ['diet_type'],
         });
 
         if (fitnessProfile && fitnessProfile.tdee_kcal) {
           const calculatedTargets = this.calculateTargetsFromTDEE(
             fitnessProfile.tdee_kcal,
             updateFitnessGoalDto.goal_type,
-            fitnessProfile.weight_kg,
+            fitnessProfile.diet_type,
           );
 
           // merge calculated targets into update DTO

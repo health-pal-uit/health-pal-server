@@ -17,12 +17,14 @@ import { calculateAge } from 'src/helpers/functions/age-calculator';
 import { cmToInch } from 'src/helpers/functions/cm-to-inch';
 import { kgToLb } from 'src/helpers/functions/kg-to-lb';
 import { isUUID } from 'class-validator';
+import { DietType } from 'src/diet_types/entities/diet_type.entity';
 
 @Injectable()
 export class FitnessProfilesService {
   constructor(
     @InjectRepository(FitnessProfile) private fitnessProfileRepository: Repository<FitnessProfile>,
     @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectRepository(DietType) private dietTypeRepository: Repository<DietType>,
   ) {}
 
   async findOneByUserId(userId: string): Promise<FitnessProfile | null> {
@@ -68,6 +70,16 @@ export class FitnessProfilesService {
     });
     if (existingProfile) {
       throw new BadRequestException('User already has a fitness profile. Use update instead.');
+    }
+
+    // if no diet type provided, assign "Balanced" diet type
+    if (!createFitnessProfileDto.diet_type_id) {
+      const balancedDietType = await this.dietTypeRepository.findOne({
+        where: { name: 'Balanced', deleted_at: IsNull() },
+      });
+      if (balancedDietType) {
+        createFitnessProfileDto.diet_type_id = balancedDietType.id;
+      }
     }
 
     const fitnessProfile = this.fitnessProfileRepository.create(createFitnessProfileDto);
