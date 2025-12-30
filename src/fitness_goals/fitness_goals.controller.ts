@@ -70,6 +70,17 @@ export class FitnessGoalsController {
     return await this.fitnessGoalsService.findAllOfUser(user.id);
   }
 
+  // User: get current/latest fitness goal
+  @Get('current')
+  @ApiOperation({
+    summary: 'Get the current fitness goal for the current user',
+    description: 'Returns the most recent fitness goal belonging to the authenticated user.',
+  })
+  @ApiResponse({ status: 200, description: 'Current fitness goal.' })
+  async findCurrent(@CurrentUser() user: ReqUserType) {
+    return await this.fitnessGoalsService.findLatestByUserId(user.id);
+  }
+
   @Get(':id')
   @ApiOperation({
     summary: 'Get a fitness goal by id for the current user',

@@ -23,6 +23,13 @@ export class FitnessGoalsService {
     });
   }
 
+  async findLatestByUserId(userId: string): Promise<FitnessGoal | null> {
+    return await this.fitnessGoalRepository.findOne({
+      where: { user: { id: userId }, deleted_at: IsNull() },
+      order: { created_at: 'DESC' },
+    });
+  }
+
   async create(createFitnessGoalDto: CreateFitnessGoalDto, userId: string): Promise<FitnessGoal> {
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
