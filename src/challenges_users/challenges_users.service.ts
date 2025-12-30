@@ -66,17 +66,17 @@ export class ChallengesUsersService {
       if (existingChallengeUser.progress_percent === 100) {
         throw new ConflictException('Challenge already finished by this user');
       }
-      // Update existing record to finished
+      // update existing record to finished
       existingChallengeUser.progress_percent = 100;
-      existingChallengeUser.achieved_at = new Date();
+      existingChallengeUser.completed_at = new Date();
       return await this.challengesUsersRepository.save(existingChallengeUser);
     }
 
-    // Create new finished challenge record
+    // create new finished challenge record
     const challenge_user = this.challengesUsersRepository.create({
       challenge,
       user,
-      achieved_at: new Date(),
+      completed_at: new Date(),
       progress_percent: 100,
     });
     return await this.challengesUsersRepository.save(challenge_user);

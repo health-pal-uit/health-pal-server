@@ -11,10 +11,13 @@ export class ChallengesUser {
   id: string;
 
   @Column({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
-  achieved_at: Date;
+  joined_at: Date;
 
-  @Column({ type: 'float', nullable: true })
-  progress_percent?: number;
+  @Column({ type: 'timestamptz', nullable: true })
+  completed_at?: Date | null;
+
+  @Column({ type: 'float', default: 0 })
+  progress_percent: number;
 
   // relations => 2
 

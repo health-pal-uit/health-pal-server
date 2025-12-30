@@ -318,21 +318,18 @@ export class ActivityRecordsService {
       throw new BadRequestException('Activity record is not associated with a challenge');
     }
 
-    // Get when user joined this challenge (to prevent counting historical data)
+    // get when user joined this challenge
     const challengeUser = await this.challengesUsersService.getOrCreateChallengesUser(
       userId,
       activityRecord.challenge.id,
     );
-    const joinDate = challengeUser.achieved_at; // This is set when user first joins
-
-    // Note: We don't have challenge-specific ActivityRecords anymore (challenge_user relation removed).
-    // Progress is calculated ONLY from daily ActivityRecords created after user joined the challenge.
+    const joinDate = challengeUser.joined_at;
 
     const dailyActivityRecords = await this.activityRecordRepository.find({
       where: {
         daily_log: { user: { id: userId } },
         type: RecordType.DAILY,
-        activity: { name: activityRecord.activity.name },
+        activity: { id: activityRecord.activity.id },
         created_at: MoreThanOrEqual(joinDate),
         deleted_at: IsNull(),
       },
@@ -341,7 +338,7 @@ export class ActivityRecordsService {
 
     const acc = makeProgressAccumulator(activityRecord);
 
-    // Add all daily activities created after user joined the challenge
+    // add all daily activities created after user joined the challenge
     for (const ar of dailyActivityRecords) {
       acc.add(ar);
     }
