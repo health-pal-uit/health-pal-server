@@ -53,12 +53,12 @@ export class CreateFitnessGoalDto {
   created_at?: Date;
 
   // relations => 1
-  @IsNotEmpty()
+  @IsOptional()
   @ApiProperty({
     type: 'string',
     format: 'uuid',
     description: 'ID of the user who owns this fitness goal',
   })
   @IsUUID('4')
-  user_id!: string;
+  user_id?: string;
 }
