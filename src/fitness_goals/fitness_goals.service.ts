@@ -272,4 +272,31 @@ export class FitnessGoalsService {
     // For now, always return false (no reference) unless you add the relation
     return { referenced: false, references: [] };
   }
+
+  async updateGoalsAfterDietTypeChange(userId: string, fitnessProfile: any): Promise<void> {
+    // get all active (non-deleted) fitness goals for this user
+    const goals = await this.fitnessGoalRepository.find({
+      where: { user: { id: userId }, deleted_at: IsNull() },
+    });
+
+    // update each goal with new macros based on new diet type
+    for (const goal of goals) {
+      if (fitnessProfile.tdee_kcal && fitnessProfile.diet_type) {
+        const calculatedTargets = this.calculateTargetsFromTDEE(
+          fitnessProfile.tdee_kcal,
+          goal.goal_type,
+          fitnessProfile.diet_type,
+        );
+
+        // update the goal with new targets
+        goal.target_kcal = calculatedTargets.target_kcal;
+        goal.target_protein_gr = calculatedTargets.target_protein_gr;
+        goal.target_fat_gr = calculatedTargets.target_fat_gr;
+        goal.target_carbs_gr = calculatedTargets.target_carbs_gr;
+        goal.target_fiber_gr = calculatedTargets.target_fiber_gr;
+
+        await this.fitnessGoalRepository.save(goal);
+      }
+    }
+  }
 }

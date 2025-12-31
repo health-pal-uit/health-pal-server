@@ -1,8 +1,10 @@
 import {
   BadRequestException,
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
+  forwardRef,
 } from '@nestjs/common';
 import { CreateFitnessProfileDto } from './dto/create-fitness_profile.dto';
 import { UpdateFitnessProfileDto } from './dto/update-fitness_profile.dto';
@@ -18,6 +20,7 @@ import { cmToInch } from 'src/helpers/functions/cm-to-inch';
 import { kgToLb } from 'src/helpers/functions/kg-to-lb';
 import { isUUID } from 'class-validator';
 import { DietType } from 'src/diet_types/entities/diet_type.entity';
+import { FitnessGoalsService } from 'src/fitness_goals/fitness_goals.service';
 
 @Injectable()
 export class FitnessProfilesService {
@@ -25,6 +28,8 @@ export class FitnessProfilesService {
     @InjectRepository(FitnessProfile) private fitnessProfileRepository: Repository<FitnessProfile>,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(DietType) private dietTypeRepository: Repository<DietType>,
+    @Inject(forwardRef(() => FitnessGoalsService))
+    private fitnessGoalsService: FitnessGoalsService,
   ) {}
 
   async findOneByUserId(userId: string): Promise<FitnessProfile | null> {
@@ -154,12 +159,18 @@ export class FitnessProfilesService {
     if (updateFitnessProfileDto.activity_level !== undefined) {
       fitnessProfile.activity_level = updateFitnessProfileDto.activity_level;
     }
+
+    let dietTypeChanged = false;
     if (updateFitnessProfileDto.diet_type_id !== undefined) {
       const dietType = await this.dietTypeRepository.findOneBy({
         id: updateFitnessProfileDto.diet_type_id,
       });
       if (!dietType) {
         throw new NotFoundException('Diet type not found');
+      }
+      // check if diet type actually changed
+      if (!fitnessProfile.diet_type || fitnessProfile.diet_type.id !== dietType.id) {
+        dietTypeChanged = true;
       }
       fitnessProfile.diet_type = dietType;
     }
@@ -189,6 +200,12 @@ export class FitnessProfilesService {
 
     // save the entity (this properly handles relations)
     await this.fitnessProfileRepository.save(fitnessProfile);
+
+    // if diet type changed, update all user's fitness goals to recalculate macros
+    if (dietTypeChanged) {
+      await this.fitnessGoalsService.updateGoalsAfterDietTypeChange(userId, fitnessProfile);
+    }
+
     return this.fitnessProfileRepository.findOne({
       where: { id: fitnessProfile.id },
       relations: ['user', 'diet_type'],

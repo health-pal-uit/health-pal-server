@@ -9,8 +9,9 @@ import {
   UseGuards,
   Query,
   UnauthorizedException,
+  BadRequestException,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
 import { ActivityRecordsService } from './activity_records.service';
 import { CreateActivityRecordDto } from './dto/create-activity_record.dto';
 import { UpdateActivityRecordDto } from './dto/update-activity_record.dto';
@@ -81,9 +82,9 @@ export class ActivityRecordsController {
 
   @Post('daily-logs')
   @ApiOperation({
-    summary: 'Create daily log activity record',
+    summary: 'Create daily log activity record for today',
     description:
-      'Records user activity for the day. Creates or updates daily log and calculates calories burned',
+      'Records user activity for today. Creates or updates daily log and calculates calories burned',
   })
   @ApiResponse({ status: 201, description: 'Daily activity record created successfully' })
   @ApiResponse({ status: 400, description: 'Invalid input data' })
@@ -93,6 +94,49 @@ export class ActivityRecordsController {
     @Body() createActivityRecordDto: CreateActivityRecordDto,
     @CurrentUser() user: any,
   ) {
+    return await this.activityRecordsService.createDailyLogs(createActivityRecordDto, user.id);
+  }
+
+  @Post('daily-logs/date/:date')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({
+    summary: 'Create daily log activity record for a specific date',
+    description:
+      'Records user activity for a specific date. Creates or updates daily log and calculates calories burned',
+  })
+  @ApiParam({
+    name: 'date',
+    type: String,
+    description: 'Date in dd-MM-yyyy format (e.g., 29-12-2025)',
+    example: '29-12-2025',
+  })
+  @ApiResponse({ status: 201, description: 'Daily activity record created successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid input data or date format' })
+  @ApiResponse({ status: 404, description: 'Activity not found' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async createDailyLogsForDate(
+    @Param('date') date: string,
+    @Body() createActivityRecordDto: CreateActivityRecordDto,
+    @CurrentUser() user: any,
+  ) {
+    // validate date format
+    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+    if (!dateRegex.test(date)) {
+      throw new BadRequestException('Invalid date format. Use dd-MM-yyyy (e.g., 29-12-2025)');
+    }
+
+    // parse date from dd-MM-yyyy to ISO format
+    const [day, month, year] = date.split('-');
+    const isoDate = `${year}-${month}-${day}`;
+    const parsedDate = new Date(isoDate);
+
+    if (isNaN(parsedDate.getTime())) {
+      throw new BadRequestException('Invalid date');
+    }
+
+    // set the created_at to the specified date
+    createActivityRecordDto.created_at = parsedDate;
+
     return await this.activityRecordsService.createDailyLogs(createActivityRecordDto, user.id);
   }
 
