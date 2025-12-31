@@ -70,10 +70,6 @@ export class ActivityRecord {
   @JoinColumn({ name: 'challenge_id' })
   challenge: Challenge | null;
 
-  // Note: We don't link to ChallengesUser here. Challenge progress is calculated by querying
-  // ActivityRecords with matching challenge_id, not by direct relation to user challenge entries.
-  // The progress calculation in ActivityRecordsService.calculateProgressPercent() handles this.
-
   @ManyToOne(() => Activity, (activity) => activity.activity_records, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'activity_id' })
   activity: Activity;

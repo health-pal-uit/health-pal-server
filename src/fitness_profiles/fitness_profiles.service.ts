@@ -139,6 +139,7 @@ export class FitnessProfilesService {
     const fitnessProfile = await this.fitnessProfileRepository.findOne({
       where: { user: { id: userId }, deleted_at: IsNull() },
       order: { created_at: 'DESC' },
+      relations: ['user'],
     });
     if (!fitnessProfile) {
       throw new UnauthorizedException('You do not have access to this fitness profile');
