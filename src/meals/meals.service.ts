@@ -237,9 +237,28 @@ export class MealsService {
     });
   }
 
-  async update(id: string, updateMealDto: UpdateMealDto): Promise<Meal | null> {
-    await this.mealsRepository.update(id, updateMealDto);
-    // Return with all fields and relations
+  async update(
+    id: string,
+    updateMealDto: UpdateMealDto,
+    imageBuffer?: Buffer,
+    imageName?: string,
+  ): Promise<Meal | null> {
+    // handle image upload if provided
+    if (imageBuffer && imageName) {
+      const bucketName = this.configService.get<string>('MEAL_IMG_BUCKET_NAME') || 'meal-imgs';
+      const imagePath = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        bucketName,
+      );
+      updateMealDto.image_url = imagePath;
+    }
+
+    // only update if there are fields to update
+    if (Object.keys(updateMealDto).length > 0) {
+      await this.mealsRepository.update(id, updateMealDto);
+    }
+    // return with all fields and relations
     return await this.mealsRepository.findOne({
       where: { id },
       relations: ['ingre_meals', 'ingre_meals.ingredient'],

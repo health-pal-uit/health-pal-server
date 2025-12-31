@@ -125,13 +125,21 @@ export class MealsController {
 
   @Patch(':id') // create update contribution -> if made from ingredients => whole another route, also need to distinguish between admin and user
   @UseGuards(AdminSupabaseGuard)
+  @UseInterceptors(FileInterceptor('image'))
   @ApiOperation({ summary: 'Admin updates a meal (users must use contributions)' })
+  @ApiConsumes('multipart/form-data')
   @ApiBody({ type: UpdateMealDto })
   @ApiParam({ name: 'id', type: String, description: 'Meal ID' })
   @ApiResponse({ status: 200, description: 'Meal updated' })
   @ApiResponse({ status: 403, description: 'Forbidden for non-admins' })
-  async update(@Param('id') id: string, @Body() updateMealDto: UpdateMealDto) {
-    return await this.mealsService.update(id, updateMealDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateMealDto: UpdateMealDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
+    return await this.mealsService.update(id, updateMealDto, imageBuffer, imageName);
   }
 
   @Delete(':id') // create delete contribution -> if made from ingredients => whole another route, also need to distinguish between admin and user
