@@ -54,7 +54,11 @@ export class DailyLogsService {
     await this.dailyLogRepository.upsert({ user: { id: userId } as any, date }, ['user', 'date']);
     return this.dailyLogRepository.findOne({
       where: { user: { id: userId }, date },
-      relations: { user: true, daily_ingres: true, daily_meals: true },
+      relations: {
+        user: true,
+        daily_ingres: { ingredient: true },
+        daily_meals: { meal: true },
+      },
     });
   }
 

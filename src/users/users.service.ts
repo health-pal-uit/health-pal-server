@@ -97,7 +97,6 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    Object.assign(user, updateUserDto);
     if (imageBuffer && imageName) {
       const avatarBucketName =
         this.configService.get<string>('SUPABASE_AVATAR_BUCKET_NAME') || 'avatars';

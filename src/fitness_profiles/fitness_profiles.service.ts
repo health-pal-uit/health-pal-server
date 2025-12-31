@@ -118,6 +118,7 @@ export class FitnessProfilesService {
     const fitnessProfile = await this.fitnessProfileRepository.findOne({
       where: { user: { id: userId }, deleted_at: IsNull() },
       order: { created_at: 'DESC' },
+      relations: ['diet_type'],
     });
     if (!fitnessProfile) {
       throw new UnauthorizedException('You do not have access to this fitness profile');
@@ -151,6 +152,15 @@ export class FitnessProfilesService {
     }
     if (updateFitnessProfileDto.activity_level !== undefined) {
       fitnessProfile.activity_level = updateFitnessProfileDto.activity_level;
+    }
+    if (updateFitnessProfileDto.diet_type_id !== undefined) {
+      const dietType = await this.dietTypeRepository.findOneBy({
+        id: updateFitnessProfileDto.diet_type_id,
+      });
+      if (!dietType) {
+        throw new NotFoundException('Diet type not found');
+      }
+      //fitnessProfile.diet_type = dietType;
     }
 
     // Calculate BMR, BMI, TDEE with updated values
