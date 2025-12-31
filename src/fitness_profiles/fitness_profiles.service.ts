@@ -161,7 +161,7 @@ export class FitnessProfilesService {
       if (!dietType) {
         throw new NotFoundException('Diet type not found');
       }
-      //fitnessProfile.diet_type = dietType;
+      fitnessProfile.diet_type = dietType;
     }
 
     // Calculate BMR, BMI, TDEE with updated values
@@ -169,12 +169,26 @@ export class FitnessProfilesService {
     fitnessProfile.bmi = this.calculateBMI(fitnessProfile);
     fitnessProfile.tdee_kcal = this.calculateTDEE(fitnessProfile);
 
-    // Merge calculated values into DTO before update
-    updateFitnessProfileDto.bmr = fitnessProfile.bmr;
-    updateFitnessProfileDto.bmi = fitnessProfile.bmi;
-    updateFitnessProfileDto.tdee_kcal = fitnessProfile.tdee_kcal;
+    // merge other DTO fields into entity
+    if (updateFitnessProfileDto.waist_cm !== undefined) {
+      fitnessProfile.waist_cm = updateFitnessProfileDto.waist_cm;
+    }
+    if (updateFitnessProfileDto.hip_cm !== undefined) {
+      fitnessProfile.hip_cm = updateFitnessProfileDto.hip_cm;
+    }
+    if (updateFitnessProfileDto.neck_cm !== undefined) {
+      fitnessProfile.neck_cm = updateFitnessProfileDto.neck_cm;
+    }
+    if (updateFitnessProfileDto.body_fat_percentages !== undefined) {
+      fitnessProfile.body_fat_percentages = updateFitnessProfileDto.body_fat_percentages;
+    }
+    if (updateFitnessProfileDto.body_fat_calculating_method !== undefined) {
+      fitnessProfile.body_fat_calculating_method =
+        updateFitnessProfileDto.body_fat_calculating_method;
+    }
 
-    await this.fitnessProfileRepository.update(fitnessProfile.id, updateFitnessProfileDto);
+    // save the entity (this properly handles relations)
+    await this.fitnessProfileRepository.save(fitnessProfile);
     return this.fitnessProfileRepository.findOne({
       where: { id: fitnessProfile.id },
       relations: ['user', 'diet_type'],

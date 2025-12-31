@@ -99,6 +99,7 @@ export class IngredientsService {
     imageBuffer?: Buffer,
     imageName?: string,
   ): Promise<Ingredient | null> {
+    // handle image upload if provided
     if (imageBuffer && imageName) {
       const bucketName =
         this.configService.get<string>('INGREDIENT_IMG_BUCKET_NAME') || 'ingredient-imgs';
@@ -109,8 +110,12 @@ export class IngredientsService {
       );
       updateIngredientDto.image_url = imagePath;
     }
-    await this.ingredientRepository.update(id, updateIngredientDto);
-    // Return with all fields
+
+    // only update if there are fields to update
+    if (Object.keys(updateIngredientDto).length > 0) {
+      await this.ingredientRepository.update(id, updateIngredientDto);
+    }
+    // return with all fields
     return await this.ingredientRepository.findOne({ where: { id } });
   }
 
