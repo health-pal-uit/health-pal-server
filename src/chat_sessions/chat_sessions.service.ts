@@ -32,7 +32,7 @@ export class ChatSessionsService {
     }
 
     // Create chat session
-    const chatSession = this.chatSessionRepository.create(createChatSessionDto);
+    const chatSession = await this.chatSessionRepository.create(createChatSessionDto);
     const savedSession = await this.chatSessionRepository.save(chatSession);
 
     // Create participant records for all users
@@ -67,7 +67,7 @@ export class ChatSessionsService {
   async findAll(page: number = 1, limit: number = 10): Promise<ChatSession[]> {
     const skip = (page - 1) * limit;
     return await this.chatSessionRepository.find({
-      relations: ['participants'],
+      relations: ['participants', 'participants.user'],
       where: { deleted_at: IsNull() },
       skip,
       take: limit,

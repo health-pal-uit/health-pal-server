@@ -66,6 +66,45 @@ export class UsersController {
     });
   }
 
+  @Get('/search')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Search users by fullname or username' })
+  @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
+  async searchUsers(@Query('q') query: string) {
+    const users = await this.usersService.findAll(1, 50); // fetch first 50 users for search
+    const filteredUsers = users.data.filter(
+      (user) =>
+        user.fullname.toLowerCase().includes(query.toLowerCase()) ||
+        user.username.toLowerCase().includes(query.toLowerCase()),
+    );
+    return responseHelper({
+      data: filteredUsers,
+      message: 'Users retrieved successfully',
+      statusCode: 200,
+    });
+  }
+
+  @Get('/:id')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get user by ID' })
+  @ApiResponse({ status: 200, description: 'User retrieved successfully' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  async findUserById(@Param('id') id: string) {
+    const user = await this.usersService.findOne(id);
+    if (!user) {
+      return responseHelper({
+        error: 'User not found',
+        message: 'User not found',
+        statusCode: 404,
+      });
+    }
+    return responseHelper({
+      data: user,
+      message: 'User retrieved successfully',
+      statusCode: 200,
+    });
+  }
+
   @Get()
   @UseGuards(AdminSupabaseGuard)
   @ApiOperation({ summary: 'Get all users (admin only)' })
