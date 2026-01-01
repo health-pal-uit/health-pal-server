@@ -71,12 +71,15 @@ export class UsersController {
   @ApiOperation({ summary: 'Search users by fullname or username' })
   @ApiResponse({ status: 200, description: 'Users retrieved successfully' })
   async searchUsers(@Query('q') query: string) {
-    const users = await this.usersService.findAll(1, 50); // fetch first 50 users for search
-    const filteredUsers = users.data.filter(
-      (user) =>
-        user.fullname.toLowerCase().includes(query.toLowerCase()) ||
-        user.username.toLowerCase().includes(query.toLowerCase()),
-    );
+    const users = await this.usersService.findAll(1, 50); // fetch first 50 users for searc
+    const filteredUsers = users.data.filter((user) => {
+      if (!user.fullname && !user.username) return false;
+      const lowerQuery = query.toLowerCase();
+      return (
+        (user.fullname && user.fullname.toLowerCase().includes(lowerQuery)) ||
+        (user.username && user.username.toLowerCase().includes(lowerQuery))
+      );
+    });
     return responseHelper({
       data: filteredUsers,
       message: 'Users retrieved successfully',

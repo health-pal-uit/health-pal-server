@@ -3,12 +3,11 @@ import { CreateChatSessionDto } from './dto/create-chat_session.dto';
 import { UpdateChatSessionDto } from './dto/update-chat_session.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ChatSession } from './entities/chat_session.entity';
-import { IsNull, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { UpdateResult } from 'typeorm';
 import { DeleteResult } from 'typeorm';
 import { ChatParticipant } from 'src/chat_participants/entities/chat_participant.entity';
-import { Equal } from 'typeorm';
 
 @Injectable()
 export class ChatSessionsService {
@@ -67,25 +66,38 @@ export class ChatSessionsService {
 
   async findAll(page: number = 1, limit: number = 10): Promise<ChatSession[]> {
     const skip = (page - 1) * limit;
-    return await this.chatSessionRepository.find({
-      relations: ['participants', 'participants.user'],
-      where: { deleted_at: IsNull() },
-      skip,
-      take: limit,
-    });
+    return await this.chatSessionRepository
+      .createQueryBuilder('chat_session')
+      .leftJoinAndSelect('chat_session.participants', 'participant')
+      .leftJoinAndSelect('participant.user', 'user')
+      .where('chat_session.deleted_at IS NULL')
+      .skip(skip)
+      .take(limit)
+      .orderBy('chat_session.created_at', 'DESC')
+      .getMany();
   }
 
   async findUserAll(id: string, page: number = 1, limit: number = 10): Promise<ChatSession[]> {
     const skip = (page - 1) * limit;
-    return await this.chatSessionRepository.find({
-      relations: ['participants', 'participants.user'],
-      where: {
-        participants: { user: { id: Equal(id) } },
-        deleted_at: IsNull(),
-      },
-      skip,
-      take: limit,
-    });
+    return await this.chatSessionRepository
+      .createQueryBuilder('chat_session')
+      .leftJoinAndSelect('chat_session.participants', 'participant')
+      .leftJoinAndSelect('participant.user', 'user')
+      .where('chat_session.deleted_at IS NULL')
+      .andWhere((qb) => {
+        const subQuery = qb
+          .subQuery()
+          .select('cp.chat_session_id')
+          .from(ChatParticipant, 'cp')
+          .where('cp.user_id = :userId')
+          .getQuery();
+        return `chat_session.id IN ${subQuery}`;
+      })
+      .setParameter('userId', id)
+      .skip(skip)
+      .take(limit)
+      .orderBy('chat_session.created_at', 'DESC')
+      .getMany();
   }
 
   async findOne(id: string): Promise<ChatSession | null> {
