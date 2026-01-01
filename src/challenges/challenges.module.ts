@@ -10,5 +10,6 @@ import { SupabaseStorageModule } from 'src/supabase-storage/supabase-storage.mod
   imports: [TypeOrmModule.forFeature([Challenge]), ActivityRecordsModule, SupabaseStorageModule],
   controllers: [ChallengesController],
   providers: [ChallengesService],
+  exports: [ChallengesService],
 })
 export class ChallengesModule {}

@@ -14,6 +14,7 @@ import {
 import { ChallengesService } from './challenges.service';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
+import { CreateChallengeWithRecordsDto } from './dto/create-challenge-with-records.dto';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
@@ -60,6 +61,25 @@ export class ChallengesController {
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
     return await this.challengesService.create(createChallengeDto, imageBuffer, imageName);
+  }
+
+  @Post('with-records')
+  @UseGuards(AdminSupabaseGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({
+    summary: 'Create challenge with activity records',
+    description: 'Admin only - Creates a challenge and its activity records in one call',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: 201, description: 'Challenge and records created' })
+  @ApiResponse({ status: 401, description: 'Unauthorized - Admin access required' })
+  async createWithRecords(
+    @Body() createDto: CreateChallengeWithRecordsDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
+    return await this.challengesService.createWithRecords(createDto, imageBuffer, imageName);
   }
 
   @ApiOperation({

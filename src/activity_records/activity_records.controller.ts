@@ -15,6 +15,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@ne
 import { ActivityRecordsService } from './activity_records.service';
 import { CreateActivityRecordDto } from './dto/create-activity_record.dto';
 import { UpdateActivityRecordDto } from './dto/update-activity_record.dto';
+import { CreateManyActivityRecordsDto } from './dto/create-many-activity_records.dto';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
@@ -78,6 +79,20 @@ export class ActivityRecordsController {
   @ApiResponse({ status: 401, description: 'Unauthorized - Admin access required' })
   async createChallenges(@Body() createActivityRecordDto: CreateActivityRecordDto) {
     return await this.activityRecordsService.createChallenges(createActivityRecordDto);
+  }
+
+  @Post('challenges/many')
+  @UseGuards(AdminSupabaseGuard)
+  @ApiOperation({
+    summary: 'Create multiple challenge activity records',
+    description: 'Admin only - Creates multiple activity requirements for a challenge in one call',
+  })
+  @ApiResponse({ status: 201, description: 'All challenge activity records created successfully' })
+  @ApiResponse({ status: 400, description: 'Invalid input data or missing challenge_id' })
+  @ApiResponse({ status: 404, description: 'Activity or challenge not found' })
+  @ApiResponse({ status: 401, description: 'Unauthorized - Admin access required' })
+  async createManyChallenges(@Body() createManyDto: CreateManyActivityRecordsDto) {
+    return await this.activityRecordsService.createManyChallenges(createManyDto);
   }
 
   @Post('daily-logs')

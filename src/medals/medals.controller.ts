@@ -14,6 +14,7 @@ import {
 import { MedalsService } from './medals.service';
 import { CreateMedalDto } from './dto/create-medal.dto';
 import { UpdateMedalDto } from './dto/update-medal.dto';
+import { CreateMedalWithChallengesDto } from './dto/create-medal-with-challenges.dto';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -41,6 +42,25 @@ export class MedalsController {
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
     return await this.medalsService.create(createMedalDto, imageBuffer, imageName);
+  }
+
+  @Post('with-challenges')
+  @UseGuards(AdminSupabaseGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({
+    summary: 'Create medal with challenges and activity records',
+    description: 'Admin only - Creates a medal, its challenges, and activity records in one call',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: 201, description: 'Medal, challenges, and records created' })
+  @ApiResponse({ status: 403, description: 'Forbidden for non-admins' })
+  async createWithChallenges(
+    @Body() createDto: CreateMedalWithChallengesDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
+    return await this.medalsService.createWithChallenges(createDto, imageBuffer, imageName);
   }
 
   @Get()

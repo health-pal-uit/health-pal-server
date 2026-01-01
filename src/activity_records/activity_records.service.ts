@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { CreateActivityRecordDto } from './dto/create-activity_record.dto';
 import { UpdateActivityRecordDto } from './dto/update-activity_record.dto';
+import { CreateManyActivityRecordsDto } from './dto/create-many-activity_records.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ActivityRecord } from './entities/activity_record.entity';
 import { DeleteResult, IsNull, MoreThanOrEqual, Repository, UpdateResult } from 'typeorm';
@@ -60,6 +61,47 @@ export class ActivityRecordsService {
     });
 
     return await this.activityRecordRepository.save(activityRecord);
+  }
+
+  // create many challenge activity records at once
+  async createManyChallenges(
+    createManyDto: CreateManyActivityRecordsDto,
+  ): Promise<ActivityRecord[]> {
+    const createdRecords: ActivityRecord[] = [];
+
+    for (const dto of createManyDto.activity_records) {
+      const activity = await this.activityRepository.findOne({
+        where: { id: dto.activity_id },
+      });
+      if (!activity) {
+        throw new NotFoundException(`Activity with id ${dto.activity_id} not found`);
+      }
+
+      if (!dto.challenge_id) {
+        throw new BadRequestException('Challenge ID is required for challenge activity records');
+      }
+
+      const challenge = await this.challengesRepository.findOneBy({
+        id: dto.challenge_id,
+      });
+      if (!challenge) {
+        throw new NotFoundException(`Challenge with id ${dto.challenge_id} not found`);
+      }
+
+      const activityRecord = this.activityRecordRepository.create({
+        duration_minutes: dto.duration_minutes,
+        intensity_level: dto.intensity_level,
+        user_owned: false,
+        type: RecordType.CHALLENGE,
+        activity,
+        challenge,
+      });
+
+      const saved = await this.activityRecordRepository.save(activityRecord);
+      createdRecords.push(saved);
+    }
+
+    return createdRecords;
   }
   async assignToChallenge(id: string, challengeId: string): Promise<ActivityRecord> {
     const activityRecord = await this.activityRecordRepository.findOneBy({ id: id });

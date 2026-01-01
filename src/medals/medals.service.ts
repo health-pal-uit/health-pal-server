@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { CreateMedalDto } from './dto/create-medal.dto';
 import { UpdateMedalDto } from './dto/update-medal.dto';
+import { CreateMedalWithChallengesDto } from './dto/create-medal-with-challenges.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Medal } from './entities/medal.entity';
 import { IsNull, Repository, UpdateResult } from 'typeorm';
@@ -8,6 +9,7 @@ import { Challenge } from 'src/challenges/entities/challenge.entity';
 import { ChallengesMedalsService } from 'src/challenges_medals/challenges_medals.service';
 import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
 import { ConfigService } from '@nestjs/config';
+import { ChallengesService } from 'src/challenges/challenges.service';
 
 @Injectable()
 export class MedalsService {
@@ -17,6 +19,8 @@ export class MedalsService {
     private challengesMedalsService: ChallengesMedalsService,
     private supabaseStorageService: SupabaseStorageService,
     private readonly configService: ConfigService,
+    @Inject(forwardRef(() => ChallengesService))
+    private challengesService: ChallengesService,
   ) {}
 
   async create(
@@ -45,6 +49,53 @@ export class MedalsService {
       });
     }
     return await this.medalsRepository.save(medal);
+  }
+
+  // create medal with new challenges and their activity records
+  async createWithChallenges(
+    createDto: CreateMedalWithChallengesDto,
+    imageBuffer?: Buffer,
+    imageName?: string,
+  ): Promise<Medal> {
+    // upload image if provided
+    let imageUrl: string | undefined;
+    if (imageBuffer && imageName) {
+      const medalImgBucketName =
+        this.configService.get<string>('MEDAL_IMG_BUCKET_NAME') || 'medal-imgs';
+      imageUrl = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        medalImgBucketName,
+      );
+    }
+
+    // create medal
+    const medal = this.medalsRepository.create({
+      name: createDto.name,
+      tier: createDto.tier,
+      note: createDto.note,
+      image_url: imageUrl,
+    });
+    const savedMedal = await this.medalsRepository.save(medal);
+
+    // create challenges with their activity records
+    const challengeIds: string[] = [];
+    for (const challengeDto of createDto.challenges) {
+      const challenge = await this.challengesService.createWithRecords(challengeDto);
+      challengeIds.push(challenge.id);
+
+      // link challenge to medal
+      await this.challengesMedalsService.create({
+        challenge_id: challenge.id,
+        medal_id: savedMedal.id,
+      });
+    }
+
+    // return medal with challenges
+    return await this.medalsRepository.findOne({
+      where: { id: savedMedal.id },
+      relations: { challenges_medals: { challenge: { activity_records: { activity: true } } } },
+    });
   }
 
   async findAll(

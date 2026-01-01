@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
+import { CreateChallengeWithRecordsDto } from './dto/create-challenge-with-records.dto';
 import { Challenge } from './entities/challenge.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
@@ -38,6 +39,50 @@ export class ChallengesService {
         await this.activityRecordsService.assignToChallenge(id, savedChallenge.id);
       }
     }
+    const foundChallenge = await this.challengesRepository.findOne({
+      where: { id: savedChallenge.id },
+      relations: ['activity_records', 'activity_records.activity'],
+    });
+    if (!foundChallenge) {
+      throw new NotFoundException('Challenge not found after creation');
+    }
+    return foundChallenge;
+  }
+
+  // create challenge with new activity records
+  async createWithRecords(
+    createDto: CreateChallengeWithRecordsDto,
+    imageBuffer?: Buffer,
+    imageName?: string,
+  ): Promise<Challenge> {
+    // upload image if provided
+    if (imageBuffer && imageName) {
+      const challengeImgBucketName =
+        this.configService.get<string>('CHALLENGE_IMG_BUCKET_NAME') || 'challenge-imgs';
+      const imageUrl = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        challengeImgBucketName,
+      );
+      createDto.image_url = imageUrl;
+    }
+
+    // create challenge
+    const challenge = this.challengesRepository.create({
+      name: createDto.name,
+      note: createDto.note,
+      image_url: createDto.image_url,
+      difficulty: createDto.difficulty,
+    });
+    const savedChallenge = await this.challengesRepository.save(challenge);
+
+    // create activity records for this challenge
+    for (const arDto of createDto.activity_records) {
+      arDto.challenge_id = savedChallenge.id;
+      await this.activityRecordsService.createChallenges(arDto);
+    }
+
+    // return challenge with activity records
     const foundChallenge = await this.challengesRepository.findOne({
       where: { id: savedChallenge.id },
       relations: ['activity_records', 'activity_records.activity'],
