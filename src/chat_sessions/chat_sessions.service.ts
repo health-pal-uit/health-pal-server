@@ -101,7 +101,7 @@ export class ChatSessionsService {
   async remove(id: string, user_id: string): Promise<DeleteResult> {
     const chatSession = await this.chatSessionRepository.findOne({
       where: { id },
-      relations: ['participants'],
+      relations: ['participants', 'participants.user'],
     });
     if (!chatSession) {
       throw new Error('Chat session not found');
