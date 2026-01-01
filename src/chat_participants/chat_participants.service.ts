@@ -18,17 +18,47 @@ export class ChatParticipantsService {
   ) {}
 
   async create(createChatParticipantDto: CreateChatParticipantDto): Promise<ChatParticipant> {
+    // Validate user exists
     const user = await this.usersRepository.findOneBy({ id: createChatParticipantDto.user_id });
+    if (!user) {
+      throw new Error(`User with ID ${createChatParticipantDto.user_id} not found`);
+    }
+
+    // Validate chat session exists
     const chatSession = await this.chatSessionRepository.findOneBy({
       id: createChatParticipantDto.chat_session_id,
     });
-    if (!user || !chatSession) {
-      throw new Error('User or Chat Session not found');
+    if (!chatSession) {
+      throw new Error(`Chat Session with ID ${createChatParticipantDto.chat_session_id} not found`);
     }
+
+    // Check if user is already a participant
+    const existingParticipant = await this.chatParticipantRepository.findOne({
+      where: {
+        user: { id: createChatParticipantDto.user_id },
+        chat_session: { id: createChatParticipantDto.chat_session_id },
+      },
+    });
+
+    if (existingParticipant) {
+      throw new Error('User is already a participant in this chat session');
+    }
+
+    // Create the participant
     const chatParticipant = this.chatParticipantRepository.create(createChatParticipantDto);
-    chatParticipant.user = user!;
-    chatParticipant.chat_session = chatSession!;
+    chatParticipant.user = user;
+    chatParticipant.chat_session = chatSession;
     return await this.chatParticipantRepository.save(chatParticipant);
+  }
+
+  async isUserAdminOfSession(userId: string, chatSessionId: string): Promise<boolean> {
+    const participant = await this.chatParticipantRepository.findOne({
+      where: {
+        user: { id: userId },
+        chat_session: { id: chatSessionId },
+      },
+    });
+    return participant?.is_admin ?? false;
   }
 
   async findBySession(

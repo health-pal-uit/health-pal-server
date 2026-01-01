@@ -43,26 +43,9 @@ export class ChatParticipantsController {
     return await this.chatParticipantsService.findBySession(sessionId, page, limit);
   }
 
-  @Post('/:id')
-  @UseGuards(SupabaseGuard)
-  @ApiOperation({ summary: 'Add a user to a chat session' })
-  @ApiBody({ type: CreateChatParticipantDto })
-  @ApiResponse({
-    status: 201,
-    description: 'The created chat participant',
-    type: CreateChatParticipantDto,
-  })
-  async createNotMe(
-    @Body() createChatParticipantDto: CreateChatParticipantDto,
-    @Param('id') id: string,
-  ) {
-    createChatParticipantDto.user_id = id;
-    return await this.chatParticipantsService.create(createChatParticipantDto);
-  }
-
   @Post()
   @UseGuards(SupabaseGuard)
-  @ApiOperation({ summary: 'Add a user to a chat session' })
+  @ApiOperation({ summary: 'Add a user to a chat session (self or other if admin)' })
   @ApiBody({ type: CreateChatParticipantDto })
   @ApiResponse({
     status: 201,
@@ -71,9 +54,26 @@ export class ChatParticipantsController {
   })
   async create(
     @Body() createChatParticipantDto: CreateChatParticipantDto,
-    @CurrentUser() user: any,
+    @CurrentUser() currentUser: any,
   ) {
-    createChatParticipantDto.user_id = user.id;
+    // If user_id is not provided, use current user's ID
+    if (!createChatParticipantDto.user_id) {
+      createChatParticipantDto.user_id = currentUser.id;
+    }
+
+    // If trying to add someone else, verify permissions
+    if (createChatParticipantDto.user_id !== currentUser.id) {
+      const isAdmin = currentUser.role === 'admin';
+      const isSessionAdmin = await this.chatParticipantsService.isUserAdminOfSession(
+        currentUser.id,
+        createChatParticipantDto.chat_session_id,
+      );
+
+      if (!isAdmin && !isSessionAdmin) {
+        throw new Error('Only admins or session admins can add other users');
+      }
+    }
+
     return await this.chatParticipantsService.create(createChatParticipantDto);
   }
 
