@@ -28,11 +28,27 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 export class ChatMessagesController {
   constructor(private readonly chatMessagesService: ChatMessagesService) {}
 
+  @Get('session/:sessionId/recent')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get recent messages for a chat session (optimized for initial load)' })
+  @ApiParam({ name: 'sessionId', description: 'ID of the chat session' })
+  @ApiResponse({ status: 200, description: 'Recent chat messages', type: [CreateChatMessageDto] })
+  async findRecentBySession(
+    @Param('sessionId') sessionId: string,
+    @Query('limit') limit: number = 50,
+  ) {
+    return await this.chatMessagesService.findRecentBySession(sessionId, limit);
+  }
+
   @Get('session/:sessionId')
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Get all messages for a chat session with pagination' })
   @ApiParam({ name: 'sessionId', description: 'ID of the chat session' })
-  @ApiResponse({ status: 200, description: 'List of chat messages', type: [CreateChatMessageDto] })
+  @ApiResponse({
+    status: 200,
+    description: 'List of chat messages with pagination info',
+    type: [CreateChatMessageDto],
+  })
   async findBySession(
     @Param('sessionId') sessionId: string,
     @Query('page') page: number = 1,
