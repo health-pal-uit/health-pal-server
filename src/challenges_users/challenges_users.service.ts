@@ -111,6 +111,44 @@ export class ChallengesUsersService {
     return finishedChallenges;
   }
 
+  // get unfinished challenges
+  async checkUnfinishedChallenges(
+    userId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Challenge[]; total: number; page: number; limit: number }> {
+    const user = await this.usersRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // get finished challenge IDs
+    const finishedChallengeUsers = await this.challengesUsersRepository.find({
+      where: { user: { id: userId }, progress_percent: 100 },
+      relations: { challenge: true },
+    });
+    const finishedChallengeIds = finishedChallengeUsers.map((cu) => cu.challenge.id);
+
+    // get all challenges excluding finished ones
+    const skip = (page - 1) * limit;
+    const queryBuilder = this.challengesRepository.createQueryBuilder('challenge');
+    queryBuilder.where('challenge.deleted_at IS NULL');
+
+    if (finishedChallengeIds.length > 0) {
+      queryBuilder.andWhere('challenge.id NOT IN (:...finishedChallengeIds)', {
+        finishedChallengeIds,
+      });
+    }
+
+    const [unfinishedChallenges, total] = await queryBuilder
+      .skip(skip)
+      .take(limit)
+      .orderBy('challenge.created_at', 'DESC')
+      .getManyAndCount();
+
+    return { data: unfinishedChallenges, total, page, limit };
+  }
+
   async getOrCreateChallengesUser(userId: string, challengeId: string): Promise<ChallengesUser> {
     let challenge_user = await this.challengesUsersRepository.findOne({
       where: { user: { id: userId }, challenge: { id: challengeId } },

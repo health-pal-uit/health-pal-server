@@ -189,7 +189,7 @@ export class ActivityRecordsService {
         daily_log: { user: { id: userId }, id: dailyLogId },
         deleted_at: IsNull(),
       },
-      relations: { activity: true, daily_log: true },
+      relations: ['activity', 'daily_log'],
       skip,
       take: limit,
     });
@@ -204,7 +204,7 @@ export class ActivityRecordsService {
     const skip = (page - 1) * limit;
     return await this.activityRecordRepository.find({
       where: { user_owned: false, challenge: { id: challengeId }, deleted_at: IsNull() },
-      relations: { activity: true, challenge: true },
+      relations: ['activity', 'challenge'],
       skip,
       take: limit,
     });

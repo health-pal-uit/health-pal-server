@@ -24,6 +24,19 @@ export class ChallengesUsersController {
     return await this.challengesUsersService.checkFinishedChallenges(user.id, page, limit);
   }
 
+  @ApiOperation({ summary: 'Get unfinished challenges for current user' })
+  @ApiResponse({ status: 200, description: 'List of unfinished challenges' })
+  @ApiResponse({ status: 404, description: 'User not found' })
+  @Get('unfinished')
+  @UseGuards(SupabaseGuard)
+  async checkUnfinishedChallenges(
+    @CurrentUser() user: ReqUserType,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return await this.challengesUsersService.checkUnfinishedChallenges(user.id, page, limit);
+  }
+
   @ApiOperation({ summary: 'Mark a challenge as finished for the current user' })
   @ApiResponse({ status: 201, description: 'Challenge marked as finished successfully' })
   @ApiResponse({ status: 404, description: 'Challenge or User not found' })

@@ -98,4 +98,40 @@ export class MedalsUsersService {
     const medals = medalUsers.map((mu) => mu.medal);
     return { data: medals, total, page, limit };
   }
+
+  // get unfinished medals
+  async checkUnfinishedMedals(
+    userId: string,
+    page: number = 1,
+    limit: number = 10,
+  ): Promise<{ data: Medal[]; total: number; page: number; limit: number }> {
+    const user = await this.usersRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // get finished medal IDs
+    const finishedMedalUsers = await this.medalsUsersRepository.find({
+      where: { user: { id: userId } },
+      relations: { medal: true },
+    });
+    const finishedMedalIds = finishedMedalUsers.map((mu) => mu.medal.id);
+
+    // get all medals excluding finished ones
+    const skip = (page - 1) * limit;
+    const queryBuilder = this.medalsRepository.createQueryBuilder('medal');
+    queryBuilder.where('medal.deleted_at IS NULL');
+
+    if (finishedMedalIds.length > 0) {
+      queryBuilder.andWhere('medal.id NOT IN (:...finishedMedalIds)', { finishedMedalIds });
+    }
+
+    const [unfinishedMedals, total] = await queryBuilder
+      .skip(skip)
+      .take(limit)
+      .orderBy('medal.created_at', 'DESC')
+      .getManyAndCount();
+
+    return { data: unfinishedMedals, total, page, limit };
+  }
 }

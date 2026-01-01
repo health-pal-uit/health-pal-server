@@ -31,6 +31,15 @@ export class MedalsUsersController {
     return await this.medalsUsersService.checkFinishedMedals(user.id, page, limit);
   }
 
+  @Get('unfinished')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get unfinished medals for current user' })
+  @ApiResponse({ status: 200, description: 'List of unfinished medals' })
+  async checkUnfinishedMedals(@CurrentUser() user: any, @Query() query: MedalsUserPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.medalsUsersService.checkUnfinishedMedals(user.id, page, limit);
+  }
+
   @Post(':id')
   @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Finish a medal for the current user' })

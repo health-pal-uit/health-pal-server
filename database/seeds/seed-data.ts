@@ -297,7 +297,7 @@ async function seedFitnessProfilesAndGoals(
     const bmi = +(weight / (heightM * heightM)).toFixed(1);
     const bmr = Math.round(
       10 * weight +
-        625 * heightM * 100 -
+        6.25 * heightM * 100 -
         5 * faker.number.int({ min: 18, max: 45 }) +
         (u.gender ? 5 : -161),
     );
