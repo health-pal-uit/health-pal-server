@@ -25,15 +25,30 @@ export class ChatMessagesService {
     sessionId: string,
     page: number = 1,
     limit: number = 10,
-  ): Promise<ChatMessage[]> {
+  ): Promise<{ data: ChatMessage[]; total: number; page: number; limit: number }> {
     const skip = (page - 1) * limit;
-    return await this.chatMessagesRepository.find({
+    const [data, total] = await this.chatMessagesRepository.findAndCount({
       where: { chat_session: { id: sessionId } },
       order: { created_at: 'ASC' },
       relations: ['user', 'chat_session'],
       skip,
       take: limit,
     });
+    return { data, total, page, limit };
+  }
+
+  async findRecentBySession(
+    sessionId: string,
+    limit: number = 50,
+  ): Promise<{ data: ChatMessage[]; total: number }> {
+    const [allMessages, total] = await this.chatMessagesRepository.findAndCount({
+      where: { chat_session: { id: sessionId } },
+      order: { created_at: 'DESC' },
+      relations: ['user', 'chat_session'],
+      take: limit,
+    });
+    // Reverse to get oldest -> newest for display
+    return { data: allMessages.reverse(), total };
   }
 
   async create(

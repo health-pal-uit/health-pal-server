@@ -17,9 +17,11 @@ async function bootstrap() {
       transform: true,
     }),
   );
-  // seed
-  const seedService = app.get(SeedService);
-  await seedService.seed();
+  // seed (only in development)
+  if (process.env.NODE_ENV !== 'production') {
+    const seedService = app.get(SeedService);
+    await seedService.seed();
+  }
 
   // cors
   app.enableCors({

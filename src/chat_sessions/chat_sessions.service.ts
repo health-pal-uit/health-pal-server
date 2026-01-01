@@ -42,6 +42,7 @@ export class ChatSessionsService {
         const participant = this.chatParticipantRepository.create({
           user: user,
           chat_session: savedSession,
+          is_admin: participantId === user_id, // Creator is admin
           joined_at: new Date(),
         });
         await this.chatParticipantRepository.save(participant);
@@ -101,7 +102,7 @@ export class ChatSessionsService {
   async remove(id: string, user_id: string): Promise<DeleteResult> {
     const chatSession = await this.chatSessionRepository.findOne({
       where: { id },
-      relations: ['participants'],
+      relations: ['participants', 'participants.user'],
     });
     if (!chatSession) {
       throw new Error('Chat session not found');
