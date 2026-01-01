@@ -22,6 +22,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { ApiOperation, ApiResponse, ApiConsumes, ApiBody, ApiParam } from '@nestjs/swagger';
 import { MedalPaginationDto } from './medal-pagination.dto';
+import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 
 @ApiBearerAuth()
 @Controller('medals')
@@ -71,6 +72,19 @@ export class MedalsController {
   async findAll(@Query() query: MedalPaginationDto) {
     const { page = 1, limit = 10 } = query;
     return await this.medalsService.findAll(page, limit);
+  }
+
+  @Get('with-progress')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({
+    summary: 'Get all medals with finished status',
+    description: 'Retrieves all medals with is_finished status calculated for current user',
+  })
+  @ApiResponse({ status: 200, description: 'Medals with status retrieved successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async findAllWithProgress(@CurrentUser() user: any, @Query() query: MedalPaginationDto) {
+    const { page = 1, limit = 10 } = query;
+    return await this.medalsService.findAllWithProgress(user.id, page, limit);
   }
 
   @Get(':id')

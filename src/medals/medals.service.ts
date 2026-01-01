@@ -121,6 +121,50 @@ export class MedalsService {
     return { data, total, page, limit };
   }
 
+  // get all medals with finished status for user
+  async findAllWithProgress(userId: string, page: number = 1, limit: number = 10): Promise<any> {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.medalsRepository.findAndCount({
+      relations: { challenges_medals: { challenge: true } },
+      where: { deleted_at: IsNull() },
+      skip,
+      take: limit,
+      order: { created_at: 'DESC' },
+    });
+
+    // check if user has finished each medal and all its challenges
+    const medalsWithProgress = await Promise.all(
+      data.map(async (medal) => {
+        // check if user claimed the medal
+        const medalUser = await this.medalsRepository.manager.getRepository('MedalUser').findOne({
+          where: { medal_id: medal.id, user_id: userId },
+        });
+
+        // check if all challenges in the medal are finished by user
+        const challengeIds = medal.challenges_medals.map((cm) => cm.challenge.id);
+        let all_challenges_finished = true;
+
+        if (challengeIds.length > 0) {
+          const finishedChallenges = await this.medalsRepository.manager
+            .getRepository('ChallengeUser')
+            .find({
+              where: { challenge_id: challengeIds, user_id: userId },
+            });
+          all_challenges_finished = finishedChallenges.length === challengeIds.length;
+        }
+
+        return {
+          ...medal,
+          is_finished: !!medalUser,
+          all_challenges_finished,
+          can_claim: !medalUser && all_challenges_finished,
+        };
+      }),
+    );
+
+    return { data: medalsWithProgress, total, page, limit };
+  }
+
   async findOne(id: string): Promise<Medal | null> {
     return await this.medalsRepository.findOne({
       where: { id },

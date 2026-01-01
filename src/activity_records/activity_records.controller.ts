@@ -28,6 +28,7 @@ export class ActivityRecordsController {
   constructor(private readonly activityRecordsService: ActivityRecordsService) {}
 
   @Get('check-challenge-progress/:challengeId')
+  @UseGuards(SupabaseGuard)
   @ApiOperation({
     summary: 'Check challenge progress',
     description:
@@ -48,6 +49,7 @@ export class ActivityRecordsController {
   }
 
   @Get('check-activity-log-progress/:activityRecordId')
+  @UseGuards(SupabaseGuard)
   @ApiOperation({
     summary: 'Check activity record progress',
     description: 'Calculates progress percentage for a specific activity record within a challenge',
@@ -156,6 +158,7 @@ export class ActivityRecordsController {
   }
 
   @Get('challenges/:challengeId')
+  @UseGuards(SupabaseGuard)
   @ApiOperation({
     summary: 'Get all challenge activity records with pagination',
     description: 'Retrieves all activity requirements for a specific challenge',
@@ -176,6 +179,7 @@ export class ActivityRecordsController {
     description: "Retrieves all activity records for a user's specific daily log",
   })
   @ApiResponse({ status: 200, description: 'Daily activity records retrieved successfully' })
+  @UseGuards(SupabaseGuard)
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async findAllDailyLogs(
     @CurrentUser() user: any,
@@ -191,6 +195,7 @@ export class ActivityRecordsController {
     );
   }
   @Get(':id')
+  @UseGuards(SupabaseGuard)
   @ApiOperation({
     summary: 'Get activity record by ID',
     description:

@@ -15,6 +15,7 @@ import { ChallengesService } from './challenges.service';
 import { CreateChallengeDto } from './dto/create-challenge.dto';
 import { UpdateChallengeDto } from './dto/update-challenge.dto';
 import { CreateChallengeWithRecordsDto } from './dto/create-challenge-with-records.dto';
+import { UpdateChallengeWithRecordsDto } from './dto/update-challenge-with-records.dto';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
@@ -120,6 +121,22 @@ export class ChallengesController {
     return await this.challengesService.findAll(page, limit);
   }
 
+  @Get('with-progress')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({
+    summary: 'Get all challenges with progress',
+    description: 'Retrieves all challenges with progress percentage calculated for current user',
+  })
+  @ApiResponse({ status: 200, description: 'Challenges with progress retrieved successfully' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async findAllWithProgress(
+    @CurrentUser() user: any,
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return await this.challengesService.findAllWithProgress(user.id, page, limit);
+  }
+
   @ApiOperation({
     summary: 'Get a specific challenge by ID',
     description:
@@ -190,6 +207,27 @@ export class ChallengesController {
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
     return await this.challengesService.update(id, updateChallengeDto, imageBuffer, imageName);
+  }
+
+  @Patch(':id/with-records')
+  @UseGuards(AdminSupabaseGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({
+    summary: 'Update challenge and add activity records',
+    description: 'Admin only - Updates a challenge and can add new activity records',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiResponse({ status: 200, description: 'Challenge and records updated' })
+  @ApiResponse({ status: 401, description: 'Unauthorized - Admin access required' })
+  @ApiResponse({ status: 404, description: 'Challenge not found' })
+  async updateWithRecords(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateChallengeWithRecordsDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
+    return await this.challengesService.updateWithRecords(id, updateDto, imageBuffer, imageName);
   }
 
   @ApiOperation({
