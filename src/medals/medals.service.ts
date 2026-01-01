@@ -1,4 +1,4 @@
-import { Injectable, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Inject, forwardRef, NotFoundException } from '@nestjs/common';
 import { CreateMedalDto } from './dto/create-medal.dto';
 import { UpdateMedalDto } from './dto/update-medal.dto';
 import { CreateMedalWithChallengesDto } from './dto/create-medal-with-challenges.dto';
@@ -62,11 +62,14 @@ export class MedalsService {
     if (imageBuffer && imageName) {
       const medalImgBucketName =
         this.configService.get<string>('MEDAL_IMG_BUCKET_NAME') || 'medal-imgs';
-      imageUrl = await this.supabaseStorageService.uploadImageFromBuffer(
+      const uploadedUrl = await this.supabaseStorageService.uploadImageFromBuffer(
         imageBuffer,
         imageName,
         medalImgBucketName,
       );
+      if (uploadedUrl) {
+        imageUrl = uploadedUrl;
+      }
     }
 
     // create medal
@@ -92,10 +95,14 @@ export class MedalsService {
     }
 
     // return medal with challenges
-    return await this.medalsRepository.findOne({
+    const foundMedal = await this.medalsRepository.findOne({
       where: { id: savedMedal.id },
       relations: { challenges_medals: { challenge: { activity_records: { activity: true } } } },
     });
+    if (!foundMedal) {
+      throw new NotFoundException('Medal not found after creation');
+    }
+    return foundMedal;
   }
 
   async findAll(

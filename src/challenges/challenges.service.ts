@@ -64,7 +64,9 @@ export class ChallengesService {
         imageName,
         challengeImgBucketName,
       );
-      createDto.image_url = imageUrl;
+      if (imageUrl) {
+        createDto.image_url = imageUrl;
+      }
     }
 
     // create challenge
