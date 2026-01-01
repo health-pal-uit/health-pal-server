@@ -15,6 +15,7 @@ import { MedalsService } from './medals.service';
 import { CreateMedalDto } from './dto/create-medal.dto';
 import { UpdateMedalDto } from './dto/update-medal.dto';
 import { CreateMedalWithChallengesDto } from './dto/create-medal-with-challenges.dto';
+import { UpdateMedalWithChallengesDto } from './dto/update-medal-with-challenges.dto';
 import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guard';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -102,6 +103,27 @@ export class MedalsController {
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
     return await this.medalsService.update(id, updateMedalDto, imageBuffer, imageName);
+  }
+
+  @Patch(':id/with-challenges')
+  @UseGuards(AdminSupabaseGuard)
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiOperation({
+    summary: 'Update medal and add new challenges with activity records',
+    description: 'Admin only - Updates a medal and can add new challenges and activity records',
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiParam({ name: 'id', type: String, description: 'Medal ID' })
+  @ApiResponse({ status: 200, description: 'Medal and challenges updated' })
+  @ApiResponse({ status: 403, description: 'Forbidden for non-admins' })
+  async updateWithChallenges(
+    @Param('id') id: string,
+    @Body() updateDto: UpdateMedalWithChallengesDto,
+    @UploadedFile() file?: Express.Multer.File,
+  ) {
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
+    return await this.medalsService.updateWithChallenges(id, updateDto, imageBuffer, imageName);
   }
 
   @Delete(':id')

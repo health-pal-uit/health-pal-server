@@ -41,7 +41,7 @@ export class ChallengesService {
     }
     const foundChallenge = await this.challengesRepository.findOne({
       where: { id: savedChallenge.id },
-      relations: ['activity_records', 'activity_records.activity'],
+      relations: { activity_records: { activity: true } },
     });
     if (!foundChallenge) {
       throw new NotFoundException('Challenge not found after creation');
@@ -87,7 +87,7 @@ export class ChallengesService {
     // return challenge with activity records
     const foundChallenge = await this.challengesRepository.findOne({
       where: { id: savedChallenge.id },
-      relations: ['activity_records', 'activity_records.activity'],
+      relations: { activity_records: { activity: true } },
     });
     if (!foundChallenge) {
       throw new NotFoundException('Challenge not found after creation');
@@ -99,7 +99,7 @@ export class ChallengesService {
     const skip = (page - 1) * limit;
     return await this.challengesRepository.find({
       where: { deleted_at: IsNull() },
-      relations: ['activity_records', 'activity_records.activity'],
+      relations: { activity_records: { activity: true } },
       skip,
       take: limit,
     });
@@ -108,7 +108,7 @@ export class ChallengesService {
   async findOne(id: string): Promise<Challenge> {
     const challenge = await this.challengesRepository.findOne({
       where: { id, deleted_at: IsNull() },
-      relations: ['activity_records', 'activity_records.activity'],
+      relations: { activity_records: { activity: true } },
     });
     if (!challenge) {
       throw new NotFoundException(`Challenge with id ${id} not found`);

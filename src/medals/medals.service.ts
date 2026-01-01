@@ -2,6 +2,7 @@ import { Injectable, Inject, forwardRef, NotFoundException } from '@nestjs/commo
 import { CreateMedalDto } from './dto/create-medal.dto';
 import { UpdateMedalDto } from './dto/update-medal.dto';
 import { CreateMedalWithChallengesDto } from './dto/create-medal-with-challenges.dto';
+import { UpdateMedalWithChallengesDto } from './dto/update-medal-with-challenges.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Medal } from './entities/medal.entity';
 import { IsNull, Repository, UpdateResult } from 'typeorm';
@@ -121,7 +122,10 @@ export class MedalsService {
   }
 
   async findOne(id: string): Promise<Medal | null> {
-    return await this.medalsRepository.findOneBy({ id });
+    return await this.medalsRepository.findOne({
+      where: { id },
+      relations: { challenges_medals: { challenge: { activity_records: { activity: true } } } },
+    });
   }
 
   async update(
@@ -150,6 +154,62 @@ export class MedalsService {
       });
     }
     await this.medalsRepository.update(id, updateMedalDto);
+    return await this.findOne(id);
+  }
+
+  // update medal and add/create new challenges with activity records
+  async updateWithChallenges(
+    id: string,
+    updateDto: UpdateMedalWithChallengesDto,
+    imageBuffer?: Buffer,
+    imageName?: string,
+  ): Promise<Medal | null> {
+    // verify medal exists
+    const medal = await this.findOne(id);
+    if (!medal) {
+      throw new NotFoundException(`Medal with id ${id} not found`);
+    }
+
+    // upload image if provided
+    let imageUrl: string | undefined;
+    if (imageBuffer && imageName) {
+      const medalImgBucketName =
+        this.configService.get<string>('MEDAL_IMG_BUCKET_NAME') || 'medal-imgs';
+      const uploadedUrl = await this.supabaseStorageService.uploadImageFromBuffer(
+        imageBuffer,
+        imageName,
+        medalImgBucketName,
+      );
+      if (uploadedUrl) {
+        imageUrl = uploadedUrl;
+      }
+    }
+
+    // update medal properties
+    const updateData: any = {};
+    if (updateDto.name) updateData.name = updateDto.name;
+    if (updateDto.tier) updateData.tier = updateDto.tier;
+    if (updateDto.note) updateData.note = updateDto.note;
+    if (imageUrl) updateData.image_url = imageUrl;
+
+    if (Object.keys(updateData).length > 0) {
+      await this.medalsRepository.update(id, updateData);
+    }
+
+    // create and link new challenges if provided
+    if (updateDto.challenges && updateDto.challenges.length > 0) {
+      for (const challengeDto of updateDto.challenges) {
+        const challenge = await this.challengesService.createWithRecords(challengeDto);
+
+        // link challenge to medal
+        await this.challengesMedalsService.create({
+          challenge_id: challenge.id,
+          medal_id: id,
+        });
+      }
+    }
+
+    // return updated medal with challenges
     return await this.findOne(id);
   }
 
