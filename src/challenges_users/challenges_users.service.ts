@@ -6,6 +6,7 @@ import { User } from 'src/users/entities/user.entity';
 import { Repository } from 'typeorm';
 import { Challenge } from 'src/challenges/entities/challenge.entity';
 import { ChallengesUser } from './entities/challenges_user.entity';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class ChallengesUsersService {
@@ -13,6 +14,7 @@ export class ChallengesUsersService {
     @InjectRepository(User) private usersRepository: Repository<User>,
     @InjectRepository(Challenge) private challengesRepository: Repository<Challenge>,
     @InjectRepository(ChallengesUser) private challengesUsersRepository: Repository<ChallengesUser>,
+    private notificationsService: NotificationsService,
   ) {}
 
   async create(createChallengesUserDto: CreateChallengesUserDto): Promise<ChallengesUser> {
@@ -79,7 +81,12 @@ export class ChallengesUsersService {
       completed_at: new Date(),
       progress_percent: 100,
     });
-    return await this.challengesUsersRepository.save(challenge_user);
+    const saved = await this.challengesUsersRepository.save(challenge_user);
+
+    // send notification to user
+    await this.notificationsService.notifyChallengeCompleted(userId, challenge.name);
+
+    return saved;
   }
 
   async checkProgress(userId: string): Promise<ChallengesUser[]> {

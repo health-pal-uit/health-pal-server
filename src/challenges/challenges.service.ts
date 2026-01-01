@@ -9,11 +9,13 @@ import { IsNull, Repository } from 'typeorm';
 import { ActivityRecordsService } from 'src/activity_records/activity_records.service';
 import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
 import { ConfigService } from '@nestjs/config';
+import { ChallengesUser } from 'src/challenges_users/entities/challenges_user.entity';
 
 @Injectable()
 export class ChallengesService {
   constructor(
     @InjectRepository(Challenge) private challengesRepository: Repository<Challenge>,
+    @InjectRepository(ChallengesUser) private challengesUserRepository: Repository<ChallengesUser>,
     private activityRecordsService: ActivityRecordsService,
     private supabaseStorageService: SupabaseStorageService,
     private readonly configService: ConfigService,
@@ -118,13 +120,22 @@ export class ChallengesService {
 
     // calculate progress for each challenge
     const challengesWithProgress = await Promise.all(
-      challenges.map(async (challenge) => ({
-        ...challenge,
-        progress_percent: await this.activityRecordsService.recalculateProgressChallengesForUser(
-          challenge.id,
-          userId,
-        ),
-      })),
+      challenges.map(async (challenge) => {
+        const userChallenge = await this.challengesUserRepository.findOne({
+          where: { challenge: { id: challenge.id }, user: { id: userId } },
+        });
+        const is_finished = userChallenge?.completed_at ? true : false;
+        const can_claim = userChallenge && userChallenge.progress_percent === 100 && !is_finished;
+        return {
+          ...challenge,
+          is_finished,
+          progress_percent: await this.activityRecordsService.recalculateProgressChallengesForUser(
+            challenge.id,
+            userId,
+          ),
+          can_claim,
+        };
+      }),
     );
 
     return challengesWithProgress;

@@ -7,6 +7,7 @@ import { Equal, Repository } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { ChatSession } from 'src/chat_sessions/entities/chat_session.entity';
 import { DeleteResult } from 'typeorm';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class ChatParticipantsService {
@@ -15,6 +16,7 @@ export class ChatParticipantsService {
     private chatParticipantRepository: Repository<ChatParticipant>,
     @InjectRepository(User) private usersRepository: Repository<User>,
     @InjectRepository(ChatSession) private chatSessionRepository: Repository<ChatSession>,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async create(createChatParticipantDto: CreateChatParticipantDto): Promise<ChatParticipant> {
@@ -25,8 +27,9 @@ export class ChatParticipantsService {
     }
 
     // Validate chat session exists
-    const chatSession = await this.chatSessionRepository.findOneBy({
-      id: createChatParticipantDto.chat_session_id,
+    const chatSession = await this.chatSessionRepository.findOne({
+      where: { id: createChatParticipantDto.chat_session_id },
+      relations: ['chat_participants', 'chat_participants.user'],
     });
     if (!chatSession) {
       throw new Error(`Chat Session with ID ${createChatParticipantDto.chat_session_id} not found`);
@@ -48,7 +51,14 @@ export class ChatParticipantsService {
     const chatParticipant = this.chatParticipantRepository.create(createChatParticipantDto);
     chatParticipant.user = user;
     chatParticipant.chat_session = chatSession;
-    return await this.chatParticipantRepository.save(chatParticipant);
+    const savedParticipant = await this.chatParticipantRepository.save(chatParticipant);
+
+    // notify user that they were added to group chat
+    const addedByUser = chatSession.participants[0]?.user;
+    const addedByName = addedByUser?.fullname || addedByUser?.email || 'Someone';
+    await this.notificationsService.notifyAddedToChat(user.id, chatSession.title, addedByName);
+
+    return savedParticipant;
   }
 
   async isUserAdminOfSession(userId: string, chatSessionId: string): Promise<boolean> {

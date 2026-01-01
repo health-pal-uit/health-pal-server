@@ -8,6 +8,7 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { Challenge } from 'src/challenges/entities/challenge.entity';
 import { ChallengesUser } from 'src/challenges_users/entities/challenges_user.entity';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class MedalsUsersService {
@@ -17,6 +18,7 @@ export class MedalsUsersService {
     @InjectRepository(User) private usersRepository: Repository<User>,
     @InjectRepository(Challenge) private challengesRepository: Repository<Challenge>,
     @InjectRepository(ChallengesUser) private challengesUsersRepository: Repository<ChallengesUser>,
+    private notificationsService: NotificationsService,
   ) {}
 
   async create(createMedalsUserDto: CreateMedalsUserDto): Promise<MedalsUser> {
@@ -70,7 +72,12 @@ export class MedalsUsersService {
     medal_user.medal = medal;
     medal_user.user = user;
     // Implement the logic to finish the medal for the user
-    return await this.medalsUsersRepository.save(medal_user);
+    const saved = await this.medalsUsersRepository.save(medal_user);
+
+    // send notification to user
+    await this.notificationsService.notifyMedalClaimed(userId, medal.name);
+
+    return saved;
   }
 
   async checkProgress(userId: string): Promise<MedalsUser[]> {

@@ -10,6 +10,7 @@ import { UpdateResult } from 'typeorm';
 import { DeleteResult } from 'typeorm';
 import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
 import { ConfigService } from '@nestjs/config';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class ChatMessagesService {
@@ -19,6 +20,7 @@ export class ChatMessagesService {
     @InjectRepository(User) private usersRepository: Repository<User>,
     private readonly supabaseStorageService: SupabaseStorageService,
     private readonly configService: ConfigService,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async findBySession(
@@ -58,6 +60,7 @@ export class ChatMessagesService {
   ): Promise<ChatMessage> {
     const chatSession = await this.chatSessionsRepository.findOne({
       where: { id: createChatMessageDto.chat_session_id },
+      relations: ['chat_participants', 'chat_participants.user'],
     });
     if (!chatSession) {
       throw new Error('Chat session not found');
@@ -80,7 +83,20 @@ export class ChatMessagesService {
       );
       chatMessage.media_url = imageUrl ?? undefined;
     }
-    return await this.chatMessagesRepository.save(chatMessage);
+    const savedMessage = await this.chatMessagesRepository.save(chatMessage);
+
+    // notify other chat participants about new message
+    const otherParticipants = chatSession.participants.filter((p) => p.user.id !== user.id);
+    for (const participant of otherParticipants) {
+      const messagePreview = createChatMessageDto.content?.substring(0, 50) || '📎 Sent a file';
+      await this.notificationsService.notifyNewMessage(
+        participant.user.id,
+        user.fullname || user.email,
+        messagePreview,
+      );
+    }
+
+    return savedMessage;
   }
 
   async findAll(page: number = 1, limit: number = 10): Promise<ChatMessage[]> {

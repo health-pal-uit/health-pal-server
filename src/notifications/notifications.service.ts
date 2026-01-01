@@ -188,4 +188,112 @@ export class NotificationsService {
     await this.notificationRepository.delete(id);
     return notification;
   }
+
+  // send notification when user reaches 100% on a challenge
+  async notifyChallengeCompleted(userId: string, challengeName: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['devices'],
+    });
+    if (!user) return;
+
+    const tokens = user.devices
+      .filter((device) => device.last_active_at !== null && device.push_token)
+      .map((device) => device.push_token);
+
+    const notification = this.notificationRepository.create({
+      user: user,
+      title: '🎉 Challenge Completed!',
+      content: `You've completed the "${challengeName}" challenge! Great job!`,
+    });
+    await this.notificationRepository.save(notification);
+
+    if (tokens.length > 0) {
+      await this.sendPushNotificationToDevice(
+        tokens,
+        '🎉 Challenge Completed!',
+        `You've completed the "${challengeName}" challenge! Great job!`,
+      );
+    }
+  }
+
+  // send notification user claims a medal
+  async notifyMedalClaimed(userId: string, medalName: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['devices'],
+    });
+    if (!user) return;
+
+    const tokens = user.devices
+      .filter((device) => device.last_active_at !== null && device.push_token)
+      .map((device) => device.push_token);
+
+    const notification = this.notificationRepository.create({
+      user: user,
+      title: '🏅 Medal Unlocked!',
+      content: `Congratulations! You've unlocked the "${medalName}" medal!`,
+    });
+    await this.notificationRepository.save(notification);
+
+    if (tokens.length > 0) {
+      await this.sendPushNotificationToDevice(
+        tokens,
+        '🏅 Medal Unlocked!',
+        `Congratulations! You've unlocked the "${medalName}" medal!`,
+      );
+    }
+  }
+
+  // send notification when user receives a new message
+  async notifyNewMessage(userId: string, senderName: string, messagePreview: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['devices'],
+    });
+    if (!user) return;
+
+    const tokens = user.devices
+      .filter((device) => device.last_active_at !== null && device.push_token)
+      .map((device) => device.push_token);
+
+    const notification = this.notificationRepository.create({
+      user: user,
+      title: `💬 ${senderName}`,
+      content: messagePreview,
+    });
+    await this.notificationRepository.save(notification);
+
+    if (tokens.length > 0) {
+      await this.sendPushNotificationToDevice(tokens, `💬 ${senderName}`, messagePreview);
+    }
+  }
+
+  // send notification when user is added to a group chat
+  async notifyAddedToChat(userId: string, chatName: string, addedByName: string) {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: ['devices'],
+    });
+    if (!user) return;
+
+    const tokens = user.devices
+      .filter((device) => device.last_active_at !== null && device.push_token)
+      .map((device) => device.push_token);
+
+    const notification = this.notificationRepository.create({
+      user: user,
+      title: '👥 Added to Group Chat',
+      content: `${addedByName} added you to "${chatName}"`,
+    });
+    await this.notificationRepository.save(notification);
+
+    if (tokens.length > 0) {
+      await this.sendPushNotificationToDevice(
+        tokens,
+        '👥 Added to Group Chat',
+        `${addedByName} added you to "${chatName}"`,
+      );
+    }
+  }
 }

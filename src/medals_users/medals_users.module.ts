@@ -7,9 +7,13 @@ import { User } from 'src/users/entities/user.entity';
 import { Medal } from 'src/medals/entities/medal.entity';
 import { Challenge } from 'src/challenges/entities/challenge.entity';
 import { ChallengesUser } from 'src/challenges_users/entities/challenges_user.entity';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([MedalsUser, User, Medal, Challenge, ChallengesUser])],
+  imports: [
+    TypeOrmModule.forFeature([MedalsUser, User, Medal, Challenge, ChallengesUser]),
+    NotificationsModule,
+  ],
   controllers: [MedalsUsersController],
   providers: [MedalsUsersService],
 })
