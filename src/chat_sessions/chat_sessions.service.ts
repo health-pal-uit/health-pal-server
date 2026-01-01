@@ -42,6 +42,7 @@ export class ChatSessionsService {
         const participant = this.chatParticipantRepository.create({
           user: user,
           chat_session: savedSession,
+          is_admin: participantId === user_id, // Creator is admin
           joined_at: new Date(),
         });
         await this.chatParticipantRepository.save(participant);
