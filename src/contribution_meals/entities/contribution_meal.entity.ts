@@ -79,8 +79,8 @@ export class ContributionMeal {
   @Column({ type: 'float', nullable: true })
   serving_gr?: number | null;
 
-  @Column({ type: 'float' })
-  kcal_per_100gr: number;
+  @Column({ type: 'float', nullable: true })
+  kcal_per_100gr?: number | null;
 
   @Column({ type: 'float', nullable: true })
   fat_per_100gr?: number | null;
