@@ -84,10 +84,10 @@ export class ContributionMealsController {
   async createFromIngredients(
     @Body() body: { meal: CreateContributionMealDto; ingredients: IngredientPayload[] },
     @CurrentUser() user: ReqUserType,
-    @UploadedFile() _file?: Express.Multer.File,
+    @UploadedFile() file?: Express.Multer.File,
   ) {
-    const imageBuffer = _file?.buffer;
-    const imageName = _file?.originalname;
+    const imageBuffer = file?.buffer;
+    const imageName = file?.originalname;
     return await this.contributionMealsService.createFromIngredients(
       body.meal,
       body.ingredients,

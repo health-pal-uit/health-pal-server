@@ -194,11 +194,6 @@ export class ActivityRecordsService {
       relations: { activity: true, challenge: true },
     });
 
-    const challengeUser = await this.challengesUsersService.getOrCreateChallengesUser(
-      userId,
-      challengeId,
-    );
-
     const percents: number[] = [];
 
     for (const ar of challengeActivityRecords) {
@@ -211,10 +206,7 @@ export class ActivityRecordsService {
       overallPercent = percents.reduce((a, b) => a + b, 0) / percents.length;
     }
 
-    challengeUser.progress_percent = Math.round(overallPercent * 10) / 10;
-    await this.challengesUsersService.save(challengeUser);
-
-    return challengeUser.progress_percent;
+    return Math.round(overallPercent * 10) / 10;
   }
 
   // controller !!
