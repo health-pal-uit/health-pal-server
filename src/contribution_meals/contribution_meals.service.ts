@@ -69,7 +69,14 @@ export class ContributionMealsService {
       );
       dto.image_url = storedImage;
     }
-    const createdContribution = await this.create(dto, userId); // create contribution meal first
+
+    const createdContribution = this.contributionMealRepository.create({
+      ...dto,
+      author: { id: userId } as any,
+      status: ContributionStatus.PENDING,
+      opt: ContributionOptions.NEW,
+    });
+
     const createMealDto: CreateMealDto = {
       name: createdContribution.name,
       protein_per_100gr: createdContribution.protein_per_100gr ?? undefined,
@@ -85,9 +92,6 @@ export class ContributionMealsService {
     };
     const meal = await this.mealsService.createFromIngredients(createMealDto, ingredients);
     createdContribution.meal = meal;
-    // create ingre_meals
-    createdContribution.status = ContributionStatus.PENDING;
-    createdContribution.opt = ContributionOptions.NEW;
     return await this.contributionMealRepository.save(createdContribution);
   }
 
