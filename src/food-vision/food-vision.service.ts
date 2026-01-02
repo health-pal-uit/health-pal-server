@@ -4,6 +4,8 @@ import axios from 'axios';
 import FormData from 'form-data';
 import { IngredientsService } from 'src/ingredients/ingredients.service';
 import { MealsService } from 'src/meals/meals.service';
+import { ContributionMealsService } from 'src/contribution_meals/contribution_meals.service';
+import { ContributionIngresService } from 'src/contribution_ingres/contribution_ingres.service';
 
 @Injectable()
 export class FoodVisionService {
@@ -13,6 +15,8 @@ export class FoodVisionService {
     private readonly config: ConfigService,
     private readonly mealsService: MealsService,
     private readonly ingredientsService: IngredientsService,
+    private readonly contributionMealsService: ContributionMealsService,
+    private readonly contributionIngresService: ContributionIngresService,
   ) {
     this.food_url = this.config.get<string>('FOOD_VISION_URL')!;
   }
@@ -34,16 +38,41 @@ export class FoodVisionService {
 
   async getIngredientOrMealByName(name: string, page: number, limit: number) {
     this.logger.log(`Searching for ingredient or meal by name: ${name}`);
-    // search ingredient first
-    const ingredientResult = await this.ingredientsService.searchByName(name, page, limit);
-    if (ingredientResult.total > 0) {
-      return { type: 'ingredient', data: ingredientResult.data[0] };
-    }
-    // search meal next
-    const mealResult = await this.mealsService.searchByName(name, page, limit);
-    if (mealResult.total > 0) {
-      return { type: 'meal', data: mealResult.data[0] };
-    }
-    return { type: 'none', data: null };
+    // search both ingredients and meals concurrently
+    const [ingredientResult, mealResult] = await Promise.all([
+      this.ingredientsService.searchByName(name, page, limit),
+      this.mealsService.searchByName(name, page, limit),
+    ]);
+
+    // combine all results
+    const combinedData = [
+      ...ingredientResult.data.map((item) => ({ ...item, type: 'ingredient' })),
+      ...mealResult.data.map((item) => ({ ...item, type: 'meal' })),
+    ];
+
+    return {
+      total: ingredientResult.total + mealResult.total,
+      data: combinedData,
+    };
+  }
+
+  async getUserContributions(userId: string) {
+    this.logger.log(`Getting all contributions for user: ${userId}`);
+    // fetch both contribution types concurrently
+    const [contributionMeals, contributionIngredients] = await Promise.all([
+      this.contributionMealsService.findAllUser(userId),
+      this.contributionIngresService.findAllUser(userId),
+    ]);
+
+    // combine all results with type tags
+    const combinedData = [
+      ...contributionMeals.map((item) => ({ ...item, type: 'meal' })),
+      ...contributionIngredients.map((item) => ({ ...item, type: 'ingredient' })),
+    ];
+
+    return {
+      total: contributionMeals.length + contributionIngredients.length,
+      data: combinedData,
+    };
   }
 }

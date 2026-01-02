@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Post,
   Query,
   UploadedFile,
@@ -10,6 +11,8 @@ import {
 import { FoodVisionService } from './food-vision.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
+import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
+import type { ReqUserType } from 'src/auth/types/req.type';
 
 @Controller('food-vision')
 export class FoodVisionController {
@@ -30,5 +33,11 @@ export class FoodVisionController {
     @Query('limit') limit: number = 10,
   ) {
     return this.foodVisionService.getIngredientOrMealByName(name, page, limit);
+  }
+
+  @UseGuards(SupabaseGuard)
+  @Get('contributions/me')
+  async getUserContributions(@CurrentUser() user: ReqUserType) {
+    return this.foodVisionService.getUserContributions(user.id);
   }
 }
