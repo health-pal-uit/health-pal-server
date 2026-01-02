@@ -29,7 +29,7 @@ export class CreateContributionMealDto {
   @Type(() => Number)
   @IsNumber()
   @Min(0)
-  kcal_per_100gr!: number;
+  kcal_per_100gr?: number;
 
   @ApiProperty({ example: 31, required: false, description: 'Protein per 100g' })
   @IsOptional()
