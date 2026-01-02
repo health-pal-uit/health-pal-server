@@ -24,6 +24,7 @@ export class ContributionMealsService {
     private contributionMealRepository: Repository<ContributionMeal>,
     @InjectRepository(Meal) private mealsRepository: Repository<Meal>,
     @InjectRepository(IngreMeal) private ingreMealRepository: Repository<IngreMeal>,
+    @InjectRepository(Ingredient) private ingredientsRepository: Repository<Ingredient>,
     private mealsService: MealsService,
     private supabaseStorageService: SupabaseStorageService,
     private readonly configService: ConfigService,
@@ -80,13 +81,48 @@ export class ContributionMealsService {
       image_url = storedImage;
     }
 
+    // fetch ingredients to calculate macros
+    const ingredientIds = ingredients.map((item) => item.ingredient_id);
+    const fetchedIngredients = await this.ingredientsRepository.find({
+      where: { id: In(ingredientIds) },
+    });
+    if (fetchedIngredients.length !== ingredientIds.length) {
+      throw new Error('One or more ingredients not found');
+    }
+
+    // calculate macros from ingredients
+    const portions = ingredients.map((item) => {
+      const ingredient = fetchedIngredients.find((i) => i.id === item.ingredient_id);
+      if (!ingredient) {
+        throw new Error(`Ingredient with id ${item.ingredient_id} not found`);
+      }
+      return {
+        quantity_kg: item.quantity_kg,
+        per100: {
+          kcal: ingredient.kcal_per_100gr,
+          protein: ingredient.protein_per_100gr,
+          fat: ingredient.fat_per_100gr,
+          carbs: ingredient.carbs_per_100gr,
+          fiber: ingredient.fiber_per_100gr,
+        },
+      };
+    });
+
+    const { per100g, totalWeightG } = calculateMacros(portions);
+
     const createdContribution = this.contributionMealRepository.create({
       ...dto,
       image_url,
+      protein_per_100gr: per100g.protein,
+      fat_per_100gr: per100g.fat,
+      carbs_per_100gr: per100g.carbs,
+      fiber_per_100gr: per100g.fiber,
+      kcal_per_100gr: per100g.kcal,
+      serving_gr: totalWeightG,
       author: { id: userId } as any,
       status: ContributionStatus.PENDING,
       opt: ContributionOptions.NEW,
-      ingredients_data: ingredients, // Store ingredients for later
+      ingredients_data: ingredients,
     });
 
     return await this.contributionMealRepository.save(createdContribution);
