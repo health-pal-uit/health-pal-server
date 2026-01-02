@@ -65,6 +65,50 @@ export class ContributionMealsController {
     );
   }
 
+  private parseFlatFormData(body: any): {
+    meal: CreateContributionMealDto;
+    ingredients: IngredientPayload[];
+  } {
+    const meal: any = {};
+    const ingredientsMap: Map<number, any> = new Map();
+
+    // Parse flattened form-data into nested objects
+    for (const [key, value] of Object.entries(body)) {
+      // Handle meal.* fields
+      if (key.startsWith('meal.')) {
+        const fieldName = key.substring(5); // Remove 'meal.' prefix
+        meal[fieldName] = value;
+      }
+      // Handle ingredients[index].* fields
+      else if (key.startsWith('ingredients[')) {
+        const match = key.match(/ingredients\[(\d+)\]\.(.+)/);
+        if (match) {
+          const index = parseInt(match[1], 10);
+          const fieldName = match[2];
+
+          if (!ingredientsMap.has(index)) {
+            ingredientsMap.set(index, {});
+          }
+
+          const ingredient = ingredientsMap.get(index);
+          // Convert quantity_kg to number
+          if (fieldName === 'quantity_kg') {
+            ingredient[fieldName] = parseFloat(value as string);
+          } else {
+            ingredient[fieldName] = value;
+          }
+        }
+      }
+    }
+
+    // Convert map to array, sorted by index
+    const ingredients = Array.from(ingredientsMap.entries())
+      .sort((a, b) => a[0] - b[0])
+      .map(([_, ingredient]) => ingredient);
+
+    return { meal, ingredients };
+  }
+
   @Post('ingredients')
   @UseGuards(SupabaseGuard)
   @UseInterceptors(FileInterceptor('image'))
@@ -75,22 +119,60 @@ export class ContributionMealsController {
     schema: {
       type: 'object',
       properties: {
-        meal: { $ref: '#/components/schemas/CreateContributionMealDto' },
-        ingredients: { type: 'array', items: { $ref: '#/components/schemas/IngredientPayload' } },
+        'meal.name': { type: 'string', example: 'Chicken Rice' },
+        'meal.tags': { type: 'array', items: { type: 'string' } },
+        'meal.notes': { type: 'string' },
+        'ingredients[0].ingredient_id': { type: 'string', format: 'uuid' },
+        'ingredients[0].quantity_kg': { type: 'number' },
+        image: { type: 'string', format: 'binary' },
       },
     },
   })
   @ApiResponse({ status: 201, description: 'Contribution created from ingredients' })
   async createFromIngredients(
-    @Body() body: { meal: CreateContributionMealDto; ingredients: IngredientPayload[] },
+    @Body() body: any,
     @CurrentUser() user: ReqUserType,
     @UploadedFile() file?: Express.Multer.File,
   ) {
+    let mealDto: CreateContributionMealDto;
+    let ingredientsPayload: IngredientPayload[];
+
+    // Check if body has nested structure (meal object exists)
+    if (body.meal && typeof body.meal === 'object') {
+      // Direct nested object format
+      mealDto = body.meal;
+      ingredientsPayload = body.ingredients;
+    } else if (body.meal && typeof body.meal === 'string') {
+      // JSON string format
+      mealDto = JSON.parse(body.meal);
+      ingredientsPayload = JSON.parse(body.ingredients);
+    } else if (Object.keys(body).some((key) => key.startsWith('meal.'))) {
+      // Flattened form-data format (meal.name, ingredients[0].*, etc.)
+      const parsed = this.parseFlatFormData(body);
+      mealDto = parsed.meal as CreateContributionMealDto;
+      ingredientsPayload = parsed.ingredients as IngredientPayload[];
+    } else {
+      console.error('Request body:', JSON.stringify(body, null, 2));
+      throw new Error('Invalid request format. Please send meal and ingredients data.');
+    }
+
+    // Validate parsed data
+    if (!mealDto || !mealDto.name) {
+      throw new Error('Meal name is required');
+    }
+    if (
+      !ingredientsPayload ||
+      !Array.isArray(ingredientsPayload) ||
+      ingredientsPayload.length === 0
+    ) {
+      throw new Error('At least one ingredient is required');
+    }
+
     const imageBuffer = file?.buffer;
     const imageName = file?.originalname;
     return await this.contributionMealsService.createFromIngredients(
-      body.meal,
-      body.ingredients,
+      mealDto,
+      ingredientsPayload,
       user.id,
       imageBuffer,
       imageName,

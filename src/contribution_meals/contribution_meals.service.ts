@@ -3,7 +3,7 @@ import { CreateContributionMealDto } from './dto/create-contribution_meal.dto';
 import { UpdateContributionMealDto } from './dto/update-contribution_meal.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Meal } from 'src/meals/entities/meal.entity';
-import { DeleteResult, IsNull, Repository, UpdateResult } from 'typeorm';
+import { DeleteResult, In, IsNull, Repository, UpdateResult } from 'typeorm';
 import { ContributionMeal } from './entities/contribution_meal.entity';
 import { ContributionStatus } from 'src/helpers/enums/contribution-status.enum';
 import { ContributionOptions } from 'src/helpers/enums/contribution-options';
@@ -14,6 +14,8 @@ import { MealsService } from 'src/meals/meals.service';
 import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
 import { ConfigService } from '@nestjs/config';
 import { NotificationsService } from 'src/notifications/notifications.service';
+import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
+import { calculateMacros } from 'src/helpers/functions/macro-calculator';
 
 @Injectable()
 export class ContributionMealsService {
@@ -62,6 +64,12 @@ export class ContributionMealsService {
     imageBuffer?: Buffer,
     imageName?: string,
   ): Promise<ContributionMeal> {
+    if (!dto || !dto.name) {
+      throw new Error('Meal data is required with a name');
+    }
+
+    let image_url = dto.image_url;
+
     if (imageBuffer && imageName) {
       const bucketName = this.configService.get<string>('MEAL_IMG_BUCKET_NAME') || 'meal-imgs';
       const storedImage = await this.supabaseStorageService.uploadImageFromBuffer(
@@ -69,11 +77,12 @@ export class ContributionMealsService {
         imageName,
         bucketName,
       );
-      dto.image_url = storedImage;
+      image_url = storedImage;
     }
 
     const createdContribution = this.contributionMealRepository.create({
       ...dto,
+      image_url,
       author: { id: userId } as any,
       status: ContributionStatus.PENDING,
       opt: ContributionOptions.NEW,
