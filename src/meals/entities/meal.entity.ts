@@ -34,6 +34,7 @@ export class Meal {
   @ApiProperty({ example: 100, description: 'Serving size in grams' })
   @IsOptional()
   @IsNumber()
+  @Column({ type: 'float', nullable: true })
   serving_gr?: number;
 
   @Column({ type: 'float', nullable: true })
