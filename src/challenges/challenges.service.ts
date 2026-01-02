@@ -125,14 +125,16 @@ export class ChallengesService {
           where: { challenge: { id: challenge.id }, user: { id: userId } },
         });
         const is_finished = userChallenge?.completed_at ? true : false;
-        const can_claim = userChallenge && userChallenge.progress_percent === 100 && !is_finished;
+        const progress_percent =
+          await this.activityRecordsService.recalculateProgressChallengesForUser(
+            challenge.id,
+            userId,
+          );
+        const can_claim = progress_percent === 100 && !is_finished;
         return {
           ...challenge,
           is_finished,
-          progress_percent: await this.activityRecordsService.recalculateProgressChallengesForUser(
-            challenge.id,
-            userId,
-          ),
+          progress_percent,
           can_claim,
         };
       }),
