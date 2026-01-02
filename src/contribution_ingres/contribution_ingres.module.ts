@@ -5,9 +5,14 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ContributionIngre } from './entities/contribution_ingre.entity';
 import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
 import { SupabaseStorageModule } from 'src/supabase-storage/supabase-storage.module';
+import { NotificationsModule } from 'src/notifications/notifications.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ContributionIngre, Ingredient]), SupabaseStorageModule],
+  imports: [
+    TypeOrmModule.forFeature([ContributionIngre, Ingredient]),
+    SupabaseStorageModule,
+    NotificationsModule,
+  ],
   controllers: [ContributionIngresController],
   providers: [ContributionIngresService],
   exports: [ContributionIngresService],

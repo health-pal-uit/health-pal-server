@@ -65,7 +65,7 @@ export class Meal {
   created_at: Date;
 
   @Column({ type: 'boolean', default: false })
-  is_verified: boolean;
+  is_verified!: boolean;
 
   @Column({ type: 'text', nullable: true })
   image_url?: string | null;

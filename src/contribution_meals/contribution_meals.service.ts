@@ -13,6 +13,7 @@ import { CreateMealDto } from 'src/meals/dto/create-meal.dto';
 import { MealsService } from 'src/meals/meals.service';
 import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
 import { ConfigService } from '@nestjs/config';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class ContributionMealsService {
@@ -24,6 +25,7 @@ export class ContributionMealsService {
     private mealsService: MealsService,
     private supabaseStorageService: SupabaseStorageService,
     private readonly configService: ConfigService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async findAllPending(
@@ -75,53 +77,94 @@ export class ContributionMealsService {
       author: { id: userId } as any,
       status: ContributionStatus.PENDING,
       opt: ContributionOptions.NEW,
+      ingredients_data: ingredients, // Store ingredients for later
     });
 
-    const createMealDto: CreateMealDto = {
-      name: createdContribution.name,
-      protein_per_100gr: createdContribution.protein_per_100gr ?? undefined,
-      fat_per_100gr: createdContribution.fat_per_100gr ?? undefined,
-      carbs_per_100gr: createdContribution.carbs_per_100gr ?? undefined,
-      fiber_per_100gr: createdContribution.fiber_per_100gr ?? undefined,
-      kcal_per_100gr: createdContribution.kcal_per_100gr ?? undefined,
-      notes: createdContribution.notes ?? undefined,
-      tags: createdContribution.tags ?? undefined,
-      image_url: createdContribution.image_url ?? undefined,
-      serving_gr: createdContribution.serving_gr ?? undefined,
-      is_verified: false,
-    };
-    const meal = await this.mealsService.createFromIngredients(createMealDto, ingredients);
-    createdContribution.meal = meal;
     return await this.contributionMealRepository.save(createdContribution);
   }
 
   async adminReject(id: string, rejectionReason: string): Promise<ContributionMeal> {
-    const contribution = await this.contributionMealRepository.findOne({ where: { id } });
+    const contribution = await this.contributionMealRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
     if (!contribution) {
       throw new Error('Contribution not found');
     }
     contribution.status = ContributionStatus.REJECTED;
     contribution.rejection_reason = rejectionReason;
     contribution.reviewed_at = new Date();
-    return await this.contributionMealRepository.save(contribution);
-    // notification here?
+    const savedContribution = await this.contributionMealRepository.save(contribution);
+
+    // notify author
+    if (contribution.author) {
+      await this.notificationsService.sendToUser({
+        user_id: contribution.author.id,
+        title: '❌ Meal Contribution Rejected',
+        content: `Your meal contribution "${contribution.name}" was rejected. Reason: ${rejectionReason}`,
+      });
+    }
+
+    return savedContribution;
   }
 
   // convert to meal
   async adminApprove(id: string): Promise<ContributionMeal> {
-    const existingContribution = await this.contributionMealRepository.findOne({ where: { id } });
+    const existingContribution = await this.contributionMealRepository.findOne({
+      where: { id },
+      relations: ['meal', 'author'],
+    });
     if (!existingContribution) {
       throw new Error('Contribution not found');
     }
+
+    // edit case: update existing
     if (existingContribution.meal) {
-      await this.mealsRepository.update(existingContribution.meal!.id, {
+      const updateData: Partial<Meal> = {
+        name: existingContribution.name,
+        protein_per_100gr: existingContribution.protein_per_100gr ?? undefined,
+        fat_per_100gr: existingContribution.fat_per_100gr ?? undefined,
+        carbs_per_100gr: existingContribution.carbs_per_100gr ?? undefined,
+        fiber_per_100gr: existingContribution.fiber_per_100gr ?? undefined,
+        kcal_per_100gr: existingContribution.kcal_per_100gr ?? undefined,
+        notes: existingContribution.notes ?? undefined,
+        tags: existingContribution.tags ?? undefined,
+        image_url: existingContribution.image_url ?? undefined,
+        serving_gr: existingContribution.serving_gr ?? undefined,
         is_verified: true,
-      }); // just verify if already has ingredients
+      };
+
+      // update from ingredients if available
+      if (
+        existingContribution.ingredients_data &&
+        Array.isArray(existingContribution.ingredients_data)
+      ) {
+        await this.mealsService.updateFromIngredients(
+          existingContribution.meal.id,
+          existingContribution.ingredients_data,
+        );
+      } else {
+        await this.mealsRepository.update(existingContribution.meal.id, updateData);
+      }
+
       existingContribution.status = ContributionStatus.APPROVED;
       existingContribution.reviewed_at = new Date();
-      return await this.contributionMealRepository.save(existingContribution);
+      const savedContribution = await this.contributionMealRepository.save(existingContribution);
+
+      // notify author
+      if (existingContribution.author) {
+        await this.notificationsService.sendToUser({
+          user_id: existingContribution.author.id,
+          title: '✅ Meal Contribution Approved',
+          content: `Your meal contribution "${existingContribution.name}" has been approved and is now available to all users!`,
+        });
+      }
+
+      return savedContribution;
     }
-    const mealData: Partial<Meal> = {
+
+    // new case: create meal
+    const createMealDto: CreateMealDto = {
       name: existingContribution.name,
       protein_per_100gr: existingContribution.protein_per_100gr ?? undefined,
       fat_per_100gr: existingContribution.fat_per_100gr ?? undefined,
@@ -130,17 +173,45 @@ export class ContributionMealsService {
       kcal_per_100gr: existingContribution.kcal_per_100gr ?? undefined,
       notes: existingContribution.notes ?? undefined,
       tags: existingContribution.tags ?? undefined,
-      is_verified: true,
       image_url: existingContribution.image_url ?? undefined,
       serving_gr: existingContribution.serving_gr ?? undefined,
+      is_verified: true,
     };
-    const meal = this.mealsRepository.create(mealData);
-    const savedMeal = await this.mealsRepository.save(meal);
-    existingContribution.meal = savedMeal;
-    existingContribution.updated_at = new Date();
+
+    let meal: Meal;
+    // create from ingredients if available
+    if (
+      existingContribution.ingredients_data &&
+      Array.isArray(existingContribution.ingredients_data)
+    ) {
+      const createdMeal = await this.mealsService.createFromIngredients(
+        createMealDto,
+        existingContribution.ingredients_data,
+      );
+      if (!createdMeal) {
+        throw new Error('Failed to create meal from ingredients');
+      }
+      meal = createdMeal;
+    } else {
+      meal = this.mealsRepository.create(createMealDto);
+      await this.mealsRepository.save(meal);
+    }
+
+    existingContribution.meal = meal;
     existingContribution.status = ContributionStatus.APPROVED;
     existingContribution.reviewed_at = new Date();
-    return await this.contributionMealRepository.save(existingContribution);
+    const savedContribution = await this.contributionMealRepository.save(existingContribution);
+
+    // notify author
+    if (existingContribution.author) {
+      await this.notificationsService.sendToUser({
+        user_id: existingContribution.author.id,
+        title: '✅ Meal Contribution Approved',
+        content: `Your meal contribution "${existingContribution.name}" has been approved and is now available to all users!`,
+      });
+    }
+
+    return savedContribution;
   }
 
   async createDeleteContribution(id: string, userId: any): Promise<ContributionMeal> {
@@ -216,7 +287,7 @@ export class ContributionMealsService {
     }
     existingContribution.opt = ContributionOptions.EDIT;
     existingContribution.status = ContributionStatus.PENDING;
-    await this.mealsService.updateFromIngredients(existingContribution.meal_id!, ingredients);
+    existingContribution.ingredients_data = ingredients; // Update stored ingredients
     return await this.contributionMealRepository.save(existingContribution);
   }
   async findOneUser(id: string, userId: any): Promise<ContributionMeal> {

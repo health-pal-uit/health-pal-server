@@ -292,6 +292,16 @@ async function seedFitnessProfilesAndGoals(
   opts: { users: User[]; diet_types: DietType[] },
 ) {
   for (const u of opts.users) {
+    // check if profile exists
+    const existingProfile = await manager.getRepository(FitnessProfile).findOne({
+      where: { user: { id: u.id } },
+    });
+
+    if (existingProfile) {
+      console.log(`Fitness profile already exists for user ${u.id}, skipping...`);
+      continue;
+    }
+
     const weight = faker.number.float({ min: 45, max: 85, multipleOf: 0.1 });
     const heightM = faker.number.float({ min: 1.5, max: 1.85, multipleOf: 0.01 });
     const bmi = +(weight / (heightM * heightM)).toFixed(1);

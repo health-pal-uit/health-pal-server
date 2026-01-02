@@ -67,7 +67,9 @@ export class ContributionMealsController {
 
   @Post('ingredients')
   @UseGuards(SupabaseGuard)
+  @UseInterceptors(FileInterceptor('image'))
   @ApiOperation({ summary: 'User creates a meal contribution from ingredients' })
+  @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'Meal DTO and ingredients array',
     schema: {
@@ -84,10 +86,14 @@ export class ContributionMealsController {
     @CurrentUser() user: ReqUserType,
     @UploadedFile() _file?: Express.Multer.File,
   ) {
+    const imageBuffer = _file?.buffer;
+    const imageName = _file?.originalname;
     return await this.contributionMealsService.createFromIngredients(
       body.meal,
       body.ingredients,
       user.id,
+      imageBuffer,
+      imageName,
     );
   }
 

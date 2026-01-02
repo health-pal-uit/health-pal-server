@@ -82,4 +82,8 @@ export class CreateContributionMealDto {
   @IsOptional()
   @IsUrl()
   image_url?: string | null;
+
+  @ApiProperty({ example: [], required: false, description: 'Ingredient data as JSON' })
+  @IsOptional()
+  ingredients_data?: any; // Store the ingredients payload temporarily
 }

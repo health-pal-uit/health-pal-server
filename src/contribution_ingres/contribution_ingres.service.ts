@@ -10,6 +10,7 @@ import { ContributionOptions } from 'src/helpers/enums/contribution-options';
 import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
 import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
 import { ConfigService } from '@nestjs/config';
+import { NotificationsService } from 'src/notifications/notifications.service';
 
 @Injectable()
 export class ContributionIngresService {
@@ -19,6 +20,7 @@ export class ContributionIngresService {
     @InjectRepository(Ingredient) private ingredientRepository: Repository<Ingredient>,
     private supabaseStorageService: SupabaseStorageService,
     private configService: ConfigService,
+    private notificationsService: NotificationsService,
   ) {}
 
   async findAllPending(
@@ -26,7 +28,7 @@ export class ContributionIngresService {
     limit = 10,
   ): Promise<{ data: ContributionIngre[]; total: number; page: number; limit: number }> {
     const [data, total] = await this.contributionIngreRepository.findAndCount({
-      where: { status: ContributionStatus.PENDING },
+      where: { status: ContributionStatus.PENDING, deleted_at: IsNull() },
       skip: (page - 1) * limit,
       take: limit,
       order: { created_at: 'DESC' },
@@ -39,7 +41,7 @@ export class ContributionIngresService {
     limit = 10,
   ): Promise<{ data: ContributionIngre[]; total: number; page: number; limit: number }> {
     const [data, total] = await this.contributionIngreRepository.findAndCount({
-      where: { status: ContributionStatus.REJECTED },
+      where: { status: ContributionStatus.REJECTED, deleted_at: IsNull() },
       skip: (page - 1) * limit,
       take: limit,
       order: { reviewed_at: 'DESC' },
@@ -49,18 +51,35 @@ export class ContributionIngresService {
   }
 
   async adminReject(id: string, reason?: string): Promise<ContributionIngre> {
-    const contribution = await this.contributionIngreRepository.findOne({ where: { id } });
+    const contribution = await this.contributionIngreRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
     if (!contribution) {
       throw new Error('Contribution not found');
     }
     contribution.status = ContributionStatus.REJECTED;
     contribution.rejection_reason = reason || null;
     contribution.reviewed_at = new Date();
-    return await this.contributionIngreRepository.save(contribution);
+    const savedContribution = await this.contributionIngreRepository.save(contribution);
+
+    // notify author
+    if (contribution.author) {
+      await this.notificationsService.sendToUser({
+        user_id: contribution.author.id,
+        title: '❌ Ingredient Contribution Rejected',
+        content: `Your ingredient contribution "${contribution.name}" was rejected.${reason ? ` Reason: ${reason}` : ''}`,
+      });
+    }
+
+    return savedContribution;
   }
   // user: get rejection reason/status for their own contribution
   async getRejectionInfo(id: string, userId: string) {
-    const contribution = await this.contributionIngreRepository.findOne({ where: { id } });
+    const contribution = await this.contributionIngreRepository.findOne({
+      where: { id },
+      relations: ['author'],
+    });
     if (!contribution) {
       throw new Error('Contribution not found');
     }
@@ -76,10 +95,46 @@ export class ContributionIngresService {
 
   // convert to real ingredient
   async adminApprove(id: string): Promise<ContributionIngre> {
-    const contribution = await this.contributionIngreRepository.findOne({ where: { id } });
+    const contribution = await this.contributionIngreRepository.findOne({
+      where: { id },
+      relations: ['ingredient', 'author'],
+    });
     if (!contribution) {
       throw new Error('Contribution not found');
     }
+
+    // edit case: update existing
+    if (contribution.ingredient) {
+      const updateData: Partial<Ingredient> = {
+        name: contribution.name,
+        kcal_per_100gr: contribution.kcal_per_100gr,
+        protein_per_100gr: contribution.protein_per_100gr ?? undefined,
+        fat_per_100gr: contribution.fat_per_100gr ?? undefined,
+        carbs_per_100gr: contribution.carbs_per_100gr ?? undefined,
+        fiber_per_100gr: contribution.fiber_per_100gr ?? undefined,
+        notes: contribution.notes ?? undefined,
+        tags: contribution.tags ?? undefined,
+        image_url: contribution.image_url ?? undefined,
+        is_verified: true,
+      };
+      await this.ingredientRepository.update(contribution.ingredient.id, updateData);
+      contribution.status = ContributionStatus.APPROVED;
+      contribution.reviewed_at = new Date();
+      const savedContribution = await this.contributionIngreRepository.save(contribution);
+
+      // notify author
+      if (contribution.author) {
+        await this.notificationsService.sendToUser({
+          user_id: contribution.author.id,
+          title: '✅ Ingredient Contribution Approved',
+          content: `Your ingredient contribution "${contribution.name}" has been approved and is now available to all users!`,
+        });
+      }
+
+      return savedContribution;
+    }
+
+    // new case: create ingredient
     const ingredientData: Partial<Ingredient> = {
       name: contribution.name,
       kcal_per_100gr: contribution.kcal_per_100gr ?? undefined,
@@ -98,37 +153,18 @@ export class ContributionIngresService {
     contribution.updated_at = new Date();
     contribution.status = ContributionStatus.APPROVED;
     contribution.reviewed_at = new Date();
-    return await this.contributionIngreRepository.save(contribution);
-    // if (contribution.opt === ContributionOptions.NEW) {
-    //   // create new ingredient
+    const savedContribution = await this.contributionIngreRepository.save(contribution);
 
-    // }
-    // else if (contribution.opt === ContributionOptions.EDIT) {
-    //   // update existing ingredient
-    //   if (!contribution.ingredient_id) {
-    //     throw new Error('No ingredient to edit');
-    //   }
+    // notify author
+    if (contribution.author) {
+      await this.notificationsService.sendToUser({
+        user_id: contribution.author.id,
+        title: '✅ Ingredient Contribution Approved',
+        content: `Your ingredient contribution "${contribution.name}" has been approved and is now available to all users!`,
+      });
+    }
 
-    //   const ingredient = await this.ingredientRepository.findOne({ where: { id: contribution.ingredient_id } });
-    //   if (!ingredient) {
-    //     throw new Error('Ingredient not found');
-    //   }
-    //   contribution.updated_at = new Date();
-    //   const updatedIngredient = Object.assign(ingredient, contribution);
-
-    //   return await this.ingredientRepository.save(updatedIngredient);
-    // }
-    // else {
-    //   if (!contribution.ingredient_id) {
-    //     throw new Error('No ingredient to edit');
-    //   }
-
-    //   const ingredient = await this.ingredientRepository.findOne({ where: { id: contribution.ingredient_id } });
-    //   if (!ingredient) {
-    //     throw new Error('Ingredient not found');
-    //   }
-    //   return await this.contributionIngreRepository.update(contribution.id, { deleted_at: new Date(),opt: ContributionOptions.DELETE_REQ }); // soft delete
-    // }
+    return savedContribution;
   }
 
   async findAllUser(id: any): Promise<ContributionIngre[]> {

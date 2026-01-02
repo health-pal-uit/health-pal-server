@@ -113,7 +113,7 @@ export class MealsService {
         imageName,
         bucketName,
       );
-      meal.image_url = imagePath;
+      meal.image_url = imagePath ?? undefined;
     }
     const createdMeal = await this.create({ ...meal, is_verified: true }); // create meal first
     const savedMeal = await this.mealsRepository.save(createdMeal);
@@ -182,7 +182,7 @@ export class MealsService {
         imageName,
         bucketName,
       );
-      createMealDto.image_url = imagePath;
+      createMealDto.image_url = imagePath ?? undefined;
     }
     const meal = this.mealsRepository.create(createMealDto);
     return await this.mealsRepository.save(meal);
@@ -251,7 +251,7 @@ export class MealsService {
         imageName,
         bucketName,
       );
-      updateMealDto.image_url = imagePath;
+      updateMealDto.image_url = imagePath ?? undefined;
     }
 
     // only update if there are fields to update

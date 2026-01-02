@@ -270,6 +270,31 @@ export class FitnessProfilesService {
     });
   }
 
+  async removeAllForUser(userId: string): Promise<{ deleted: number; message: string }> {
+    const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    // find all profiles
+    const profiles = await this.fitnessProfileRepository.find({
+      where: { user: { id: userId }, deleted_at: IsNull() },
+    });
+
+    if (profiles.length === 0) {
+      return { deleted: 0, message: 'No fitness profiles found to delete' };
+    }
+
+    // soft delete all
+    const profileIds = profiles.map((p) => p.id);
+    await this.fitnessProfileRepository.softDelete(profileIds);
+
+    return {
+      deleted: profiles.length,
+      message: `Successfully deleted ${profiles.length} fitness profile(s)`,
+    };
+  }
+
   calculateBMR(fitnessProfile: FitnessProfile) {
     const user = fitnessProfile.user;
     if (!user || !user.birth_date) {

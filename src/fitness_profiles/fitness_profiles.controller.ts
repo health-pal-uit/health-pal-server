@@ -164,6 +164,27 @@ export class FitnessProfilesController {
     return await this.fitnessProfilesService.calculateBodyFatPercentage(user.id, bdf);
   }
 
+  @Delete('me/all')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({
+    summary: 'Delete all fitness profiles for the current user',
+    description: 'Soft deletes all fitness profiles belonging to the authenticated user.',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'All fitness profiles soft deleted.',
+    schema: {
+      type: 'object',
+      properties: {
+        deleted: { type: 'number', example: 5 },
+        message: { type: 'string', example: 'Successfully deleted 5 fitness profile(s)' },
+      },
+    },
+  })
+  async removeAll(@CurrentUser() user: ReqUserType) {
+    return await this.fitnessProfilesService.removeAllForUser(user.id);
+  }
+
   @Delete(':id')
   @UseGuards(SupabaseGuard)
   @ApiOperation({

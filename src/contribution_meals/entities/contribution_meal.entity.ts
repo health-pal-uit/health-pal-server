@@ -100,8 +100,11 @@ export class ContributionMeal {
   @Column({ type: 'enum', enum: FoodType, array: true, nullable: true })
   tags?: FoodType[] | null;
 
-  @Column({ type: 'text', nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   image_url?: string | null;
+
+  @Column({ type: 'jsonb', nullable: true })
+  ingredients_data?: any;
 
   // --- Moderation ---
   @Column({ type: 'enum', enum: ContributionStatus, default: ContributionStatus.PENDING })
