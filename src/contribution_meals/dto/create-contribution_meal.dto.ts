@@ -27,6 +27,7 @@ export class CreateContributionMealDto {
 
   @ApiProperty({ example: 165, description: 'Calories per 100g' })
   @Type(() => Number)
+  @IsOptional()
   @IsNumber()
   @Min(0)
   kcal_per_100gr?: number;
