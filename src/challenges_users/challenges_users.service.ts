@@ -65,7 +65,7 @@ export class ChallengesUsersService {
     });
 
     if (existingChallengeUser) {
-      if (existingChallengeUser.progress_percent === 100) {
+      if (existingChallengeUser.completed_at) {
         throw new ConflictException('Challenge already finished by this user');
       }
       // update existing record to finished

@@ -124,7 +124,7 @@ export class ChallengesService {
         const userChallenge = await this.challengesUserRepository.findOne({
           where: { challenge: { id: challenge.id }, user: { id: userId } },
         });
-        const is_finished = userChallenge?.completed_at ? true : false;
+        const is_finished = userChallenge ? true : false;
         const progress_percent =
           await this.activityRecordsService.recalculateProgressChallengesForUser(
             challenge.id,
