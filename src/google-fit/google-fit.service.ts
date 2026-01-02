@@ -350,7 +350,7 @@ export class GoogleFitService {
       return null;
     }
 
-    // Get or create daily log
+    // get or create daily log
     const sessionDate = new Date(parseInt(session.startTimeMillis));
     const dailyLog = await this.dailyLogsService.getOrCreateDailyLog(userId, sessionDate);
     if (!dailyLog) {
@@ -358,30 +358,41 @@ export class GoogleFitService {
       return null;
     }
 
-    // Create activity record with duration
+    // check for duplicate
+    const durationMs = parseInt(session.endTimeMillis) - parseInt(session.startTimeMillis);
+    const durationMinutes = durationMs / (1000 * 60);
+
+    const existingRecord = await this.activityRecordRepo.findOne({
+      where: {
+        daily_log: { id: dailyLog.id },
+        user_owned: false,
+        activity: { id: activity.id },
+        duration_minutes: durationMinutes,
+      },
+    });
+
+    if (existingRecord) {
+      Logger.log(`Skipping duplicate strength training record for ${sessionDate.toDateString()}`);
+      return null;
+    }
+
+    // create activity record
     const activityRecord = this.activityRecordRepo.create();
     activityRecord.user_owned = false;
     activityRecord.type = RecordType.DAILY;
     activityRecord.activity = activity;
     activityRecord.daily_log = dailyLog;
+    activityRecord.duration_minutes = durationMinutes;
 
-    // Google Fit doesn't provide reps/load, so we estimate duration from session length
-    const durationMs = parseInt(session.endTimeMillis) - parseInt(session.startTimeMillis);
-    activityRecord.duration_minutes = durationMs / (1000 * 60);
-
-    // Calculate calories if available
     const sessionCalories = session.calories || 0;
     if (sessionCalories > 0) {
       activityRecord.kcal_burned = sessionCalories;
-      dailyLog.total_kcal_burned += sessionCalories;
-      await this.dailyLogsService.save(dailyLog);
     }
 
     const savedRecord = await this.activityRecordRepo.save(activityRecord);
 
-    if (sessionCalories > 0) {
-      await this.dailyLogsService.recalculateTotalKcal(dailyLog.id);
-    }
+    // recalculate daily log totals
+    await this.dailyLogsService.recalculateTotalKcal(dailyLog.id);
 
     Logger.log(
       `Saved Google Fit strength training: ${activity.name}, ${reps} reps${resistanceKg > 0 ? `, ${resistanceKg.toFixed(1)} kg` : ''}`,
@@ -395,7 +406,7 @@ export class GoogleFitService {
     session: any,
     userId: string,
   ): Promise<ActivityRecord | null> {
-    // Find a generic strength training activity
+    // find a generic strength training activity
     const activity = await this.activityRepo.findOne({
       where: { name: 'Weight lifting (body building exercise), vigorous effort' },
     });
@@ -414,6 +425,21 @@ export class GoogleFitService {
     const durationMs = parseInt(session.endTimeMillis) - parseInt(session.startTimeMillis);
     const durationMinutes = durationMs / (1000 * 60);
 
+    // check for duplicate
+    const existingRecord = await this.activityRecordRepo.findOne({
+      where: {
+        daily_log: { id: dailyLog.id },
+        user_owned: false,
+        activity: { id: activity.id },
+        duration_minutes: durationMinutes,
+      },
+    });
+
+    if (existingRecord) {
+      Logger.log(`Skipping duplicate generic strength record for ${sessionDate.toDateString()}`);
+      return null;
+    }
+
     const activityRecord = this.activityRecordRepo.create();
     activityRecord.user_owned = false;
     activityRecord.type = RecordType.DAILY;
@@ -424,15 +450,12 @@ export class GoogleFitService {
     const sessionCalories = session.calories || 0;
     if (sessionCalories > 0) {
       activityRecord.kcal_burned = sessionCalories;
-      dailyLog.total_kcal_burned += sessionCalories;
-      await this.dailyLogsService.save(dailyLog);
     }
 
     const savedRecord = await this.activityRecordRepo.save(activityRecord);
 
-    if (sessionCalories > 0) {
-      await this.dailyLogsService.recalculateTotalKcal(dailyLog.id);
-    }
+    // recalculate daily log totals
+    await this.dailyLogsService.recalculateTotalKcal(dailyLog.id);
 
     Logger.log(
       `Saved generic Google Fit strength training session: ${durationMinutes.toFixed(1)} min`,
@@ -470,8 +493,9 @@ export class GoogleFitService {
     let kcal_burned = 0;
     let distance_km = 0;
     let active_minutes = 0;
-    let ahr = 0;
     let step_count = 0;
+    let hrSum = 0;
+    let hrCount = 0;
 
     for (const dataset of bucket.dataset) {
       for (const point of dataset.point) {
@@ -495,20 +519,23 @@ export class GoogleFitService {
             break;
 
           case 'com.google.heart_minutes':
-            // This is weighted heart minutes, could use for intensity
+            // weighted heart minutes, could use for intensity
             break;
 
           case 'com.google.heart_rate.bpm': {
-            // Average heart rate
             const hr = point.value[0].fpVal;
             if (hr && hr > 0) {
-              ahr = Math.round(hr);
+              hrSum += hr;
+              hrCount++;
             }
             break;
           }
         }
       }
     }
+
+    // calculate average heart rate
+    const ahr = hrCount > 0 ? Math.round(hrSum / hrCount) : 0;
 
     // fallback
     if (distance_km === 0 && step_count > 0) {
@@ -557,8 +584,22 @@ export class GoogleFitService {
       return null;
     }
 
+    // check for duplicate - prevent re-syncing same data
+    const existingRecord = await this.activityRecordRepo.findOne({
+      where: {
+        daily_log: { id: dailyLog.id },
+        user_owned: false,
+        activity: { id: activity.id },
+      },
+    });
+
+    if (existingRecord) {
+      Logger.log(`Skipping duplicate Google Fit record for ${bucketDate.toDateString()}`);
+      return null;
+    }
+
     // estimate calories based on activity if Google Fit calories seem unrealistic
-    // Google Fit often includes BMR in calories.expended, making values very high
+    // google fit often includes BMR in calories.expended, making values very high
     let estimatedCalories = kcal_burned;
     const durationMinutes = hours * 60;
     if (activity.met_value && durationMinutes) {
@@ -566,7 +607,7 @@ export class GoogleFitService {
       // assume average weight of 70kg if user weight not available
       const estimatedFromMET = ((activity.met_value * 3.5 * 70) / 200) * durationMinutes;
 
-      // if Google Fit calories are more than 3x the MET estimate, use MET estimate instead
+      // if google fit calories are more than 3x the MET estimate, use MET estimate instead
       if (kcal_burned > estimatedFromMET * 3) {
         Logger.warn(
           `Google Fit calories (${kcal_burned.toFixed(0)}) seem inflated. Using MET estimate (${estimatedFromMET.toFixed(0)}) instead.`,
@@ -575,9 +616,9 @@ export class GoogleFitService {
       }
     }
 
-    // Create activity record
+    // create activity record
     const activityRecord = this.activityRecordRepo.create();
-    activityRecord.user_owned = false; // From Google Fit, not user-entered
+    activityRecord.user_owned = false;
     activityRecord.type = RecordType.DAILY;
     activityRecord.activity = activity;
     activityRecord.daily_log = dailyLog;
@@ -586,14 +627,10 @@ export class GoogleFitService {
     if (ahr > 0) {
       activityRecord.ahr = ahr;
     }
-    // rhr, intensity_level remain undefined (Google Fit doesn't track these)
-
-    dailyLog.total_kcal_burned += estimatedCalories;
-    await this.dailyLogsService.save(dailyLog);
 
     const savedRecord = await this.activityRecordRepo.save(activityRecord);
 
-    // Recalculate total_kcal (total_kcal = total_kcal_eaten - total_kcal_burned)
+    // recalculate daily log totals after adding activity record
     await this.dailyLogsService.recalculateTotalKcal(dailyLog.id);
 
     Logger.log(
