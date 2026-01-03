@@ -60,7 +60,7 @@ export class ChatMessagesService {
   ): Promise<ChatMessage> {
     const chatSession = await this.chatSessionsRepository.findOne({
       where: { id: createChatMessageDto.chat_session_id },
-      relations: ['chat_participants', 'chat_participants.user'],
+      relations: ['participants', 'participants.user'],
     });
     if (!chatSession) {
       throw new Error('Chat session not found');

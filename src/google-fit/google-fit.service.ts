@@ -169,6 +169,8 @@ export class GoogleFitService {
       },
     );
 
+    Logger.log('Response data: ' + JSON.stringify(response.data));
+
     const buckets = response.data.bucket;
 
     // Process and store the aggregated data
