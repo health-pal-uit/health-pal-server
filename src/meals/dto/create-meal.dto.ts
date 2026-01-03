@@ -21,11 +21,10 @@ export class CreateMealDto {
   @IsString()
   name!: string;
 
-  @ApiProperty({ example: 100, required: false, description: 'Serving size in grams' })
+  @ApiProperty({ example: 100, description: 'Serving size in grams' })
   @IsOptional()
   @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
-  @Min(0)
   serving_gr?: number;
 
   @ApiProperty({ example: 250, description: 'Calories per 100g' })
@@ -106,7 +105,19 @@ export class CreateMealDto {
   @ApiProperty({ example: 'https://example.com/image.jpg', description: 'Image URL of the meal' })
   @IsOptional()
   @IsUrl()
-  image_url?: string;
+  image_url?: string | null;
+
+  // @ApiProperty({ example: 100, required: false, description: 'Serving size in grams' })
+  // @IsOptional()
+  // @Transform(({ value }) => (value ? Number(value) : value))
+  // @IsNumber()
+  // @Min(0)
+  // serving_gr?: number;
+
+  // @ApiProperty({ example: false, required: false })
+  // @IsOptional()
+  // @IsBoolean()
+  // is_verified?: boolean;
 
   @IsOptional()
   @IsDateString()
