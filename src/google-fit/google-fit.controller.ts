@@ -2,10 +2,14 @@ import { Controller, Delete, Get, Query, Res, UseGuards } from '@nestjs/common';
 import { GoogleFitService } from './google-fit.service';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('google-fit')
 export class GoogleFitController {
-  constructor(private readonly googleFitService: GoogleFitService) {}
+  constructor(
+    private readonly googleFitService: GoogleFitService,
+    private readonly configService: ConfigService,
+  ) {}
 
   @Get('connect')
   @UseGuards(SupabaseGuard) // Only this route needs auth
@@ -16,11 +20,12 @@ export class GoogleFitController {
 
   @Get('callback')
   async callback(@Query('code') authCode: string, @Query('state') userId: string, @Res() res: any) {
+    const frontendUrl = this.configService.get<string>('FRONTEND_URL') || 'http://localhost:3001';
     const result = await this.googleFitService.connectGoogleFit(userId, authCode);
     if (!result) {
-      return res.redirect('http://localhost:3001/settings?success=false'); // fe failure url
+      return res.redirect(`${frontendUrl}/settings?success=false`); // fe failure url
     }
-    return res.redirect('http://localhost:3001/settings?success=true'); // fe success url
+    return res.redirect(`${frontendUrl}/settings?success=true`); // fe success url
   }
 
   @Get('status')
