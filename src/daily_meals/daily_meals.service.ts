@@ -177,15 +177,15 @@ export class DailyMealsService {
     }
     const dailyLogId = dailyMeal.daily_log?.id;
 
-    // Update by ID only - ownership already verified above
-    await this.dailyMealsRepository.update({ id }, updateDailyMealDto);
+    Object.assign(dailyMeal, updateDailyMealDto);
+    const updated = await this.dailyMealsRepository.save(dailyMeal);
 
     // Recalculate daily log macros after update
     if (dailyLogId) {
       await this.dailyLogsService.recalculateDailyLogMacros(dailyLogId);
     }
 
-    return await this.findOneOwned(id, userId);
+    return updated;
   }
 
   async removeOwned(id: string, userId: string): Promise<DailyMeal | null> {
