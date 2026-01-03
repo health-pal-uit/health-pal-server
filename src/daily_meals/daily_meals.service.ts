@@ -176,10 +176,9 @@ export class DailyMealsService {
       throw new ForbiddenException('Access denied');
     }
     const dailyLogId = dailyMeal.daily_log?.id;
-    await this.dailyMealsRepository.update(
-      { id, daily_log: { user: { id: userId } } },
-      updateDailyMealDto,
-    );
+
+    // Update by ID only - ownership already verified above
+    await this.dailyMealsRepository.update({ id }, updateDailyMealDto);
 
     // Recalculate daily log macros after update
     if (dailyLogId) {
