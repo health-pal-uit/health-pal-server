@@ -175,10 +175,17 @@ export class DailyMealsService {
     if (!dailyMeal) {
       throw new ForbiddenException('Access denied');
     }
+    const dailyLogId = dailyMeal.daily_log?.id;
     await this.dailyMealsRepository.update(
       { id, daily_log: { user: { id: userId } } },
       updateDailyMealDto,
     );
+
+    // Recalculate daily log macros after update
+    if (dailyLogId) {
+      await this.dailyLogsService.recalculateDailyLogMacros(dailyLogId);
+    }
+
     return await this.findOneOwned(id, userId);
   }
 
@@ -190,7 +197,14 @@ export class DailyMealsService {
     if (!dailyMeal) {
       throw new ForbiddenException('Access denied');
     }
+    const dailyLogId = dailyMeal.daily_log?.id;
     await this.dailyMealsRepository.delete(id);
+
+    // Recalculate daily log macros after deletion
+    if (dailyLogId) {
+      await this.dailyLogsService.recalculateDailyLogMacros(dailyLogId);
+    }
+
     return dailyMeal;
   }
 }

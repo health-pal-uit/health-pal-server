@@ -114,10 +114,18 @@ export class DailyIngresService {
     if (!dailyIngre) {
       throw new ForbiddenException('Access denied');
     }
-    return await this.dailyIngreRepository.update(
+    const dailyLogId = dailyIngre.daily_log?.id;
+    await this.dailyIngreRepository.update(
       { id, daily_log: { user: { id: userId } } },
       updateDailyIngreDto,
     );
+
+    // Recalculate daily log macros after update
+    if (dailyLogId) {
+      await this.dailyLogsService.recalculateDailyLogMacros(dailyLogId);
+    }
+
+    return await this.findOneOwned(id, userId);
   }
 
   async removeOwned(id: string, userId: string): Promise<DeleteResult> {
@@ -125,6 +133,17 @@ export class DailyIngresService {
     if (!dailyIngre) {
       throw new ForbiddenException('Access denied');
     }
-    return await this.dailyIngreRepository.delete({ id, daily_log: { user: { id: userId } } });
+    const dailyLogId = dailyIngre.daily_log?.id;
+    const result = await this.dailyIngreRepository.delete({
+      id,
+      daily_log: { user: { id: userId } },
+    });
+
+    // Recalculate daily log macros after deletion
+    if (dailyLogId) {
+      await this.dailyLogsService.recalculateDailyLogMacros(dailyLogId);
+    }
+
+    return result;
   }
 }
