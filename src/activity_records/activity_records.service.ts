@@ -219,7 +219,6 @@ export class ActivityRecordsService {
     const skip = (page - 1) * limit;
     return await this.activityRecordRepository.find({
       where: {
-        user_owned: true,
         daily_log: { user: { id: userId }, id: dailyLogId },
         deleted_at: IsNull(),
       },

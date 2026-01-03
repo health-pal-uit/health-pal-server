@@ -185,7 +185,6 @@ export class GoogleFitService {
       }
     }
 
-    // Also fetch workout sessions (includes strength training with reps/weight)
     try {
       const sessionRecords = await this.syncGoogleFitSessions(userId, startMs, endMs, accessToken);
       savedRecords.push(...sessionRecords);

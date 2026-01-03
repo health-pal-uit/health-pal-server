@@ -117,6 +117,7 @@ jobs:
           echo "📝 User token: ${USER_TOKEN:0:20}..."
           echo "📝 Admin token: ${ADMIN_TOKEN:0:20}..."
       - run: npm run test:e2e
+        timeout-minutes: 10 # prevent infinite hanging
         continue-on-error: true # temporarily allow test failures
       - name: Stop Docker Compose services
         if: always()
