@@ -157,7 +157,7 @@ export class DailyMealsService {
 
   async findOneOwned(id: string, userId: string): Promise<DailyMeal | null> {
     return await this.dailyMealsRepository
-      .findOne({ where: { id }, relations: { daily_log: { user: true } } })
+      .findOne({ where: { id }, relations: ['daily_log', 'daily_log.user'] })
       .then((dailyMeal) => {
         if (!dailyMeal || dailyMeal.daily_log?.user?.id !== userId) {
           throw new ForbiddenException('Access denied');
