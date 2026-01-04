@@ -94,6 +94,10 @@ export class PostsService {
     const posts = await this.postsRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user')
+      .leftJoinAndSelect('post.attach_challenge', 'attach_challenge')
+      .leftJoinAndSelect('post.attach_medal', 'attach_medal')
+      .leftJoinAndSelect('post.attach_meal', 'attach_meal')
+      .leftJoinAndSelect('post.attach_ingredient', 'attach_ingredient')
       .loadRelationCountAndMap('post.like_count', 'post.likes')
       .leftJoin('post.likes', 'like', 'like.user.id = :userId', { userId })
       .addSelect('CASE WHEN like.id IS NOT NULL THEN true ELSE false END', 'post_is_liked_by_user')
@@ -120,6 +124,10 @@ export class PostsService {
     const queryBuilder = this.postsRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user')
+      .leftJoinAndSelect('post.attach_challenge', 'attach_challenge')
+      .leftJoinAndSelect('post.attach_medal', 'attach_medal')
+      .leftJoinAndSelect('post.attach_meal', 'attach_meal')
+      .leftJoinAndSelect('post.attach_ingredient', 'attach_ingredient')
       .loadRelationCountAndMap('post.like_count', 'post.likes')
       .where('post.id = :id', { id });
 
@@ -149,6 +157,10 @@ export class PostsService {
     const queryBuilder = this.postsRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.user', 'user')
+      .leftJoinAndSelect('post.attach_challenge', 'attach_challenge')
+      .leftJoinAndSelect('post.attach_medal', 'attach_medal')
+      .leftJoinAndSelect('post.attach_meal', 'attach_meal')
+      .leftJoinAndSelect('post.attach_ingredient', 'attach_ingredient')
       .loadRelationCountAndMap('post.like_count', 'post.likes')
       .where('post.user.id = :userId', { userId })
       .andWhere('post.deleted_at IS NULL')
