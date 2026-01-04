@@ -74,20 +74,27 @@ export class RecommendationsService {
   }
 
   private calculateCalorieIntake(baseKcal: number, goalType: FitnessGoalType): number {
+    let targetKcal: number;
     switch (goalType) {
       case FitnessGoalType.CUT:
-        return baseKcal - 500; // reduce 500 kcal for weight loss
+        targetKcal = baseKcal - 500; // reduce 500 kcal for weight loss
+        break;
       case FitnessGoalType.BULK:
-        return baseKcal + 500; // increase 500 kcal for muscle gain
+        targetKcal = baseKcal + 500; // increase 500 kcal for muscle gain
+        break;
       case FitnessGoalType.MAINTAIN:
-        return baseKcal; // Maintain current intake
+        targetKcal = baseKcal; // Maintain current intake
+        break;
       case FitnessGoalType.RECOVERY:
-        return baseKcal + 300; // increase 300 kcal for recovery
+        targetKcal = baseKcal + 300; // increase 300 kcal for recovery
+        break;
       case FitnessGoalType.GAIN_MUSCLES:
-        return baseKcal + 400; // increase 400 kcal for muscle gain
+        targetKcal = baseKcal + 400; // increase 400 kcal for muscle gain
+        break;
       default:
-        return baseKcal; // Maintain current intake
+        targetKcal = baseKcal; // Maintain current intake
     }
+    return Math.round(targetKcal);
   }
 
   private calculateMacronutrients(
