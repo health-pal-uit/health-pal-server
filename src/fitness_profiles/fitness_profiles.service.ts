@@ -373,11 +373,37 @@ export class FitnessProfilesService {
     if (!fitnessProfileEntity) {
       throw new Error('Fitness profile not found for the user');
     }
-    fitnessProfileEntity.hip_cm = bFFitnessProfileDto.hip_cm;
-    fitnessProfileEntity.waist_cm = bFFitnessProfileDto.waist_cm;
-    fitnessProfileEntity.neck_cm = bFFitnessProfileDto.neck_cm;
-    fitnessProfileEntity.body_fat_calculating_method =
-      bFFitnessProfileDto.body_fat_calculating_method || BFPCalculatingMethod.BMI;
+
+    const method = bFFitnessProfileDto.body_fat_calculating_method || BFPCalculatingMethod.BMI;
+
+    // validate required measurements based on method
+    if (method === BFPCalculatingMethod.US_NAVY) {
+      if (bFFitnessProfileDto.neck_cm === undefined || bFFitnessProfileDto.waist_cm === undefined) {
+        throw new BadRequestException(
+          'Neck and waist measurements are required for US Navy method',
+        );
+      }
+      if (user.gender === false && bFFitnessProfileDto.hip_cm === undefined) {
+        throw new BadRequestException(
+          'Hip measurement is required for females using US Navy method',
+        );
+      }
+    } else if (method === BFPCalculatingMethod.YMCA) {
+      if (bFFitnessProfileDto.waist_cm === undefined) {
+        throw new BadRequestException('Waist measurement is required for YMCA method');
+      }
+    }
+
+    if (bFFitnessProfileDto.hip_cm !== undefined) {
+      fitnessProfileEntity.hip_cm = bFFitnessProfileDto.hip_cm;
+    }
+    if (bFFitnessProfileDto.waist_cm !== undefined) {
+      fitnessProfileEntity.waist_cm = bFFitnessProfileDto.waist_cm;
+    }
+    if (bFFitnessProfileDto.neck_cm !== undefined) {
+      fitnessProfileEntity.neck_cm = bFFitnessProfileDto.neck_cm;
+    }
+    fitnessProfileEntity.body_fat_calculating_method = method;
 
     if (fitnessProfileEntity.body_fat_calculating_method === BFPCalculatingMethod.BMI) {
       const bmi = this.calculateBMI(fitnessProfileEntity);
@@ -448,17 +474,17 @@ export class FitnessProfilesService {
       const user = fitnessProfileEntity.user;
 
       if (user.gender === true) {
-        // Male
-        const bfp = 1.634 * waistCircumference - 0.1804 * weight - 98.42;
-        const clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2))); // Clamp between 0 and 70
+        // male
+        const bfp = ((4.15 * waistCircumference - 0.082 * weight - 98.42) / weight) * 100;
+        const clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2)));
         return await this.fitnessProfileRepository.update(fitnessProfileEntity.id, {
           ...fitnessProfileEntity,
           body_fat_percentages: clampedBFP,
         });
       } else {
-        // Female
-        const bfp = 1.634 * waistCircumference - 0.1804 * weight - 76.76;
-        const clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2))); // Clamp between 0 and 70
+        // female
+        const bfp = ((4.15 * waistCircumference - 0.082 * weight - 76.76) / weight) * 100;
+        const clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2)));
         return await this.fitnessProfileRepository.update(fitnessProfileEntity.id, {
           ...fitnessProfileEntity,
           body_fat_percentages: clampedBFP,

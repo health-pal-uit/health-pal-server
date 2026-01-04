@@ -4,23 +4,23 @@ import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsUUID } from 'class-validato
 import { BFPCalculatingMethod } from 'src/helpers/enums/bfp-calculating-method.enum';
 
 export class BFFitnessProfileDto {
-  @ApiProperty({ description: 'Waist circumference in centimeters' })
-  @IsNotEmpty()
+  @ApiProperty({ description: 'Waist circumference in centimeters', required: false })
   @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
-  waist_cm!: number;
+  @IsOptional()
+  waist_cm?: number;
 
-  @ApiProperty({ description: 'Hip circumference in centimeters' })
-  @IsNotEmpty()
+  @ApiProperty({ description: 'Hip circumference in centimeters', required: false })
   @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
-  hip_cm!: number;
+  @IsOptional()
+  hip_cm?: number;
 
-  @ApiProperty({ description: 'Neck circumference in centimeters' })
-  @IsNotEmpty()
+  @ApiProperty({ description: 'Neck circumference in centimeters', required: false })
   @Transform(({ value }) => (value ? Number(value) : value))
   @IsNumber()
-  neck_cm!: number;
+  @IsOptional()
+  neck_cm?: number;
 
   @ApiProperty({ description: 'Body fat percentage' })
   @Transform(({ value }) => (value ? Number(value) : value))
