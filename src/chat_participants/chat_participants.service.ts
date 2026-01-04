@@ -29,7 +29,7 @@ export class ChatParticipantsService {
     // Validate chat session exists
     const chatSession = await this.chatSessionRepository.findOne({
       where: { id: createChatParticipantDto.chat_session_id },
-      relations: ['chat_participants', 'chat_participants.user'],
+      relations: ['participants', 'participants.user'],
     });
     if (!chatSession) {
       throw new Error(`Chat Session with ID ${createChatParticipantDto.chat_session_id} not found`);
