@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsNotEmpty, IsNumber, IsOptional, IsUUID } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsUUID } from 'class-validator';
 import { BFPCalculatingMethod } from 'src/helpers/enums/bfp-calculating-method.enum';
 
 export class BFFitnessProfileDto {
@@ -39,8 +39,9 @@ export class BFFitnessProfileDto {
   @IsUUID('4')
   user_id?: string;
 
-  @ApiProperty({ description: 'Diet type ID' })
-  @IsNotEmpty()
+  @ApiProperty({ description: 'Diet type ID', required: false })
+  @IsOptional()
+  @Transform(({ value }) => (value === '' || value === null ? undefined : value))
   @IsUUID('4')
   diet_type_id?: string;
 }

@@ -119,6 +119,19 @@ export class FitnessProfilesController {
     return await this.fitnessProfilesService.findOne(userId);
   }
 
+  @Patch('calculate-bfp')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({
+    summary: 'Calculate body fat percentage for the current user',
+    description:
+      'Calculates and updates the body fat percentage for the authenticated user based on provided measurements.',
+  })
+  @ApiBody({ type: BFFitnessProfileDto })
+  @ApiResponse({ status: 200, description: 'Body fat percentage calculated and updated.' })
+  async calculateBFP(@CurrentUser() user: ReqUserType, @Body() bdf: BFFitnessProfileDto) {
+    return await this.fitnessProfilesService.calculateBodyFatPercentage(user.id, bdf);
+  }
+
   @Patch('me')
   @UseGuards(SupabaseGuard)
   @ApiOperation({
@@ -149,19 +162,6 @@ export class FitnessProfilesController {
     @Body() updateFitnessProfileDto: UpdateFitnessProfileDto,
   ) {
     return await this.fitnessProfilesService.update(updateFitnessProfileDto, userId);
-  }
-
-  @Patch('calculate-bfp')
-  @UseGuards(SupabaseGuard)
-  @ApiOperation({
-    summary: 'Calculate body fat percentage for the current user',
-    description:
-      'Calculates and updates the body fat percentage for the authenticated user based on provided measurements.',
-  })
-  @ApiBody({ type: BFFitnessProfileDto })
-  @ApiResponse({ status: 200, description: 'Body fat percentage calculated and updated.' })
-  async calculateBFP(@CurrentUser() user: ReqUserType, @Body() bdf: BFFitnessProfileDto) {
-    return await this.fitnessProfilesService.calculateBodyFatPercentage(user.id, bdf);
   }
 
   @Delete('me/all')

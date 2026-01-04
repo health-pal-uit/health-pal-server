@@ -92,8 +92,9 @@ export class CreateFitnessProfileDto {
   @IsUUID('4')
   user_id?: string;
 
-  @ApiProperty({ description: 'Diet type ID' })
+  @ApiProperty({ description: 'Diet type ID', required: false })
   @IsOptional()
+  @Transform(({ value }) => (value === '' || value === null ? undefined : value))
   @IsUUID('4')
   diet_type_id?: string;
 }

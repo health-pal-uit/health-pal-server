@@ -358,7 +358,7 @@ export class FitnessProfilesService {
   async calculateBodyFatPercentage(
     userId: string,
     bFFitnessProfileDto: BFFitnessProfileDto,
-  ): Promise<UpdateResult> {
+  ): Promise<FitnessProfile> {
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
       throw new Error('User not found');
@@ -416,21 +416,27 @@ export class FitnessProfilesService {
       }
 
       // Calculate body fat percentage using BMI
+      let clampedBFP: number;
       if (user.gender === true) {
         const bfp = 1.2 * bmi + 0.23 * age - 16.2;
-        const clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2))); // Clamp between 0 and 70
-        return await this.fitnessProfileRepository.update(fitnessProfileEntity.id, {
-          ...fitnessProfileEntity,
-          body_fat_percentages: clampedBFP,
-        });
+        clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2))); // Clamp between 0 and 70
       } else {
         const bfp = 1.2 * bmi + 0.23 * age - 5.4;
-        const clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2))); // Clamp between 0 and 70
-        return await this.fitnessProfileRepository.update(fitnessProfileEntity.id, {
-          ...fitnessProfileEntity,
-          body_fat_percentages: clampedBFP,
-        });
+        clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2))); // Clamp between 0 and 70
       }
+
+      await this.fitnessProfileRepository.update(fitnessProfileEntity.id, {
+        ...fitnessProfileEntity,
+        body_fat_percentages: clampedBFP,
+      });
+
+      const updatedProfile = await this.fitnessProfileRepository.findOneBy({
+        id: fitnessProfileEntity.id,
+      });
+      if (!updatedProfile) {
+        throw new Error('Failed to retrieve updated fitness profile');
+      }
+      return updatedProfile;
     } else if (fitnessProfileEntity.body_fat_calculating_method === BFPCalculatingMethod.US_NAVY) {
       const neckCircumference = cmToInch(fitnessProfileEntity.neck_cm);
       const waistCircumference = cmToInch(fitnessProfileEntity.waist_cm);
@@ -441,6 +447,8 @@ export class FitnessProfilesService {
 
       if (height < 0)
         throw new Error('Height must be greater than 0 for US Navy body fat calculation');
+
+      let clampedBFP: number;
       if (user.gender === true) {
         if (waistCircumference - neckCircumference <= 0) {
           throw new Error('Invalid measurements for US Navy body fat calculation');
@@ -450,49 +458,67 @@ export class FitnessProfilesService {
           86.01 * Math.log10(waistCircumference - neckCircumference) -
           70.041 * Math.log10(height) +
           36.76;
-        const clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2))); // Clamp between 0 and 70
-        return await this.fitnessProfileRepository.update(fitnessProfileEntity.id, {
-          ...fitnessProfileEntity,
-          body_fat_percentages: clampedBFP,
-        });
+        clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2))); // Clamp between 0 and 70
       } else {
         // Female
         const bfp =
           163.205 * Math.log10(waistCircumference + hipCircumference - neckCircumference) -
           97.684 * Math.log10(height) -
           78.387;
-        const clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2))); // Clamp between 0 and 70
-        return await this.fitnessProfileRepository.update(fitnessProfileEntity.id, {
-          ...fitnessProfileEntity,
-          body_fat_percentages: clampedBFP,
-        });
+        clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2))); // Clamp between 0 and 70
       }
+
+      await this.fitnessProfileRepository.update(fitnessProfileEntity.id, {
+        ...fitnessProfileEntity,
+        body_fat_percentages: clampedBFP,
+      });
+
+      const updatedProfile = await this.fitnessProfileRepository.findOneBy({
+        id: fitnessProfileEntity.id,
+      });
+      if (!updatedProfile) {
+        throw new Error('Failed to retrieve updated fitness profile');
+      }
+      return updatedProfile;
     } else if (fitnessProfileEntity.body_fat_calculating_method === BFPCalculatingMethod.YMCA) {
       const waistCircumference = cmToInch(fitnessProfileEntity.waist_cm);
       const weight = kgToLb(fitnessProfileEntity.weight_kg);
 
       const user = fitnessProfileEntity.user;
 
+      let clampedBFP: number;
       if (user.gender === true) {
         // male
         const bfp = ((4.15 * waistCircumference - 0.082 * weight - 98.42) / weight) * 100;
-        const clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2)));
-        return await this.fitnessProfileRepository.update(fitnessProfileEntity.id, {
-          ...fitnessProfileEntity,
-          body_fat_percentages: clampedBFP,
-        });
+        clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2)));
       } else {
         // female
         const bfp = ((4.15 * waistCircumference - 0.082 * weight - 76.76) / weight) * 100;
-        const clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2)));
-        return await this.fitnessProfileRepository.update(fitnessProfileEntity.id, {
-          ...fitnessProfileEntity,
-          body_fat_percentages: clampedBFP,
-        });
+        clampedBFP = Math.max(0, Math.min(70, +bfp.toFixed(2)));
       }
+
+      await this.fitnessProfileRepository.update(fitnessProfileEntity.id, {
+        ...fitnessProfileEntity,
+        body_fat_percentages: clampedBFP,
+      });
+
+      const updatedProfile = await this.fitnessProfileRepository.findOneBy({
+        id: fitnessProfileEntity.id,
+      });
+      if (!updatedProfile) {
+        throw new Error('Failed to retrieve updated fitness profile');
+      }
+      return updatedProfile;
     }
-    return await this.fitnessProfileRepository.update(fitnessProfileEntity.id, {
+    await this.fitnessProfileRepository.update(fitnessProfileEntity.id, {
       ...fitnessProfileEntity,
     });
+    const updatedProfile = await this.fitnessProfileRepository.findOneBy({
+      id: fitnessProfileEntity.id,
+    });
+    if (!updatedProfile) {
+      throw new Error('Failed to retrieve updated fitness profile');
+    }
+    return updatedProfile;
   }
 }
