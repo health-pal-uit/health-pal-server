@@ -70,6 +70,7 @@ export class CreatePostDto {
     description: 'ID of the attached entity (challenge, medal, meal, or ingredient)',
   })
   @IsOptional()
+  @ValidateIf((dto) => dto.attach_type && dto.attach_type !== AttachType.NONE)
   @IsUUID('4')
   attach_id?: string;
 
@@ -81,24 +82,7 @@ export class CreatePostDto {
   })
   @IsOptional()
   @IsUUID('4', { each: true })
-  @ValidateIf((dto) => dto.attach_type === AttachType.NONE)
   media_ids?: string[];
-
-  // if attach_type <> none => medias is required and must contain at least one item
-  @ValidateIf((dto) => dto.attach_type && dto.attach_type !== AttachType.NONE)
-  @IsUUID('4', { each: true })
-  @IsArray()
-  @ArrayNotEmpty({
-    message: 'medias must contain at least one item when attach_type is not "none"',
-  })
-  @ValidateNested({ each: true })
-  @ApiProperty({
-    required: true,
-    example: ['uuid1', 'uuid2'],
-    description: 'List of media IDs associated with the post',
-    isArray: true,
-  })
-  medias_ids!: string[];
 
   @ApiProperty({
     example: ['uuid1', 'uuid2'],
