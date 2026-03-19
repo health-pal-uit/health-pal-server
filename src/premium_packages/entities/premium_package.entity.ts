@@ -25,6 +25,9 @@ export class PremiumPackage {
   @Column({ type: 'numeric', precision: 12, scale: 2, transformer: Money })
   price: number;
 
+  @Column({ type: 'float', nullable: true, default: 0 })
+  booking_fee_discount_percent: number;
+
   @UpdateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   updated_at: Date;
 

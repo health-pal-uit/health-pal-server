@@ -54,6 +54,12 @@ export class DailyLog {
   @Column({ type: 'float', default: 0 })
   water_drank_l: number;
 
+  @Column({ type: 'float', nullable: true })
+  sleep_duration_hours?: number | null;
+
+  @Column({ type: 'int', nullable: true })
+  sleep_quality?: number | null;
+
   @UpdateDateColumn({ type: 'timestamptz' })
   updated_at: Date;
 

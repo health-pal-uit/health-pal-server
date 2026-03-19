@@ -1,4 +1,4 @@
-import { ApiProperty, ApiSchema } from '@nestjs/swagger';
+import { ApiSchema } from '@nestjs/swagger';
 import {
   Column,
   CreateDateColumn,
@@ -31,7 +31,10 @@ import { Role } from 'src/roles/entities/role.entity';
 import { PremiumPackage } from 'src/premium_packages/entities/premium_package.entity';
 import { ContributionIngre } from 'src/contribution_ingres/entities/contribution_ingre.entity';
 import { ContributionMeal } from 'src/contribution_meals/entities/contribution_meal.entity';
-import { ActivityRecord } from 'src/activity_records/entities/activity_record.entity';
+import { Expert } from 'src/experts/entities/expert.entity';
+import { ExpertRating } from 'src/expert_ratings/entities/expert_rating.entity';
+import { Booking } from 'src/bookings/entities/booking.entity';
+import { Wallet } from 'src/wallets/entities/wallet.entity';
 
 @ApiSchema({ name: User.name, description: 'User entity' })
 @Entity('users')
@@ -74,20 +77,11 @@ export class User {
   @Column({ type: 'boolean', default: false })
   isVerified: boolean; // email verified
 
-  @Column({ type: 'timestamptz', nullable: true })
-  google_fit_connected_at: Date | null;
-
-  @Column({ type: 'text', nullable: true })
-  google_fit_refresh_token: string | null;
-
-  @Column({ type: 'text', nullable: true })
-  google_fit_access_token: string | null;
+  @Column({ type: 'boolean', default: false })
+  health_connect_enabled: boolean;
 
   @Column({ type: 'timestamptz', nullable: true })
-  google_fit_token_expires_at: Date | null;
-
-  @Column({ type: 'text', nullable: true })
-  google_fit_email: string | null;
+  health_connect_last_synced_at: Date | null;
 
   // relations
 
@@ -167,4 +161,16 @@ export class User {
 
   @OneToMany(() => ContributionMeal, (contribution) => contribution.reviewer)
   contributionsMealsReviewed: ContributionMeal[];
+
+  @OneToOne(() => Expert, (expert) => expert.user)
+  expert?: Expert;
+
+  @OneToMany(() => ExpertRating, (expertRating) => expertRating.client)
+  expert_ratings: ExpertRating[];
+
+  @OneToMany(() => Booking, (booking) => booking.client)
+  bookings: Booking[];
+
+  @OneToOne(() => Wallet, (wallet) => wallet.user)
+  wallet?: Wallet;
 }

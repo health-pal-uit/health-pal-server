@@ -47,6 +47,13 @@ import { AdminReportsModule } from './admin-reports/admin-reports.module';
 import { ChatAiModule } from './chat-ai/chat-ai.module';
 import { RecommendationsModule } from './recommendations/recommendations.module';
 import { FoodVisionModule } from './food-vision/food-vision.module';
+import { ExpertRolesModule } from './expert_roles/expert_roles.module';
+import { ExpertsModule } from './experts/experts.module';
+import { ExpertRatingsModule } from './expert_ratings/expert_ratings.module';
+import { BookingsModule } from './bookings/bookings.module';
+import { ConsultationsModule } from './consultations/consultations.module';
+import { WalletsModule } from './wallets/wallets.module';
+import { TokenTransactionsModule } from './token_transactions/token_transactions.module';
 import configuration from './config/configuration';
 import * as joi from 'joi';
 
@@ -108,6 +115,13 @@ import * as joi from 'joi';
     ChatAiModule,
     RecommendationsModule,
     FoodVisionModule,
+    ExpertRolesModule,
+    ExpertsModule,
+    ExpertRatingsModule,
+    BookingsModule,
+    ConsultationsModule,
+    WalletsModule,
+    TokenTransactionsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

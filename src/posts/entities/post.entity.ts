@@ -1,8 +1,7 @@
-import { ApiProperty, ApiSchema } from '@nestjs/swagger';
+import { ApiSchema } from '@nestjs/swagger';
 import { PostsMedia } from 'src/posts_medias/entities/posts_media.entity';
 import { User } from 'src/users/entities/user.entity';
 import {
-  Check,
   Column,
   CreateDateColumn,
   DeleteDateColumn,
@@ -13,7 +12,6 @@ import {
   ManyToMany,
   ManyToOne,
   OneToMany,
-  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Comment } from 'src/comments/entities/comment.entity';
@@ -55,8 +53,8 @@ export class Post {
   @ManyToMany(() => User, (user) => user.reported_posts)
   @JoinTable({
     name: 'posts_reported_by',
-    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'post_id', referencedColumnName: 'id' },
+    joinColumn: { name: 'post_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
   })
   reported_by: User[];
 

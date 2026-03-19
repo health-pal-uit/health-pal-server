@@ -16,6 +16,11 @@ import { DailyLog } from 'src/daily_logs/entities/daily_log.entity';
 import { DailyMeal } from 'src/daily_meals/entities/daily_meal.entity';
 import { Device } from 'src/devices/entities/device.entity';
 import { DietType } from 'src/diet_types/entities/diet_type.entity';
+import { Booking } from 'src/bookings/entities/booking.entity';
+import { Consultation } from 'src/consultations/entities/consultation.entity';
+import { ExpertRating } from 'src/expert_ratings/entities/expert_rating.entity';
+import { ExpertRole } from 'src/expert_roles/entities/expert_role.entity';
+import { Expert } from 'src/experts/entities/expert.entity';
 import { FavIngre } from 'src/fav_ingres/entities/fav_ingre.entity';
 import { FavMeal } from 'src/fav_meals/entities/fav_meal.entity';
 import { FitnessGoal } from 'src/fitness_goals/entities/fitness_goal.entity';
@@ -31,7 +36,9 @@ import { Post } from 'src/posts/entities/post.entity';
 import { PostsMedia } from 'src/posts_medias/entities/posts_media.entity';
 import { PremiumPackage } from 'src/premium_packages/entities/premium_package.entity';
 import { Role } from 'src/roles/entities/role.entity';
+import { TokenTransaction } from 'src/token_transactions/entities/token_transaction.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Wallet } from 'src/wallets/entities/wallet.entity';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
 export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
@@ -59,6 +66,11 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
       DailyMeal,
       Device,
       DietType,
+      Booking,
+      Consultation,
+      Expert,
+      ExpertRating,
+      ExpertRole,
       FavIngre,
       FavMeal,
       FitnessGoal,
@@ -73,7 +85,9 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
       Post,
       PostsMedia,
       PremiumPackage,
+      TokenTransaction,
       User,
+      Wallet,
       Role,
       ContributionMeal,
       ContributionIngre,
