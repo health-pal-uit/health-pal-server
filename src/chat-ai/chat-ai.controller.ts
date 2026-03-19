@@ -21,31 +21,4 @@ export class ChatAiController {
   async chat(@Body() dto: ChatDto) {
     return await this.chatAiService.chat(dto);
   }
-
-  @Post('generate-imgs/ingre')
-  @UseGuards(AdminSupabaseGuard)
-  @ApiOperation({
-    summary: 'Generate images for popular ingredients',
-    description:
-      'Uses Gemini image generation to produce inline images for common ingredients (not stored; returned as base64).',
-  })
-  async generateImagesForIngredients() {
-    return await this.chatAiService.generateImagesForIngredients();
-  }
-
-  @Post('generate-imgs/test')
-  @UseGuards(AdminSupabaseGuard)
-  @ApiOperation({
-    summary: 'Test Gemini image generation',
-    description:
-      'Attempts to generate a single test image with the configured GEMINI_IMAGE_MODEL (or an optional override). Returns base64 data URI if successful.',
-  })
-  async testGenerateImage(@Body('model') model?: string) {
-    const data = await this.chatAiService.testGenerateImage(model);
-    return {
-      message: data ? 'Image generated' : 'Image not generated',
-      model: model || 'configured',
-      image: data,
-    };
-  }
 }

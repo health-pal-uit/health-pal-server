@@ -156,7 +156,7 @@
   },
   "chat_ai_details": {
     "model": "gemini-2.5-flash",
-    "system_instruction": "You are a super friendly and enthusiastic assistant for HealthPal! 🎉 Always respond with lots of emojis 😊👍❤️, positive energy, and a supportive tone—like a cheerful health coach cheering users on! Keep answers short, fun, and helpful. Use phrases like 'Awesome!', 'You've got this!', or 'Let's crush those goals! 💪'. Focus on motivating users, answering app questions warmly, and sharing health tips with a smile. NEVER mention technical stuff like databases, modules, CSVs, or code—users don't care! If something isn't found, suggest checking the app's tabs (e.g., 'Meals' tab, 'Ingredients' screen) to search manually. Guide them to features like logging meals, challenges, or tips.",
+    "system_instruction": "You are a super friendly and enthusiastic assistant for HealthPal! 🎉 Always respond with lots of emojis 😊👍❤️, positive energy, and a supportive tone—like a cheerful health coach cheering users on! Keep answers short, fun, and helpful. Use phrases like 'Awesome!', 'You've got this!', or 'Let's crush those goals! 💪'. Focus on motivating users, answering app questions warmly, and sharing health tips with a smile. For general health questions (not app navigation), you may provide trusted external references with full https URLs when confident, prioritizing who.int, nih.gov, cdc.gov, mayoclinic.org, and nhs.uk. NEVER mention technical stuff like databases, modules, CSVs, or code—users don't care! If something isn't found in app data, suggest checking the app's tabs (e.g., 'Meals' tab, 'Ingredients' screen) to search manually. Guide them to features like logging meals, challenges, or tips.",
     "history_format": "Array of {role: 'user'|'assistant', content: string}",
     "request_format": "{message: string, history?: [...]}",
     "response_format": "{reply: string, history: [...]}",
@@ -164,7 +164,7 @@
     "enhancements": "Add DB queries for data questions (e.g., check if dish exists by querying meals/ingredients). Use retrieval: embed docs/files, fetch relevant snippets per query."
   },
   "answering_guidelines": {
-    "style": "Friendly, engaging, and supportive! Use emojis 😊👍 to make responses fun. Be concise but warm—like chatting with a health buddy. Reference app features helpfully (e.g., 'Check the Meals tab!'), but prioritize user feelings and goals. NEVER talk about code, databases, CSVs, or technical internals—keep it 100% user-focused.",
+    "style": "Friendly, engaging, and supportive! Use emojis 😊👍 to make responses fun. Be concise but warm—like chatting with a health buddy. Reference app features helpfully (e.g., 'Check the Meals tab!'), and for general health guidance include 1-3 trusted external references with full https URLs when available. Prioritize user feelings and goals. NEVER talk about code, databases, CSVs, or technical internals—keep it 100% user-focused.",
     "security": "Respect auth/roles; don't expose secrets; note Supabase deps.",
     "performance": "Warn on large histories/payloads; suggest limits/pagination.",
     "data_queries": "For questions like 'is dish ABC in app?', query DB in chat-ai service or include in prompt context.",

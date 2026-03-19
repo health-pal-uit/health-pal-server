@@ -1,8 +1,8 @@
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { GoogleGenAI } from '@google/genai';
 import { ConfigService } from '@nestjs/config';
 import { Meal } from 'src/meals/entities/meal.entity';
-import { Like, ILike } from 'typeorm';
+import { ILike } from 'typeorm';
 import { Repository } from 'typeorm';
 import { Ingredient } from 'src/ingredients/entities/ingredient.entity';
 import { Activity } from 'src/activities/entities/activity.entity';
@@ -12,13 +12,7 @@ import { PremiumPackage } from 'src/premium_packages/entities/premium_package.en
 import { InjectRepository } from '@nestjs/typeorm';
 import * as path from 'path';
 import * as fs from 'fs';
-
-type IngredientGeneratedImage = {
-  name: string;
-  mimeType: string;
-  base64: string;
-  dataUri: string;
-};
+import { ChatReference } from './dto/chat_references.type';
 
 @Injectable()
 export class ChatAiService {
@@ -26,6 +20,8 @@ export class ChatAiService {
   private readonly ai: GoogleGenAI;
   private readonly logger = new Logger(ChatAiService.name);
   private readonly imageModel: string;
+  // trusted health domains
+  private readonly trustedDomains = ['who.int', 'nih.gov', 'cdc.gov', 'mayoclinic.org', 'nhs.uk'];
 
   constructor(
     @InjectRepository(Meal) private readonly mealsRepository: Repository<Meal>,
@@ -132,7 +128,7 @@ export class ChatAiService {
       dbContext += `Premium Packages: ${JSON.stringify(premiumPackages)}\n`;
     }
 
-    const fullSystemInstruction = `${this.systemInstruction} ${dbContext ? `\n\nIMPORTANT: Use this DB data to answer questions about meals, ingredients, activities, etc. If the data shows matches, say YES and list them with emojis! If no matches, suggest checking the app tabs. DB Data:\n${dbContext}` : ''}`;
+    const fullSystemInstruction = `${this.systemInstruction} ${dbContext ? `\n\nIMPORTANT: Use this DB data to answer questions about meals, ingredients, activities, etc. If the data shows matches, say YES and list them with emojis! If no matches, suggest checking the app tabs. DB Data:\n${dbContext}` : ''}\n\nReturn valid JSON only with this shape: {"answer":"string","references":[{"title":"string","url":"https://..."}]}. Include references only when useful, keep max 3, prefer trusted health domains (who.int, nih.gov, cdc.gov, mayoclinic.org, nhs.uk), and never invent uncertain links.`;
 
     //Logger.log('context:', dbContext)
 
@@ -149,11 +145,13 @@ export class ChatAiService {
       model: 'gemini-2.5-flash',
       contents: contents,
     });
-    const reply =
+    const rawReply =
       res.candidates?.[0]?.content?.parts?.[0].text ?? 'Sorry, I could not generate a response.';
+    const { reply, references } = this.parseChatResponse(rawReply);
 
     return {
       reply,
+      references,
       history: [
         ...(history || []),
         { role: 'user', content: message },
@@ -162,105 +160,103 @@ export class ChatAiService {
     };
   }
 
-  async generateImagesForIngredients(): Promise<{ images: IngredientGeneratedImage[] }> {
-    const targets = [
-      'chicken breast',
-      'pork loin',
-      'beef steak',
-      'salmon fillet',
-      'shrimp',
-      'egg',
-      'milk',
-      'yogurt',
-      'cheddar cheese',
-      'mozzarella',
-      'rice',
-      'pasta',
-      'bread',
-      'potato',
-      'tomato',
-      'broccoli',
-      'spinach',
-      'carrot',
-      'apple',
-      'banana',
-    ];
+  private parseChatResponse(rawText: string): {
+    reply: string;
+    references: ChatReference[];
+  } {
+    const fallbackReply = rawText?.trim() || 'Sorry, I could not generate a response.';
+    const cleaned = this.stripCodeFence(rawText);
 
-    this.logger.log(`Generating ingredient images for ${targets.length} items`);
-    const results: IngredientGeneratedImage[] = [];
-    let quotaExceeded = false;
-    let quotaMessage = '';
+    try {
+      // prefer structured json from model
+      const parsed = JSON.parse(cleaned) as {
+        answer?: unknown;
+        references?: unknown;
+      };
 
-    for (const name of targets) {
-      try {
-        const prompt = `High-resolution photo of ${name} alone, centered, on a clean light background, in focus, no people, no props, no plate, food-safe, SFW.`;
-        const res = await (this.ai.models.generateContent as any)({
-          model: this.imageModel,
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
-          generationConfig: { responseMimeType: 'image/png' },
-        });
-        const part = res.candidates?.[0]?.content?.parts?.[0];
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const data = (part as any)?.inlineData?.data as string | undefined;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const mimeType = (part as any)?.inlineData?.mimeType as string | undefined;
-
-        if (data && mimeType) {
-          results.push({
-            name,
-            mimeType,
-            base64: data,
-            dataUri: `data:${mimeType};base64,${data}`,
-          });
-          this.logger.log(`Generated image for ${name}`);
-        } else {
-          this.logger.warn(`No inline image data returned for ${name}`);
-        }
-      } catch (error) {
-        const msg = (error as Error).message;
-        this.logger.warn(`Failed to generate image for ${name}: ${msg}`);
-        if (msg && msg.toLowerCase().includes('quota')) {
-          quotaExceeded = true;
-          quotaMessage = msg;
-          break; // stop after quota failure
-        }
-      }
+      const reply =
+        typeof parsed.answer === 'string' && parsed.answer.trim().length > 0
+          ? parsed.answer.trim()
+          : fallbackReply;
+      const references = this.sanitizeReferences(parsed.references);
+      return { reply, references };
+    } catch {
+      // fallback to plain text and url scan
+      return {
+        reply: fallbackReply,
+        references: this.extractReferencesFromText(fallbackReply),
+      };
     }
-
-    this.logger.log(`Generated ${results.length}/${targets.length} ingredient images`);
-    if (quotaExceeded && results.length === 0) {
-      throw new Error(
-        `Gemini image generation quota exceeded. Configure billing or try again later. Details: ${quotaMessage}`,
-      );
-    }
-    return { images: results };
   }
 
-  async testGenerateImage(model?: string): Promise<IngredientGeneratedImage | null> {
-    const prompt =
-      'Create a picture of a nano banana dish in a fancy restaurant with a Gemini theme';
+  private stripCodeFence(text: string): string {
+    const trimmed = text.trim();
+    if (!trimmed.startsWith('```')) {
+      return trimmed;
+    }
 
-    const response = await this.ai.models.generateContent({
-      model: 'gemini-2.5-flash-image',
-      contents: prompt,
-    });
-    if (
-      response.candidates &&
-      response.candidates[0] &&
-      response.candidates[0].content &&
-      response.candidates[0].content.parts
-    ) {
-      for (const part of response.candidates[0].content.parts) {
-        if (part.text) {
-          console.log(part.text);
-        } else if (part.inlineData && part.inlineData.data) {
-          const imageData = part.inlineData.data;
-          const buffer = Buffer.from(imageData, 'base64');
-          fs.writeFileSync('gemini-native-image.png', buffer);
-          console.log('Image saved as gemini-native-image.png');
-        }
+    // handle ```json wrappers
+    return trimmed
+      .replace(/^```(?:json)?\s*/i, '')
+      .replace(/\s*```$/, '')
+      .trim();
+  }
+
+  private sanitizeReferences(input: unknown): ChatReference[] {
+    if (!Array.isArray(input)) {
+      return [];
+    }
+
+    // keep only valid and unique refs
+    const result: ChatReference[] = [];
+    const seen = new Set<string>();
+
+    for (const item of input) {
+      if (!item || typeof item !== 'object') {
+        continue;
+      }
+
+      const title =
+        'title' in item && typeof item.title === 'string' ? item.title.trim() : 'Reference';
+      const url = 'url' in item && typeof item.url === 'string' ? item.url.trim() : '';
+      if (!this.isValidReferenceUrl(url)) {
+        continue;
+      }
+
+      if (seen.has(url)) {
+        continue;
+      }
+
+      seen.add(url);
+      result.push({ title: title || 'Reference', url });
+
+      if (result.length >= 3) {
+        break;
       }
     }
-    return null;
+
+    return result;
+  }
+
+  private extractReferencesFromText(text: string): ChatReference[] {
+    // fallback url extraction from answer text
+    const urls = text.match(/https:\/\/[^\s)\]}"']+/g) || [];
+    const rawRefs = urls.map((url) => ({ title: 'Reference', url }));
+    return this.sanitizeReferences(rawRefs);
+  }
+
+  private isValidReferenceUrl(url: string): boolean {
+    try {
+      const parsed = new URL(url);
+      if (parsed.protocol !== 'https:') {
+        return false;
+      }
+
+      // allow only trusted hosts
+      const host = parsed.hostname.toLowerCase();
+      return this.trustedDomains.some((domain) => host === domain || host.endsWith(`.${domain}`));
+    } catch {
+      return false;
+    }
   }
 }
