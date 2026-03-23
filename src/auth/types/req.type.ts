@@ -1,4 +1,4 @@
-export type AppRole = 'user' | 'admin';
+export type AppRole = 'user' | 'admin' | 'expert';
 
 export interface ReqUserType {
   id: string;

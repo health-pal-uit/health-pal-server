@@ -62,6 +62,10 @@ export class SupabaseStrategy extends PassportStrategy(SupabaseAuthStrategy, 'su
 
     const roleName = userInDB.role?.name || 'user';
 
+    if (roleName === 'expert' && !userInDB.expert) {
+      return this.fail('Expert profile not found', 401);
+    }
+
     this.success({ id: data.user.id, email: data.user.email, role: roleName }, null); // this is ReqUserType
   }
 }
