@@ -25,7 +25,8 @@
     "test:token": "pwsh -File ./scripts/get-token.ps1",
     "test:insert-user": "pwsh -File ./scripts/insert-test-user.ps1",
     "seed-test-users": "ts-node scripts/seed-test-users.ts",
-    "refresh-tokens": "ts-node scripts/refresh-test-tokens.ts"
+    "refresh-tokens": "ts-node scripts/refresh-test-tokens.ts",
+    "patch-food-images": "ts-node scripts/patch-food-images.ts"
   },
   "dependencies": {
     "@faker-js/faker": "^10.1.0",
