@@ -65,11 +65,49 @@ import * as joi from 'joi';
       // envFilePath: '.env', // Commented out - use environment variables from Docker/system
       load: [configuration],
       validationSchema: joi.object({
-        DB_DATABASE: joi.string().required(),
-        DB_USERNAME: joi.string().required(),
+        DB_TARGET: joi.string().valid('local', 'cloud').default('local'),
+        DB_DATABASE: joi.string().when('DB_TARGET', {
+          is: 'cloud',
+          then: joi.optional(),
+          otherwise: joi.required(),
+        }),
+        DB_USERNAME: joi.string().when('DB_TARGET', {
+          is: 'cloud',
+          then: joi.optional(),
+          otherwise: joi.required(),
+        }),
         DB_PORT: joi.number().default(5432),
-        DB_PASSWORD: joi.string().required(),
-        DB_HOST: joi.string().required(),
+        DB_PASSWORD: joi.string().when('DB_TARGET', {
+          is: 'cloud',
+          then: joi.optional(),
+          otherwise: joi.required(),
+        }),
+        DB_HOST: joi.string().when('DB_TARGET', {
+          is: 'cloud',
+          then: joi.optional(),
+          otherwise: joi.required(),
+        }),
+        CLOUD_DB_DATABASE: joi.string().when('DB_TARGET', {
+          is: 'cloud',
+          then: joi.required(),
+          otherwise: joi.optional(),
+        }),
+        CLOUD_DB_USERNAME: joi.string().when('DB_TARGET', {
+          is: 'cloud',
+          then: joi.required(),
+          otherwise: joi.optional(),
+        }),
+        CLOUD_DB_PORT: joi.number().default(5432),
+        CLOUD_DB_PASSWORD: joi.string().when('DB_TARGET', {
+          is: 'cloud',
+          then: joi.required(),
+          otherwise: joi.optional(),
+        }),
+        CLOUD_DB_HOST: joi.string().when('DB_TARGET', {
+          is: 'cloud',
+          then: joi.required(),
+          otherwise: joi.optional(),
+        }),
       }),
     }),
     TypeOrmModule.forRootAsync(typeOrmConfig),

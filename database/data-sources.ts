@@ -41,6 +41,31 @@ import { User } from 'src/users/entities/user.entity';
 import { Wallet } from 'src/wallets/entities/wallet.entity';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
+const resolveDbConfigFromEnv = () => {
+  const dbTarget = (process.env.DB_TARGET || 'local').toLowerCase();
+  const useCloudDb = dbTarget === 'cloud';
+
+  const localDb = {
+    host: process.env.DB_HOST || 'localhost',
+    port: +(process.env.DB_PORT ?? 5432),
+    username: process.env.DB_USERNAME || 'postgres',
+    password: process.env.DB_PASSWORD || '135792468',
+    database: process.env.DB_DATABASE || 'health-pal-db',
+  };
+
+  if (!useCloudDb) {
+    return localDb;
+  }
+
+  return {
+    host: process.env.CLOUD_DB_HOST || localDb.host,
+    port: +(process.env.CLOUD_DB_PORT ?? localDb.port),
+    username: process.env.CLOUD_DB_USERNAME || localDb.username,
+    password: process.env.CLOUD_DB_PASSWORD || localDb.password,
+    database: process.env.CLOUD_DB_DATABASE || localDb.database,
+  };
+};
+
 export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
   imports: [ConfigModule.forRoot()],
   inject: [ConfigService], // injecttttttttt configservice
@@ -100,12 +125,8 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
 // for cli
 
 export const dataSourceOptions: DataSourceOptions = {
+  ...resolveDbConfigFromEnv(),
   type: 'postgres',
-  host: process.env.DB_HOST || 'localhost',
-  port: +(process.env.DB_PORT ?? 5432),
-  username: process.env.DB_USERNAME || 'postgres',
-  password: process.env.DB_PASSWORD || '135792468',
-  database: process.env.DB_DATABASE || 'health-pal-db',
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   migrations: [__dirname + '/../migrations/**/*{.ts,.js}'],
 };

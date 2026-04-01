@@ -216,11 +216,21 @@ health-pal-server/
 
    ```env
    # Database Configuration
+   DB_TARGET=local
+
+   # Local database (used when DB_TARGET=local)
    DB_HOST=localhost
    DB_PORT=5432
    DB_USERNAME=postgres
    DB_PASSWORD=your_password
    DB_DATABASE=health-pal-db
+
+   # Cloud database (used when DB_TARGET=cloud)
+   CLOUD_DB_HOST=your_cloud_host
+   CLOUD_DB_PORT=5432
+   CLOUD_DB_USERNAME=your_cloud_username
+   CLOUD_DB_PASSWORD=your_cloud_password
+   CLOUD_DB_DATABASE=your_cloud_database
 
    # Supabase Configuration
    SUPABASE_URL=your_supabase_url
