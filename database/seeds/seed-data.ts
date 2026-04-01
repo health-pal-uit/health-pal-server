@@ -155,7 +155,7 @@ export async function seedData(manager: EntityManager) {
 }
 
 async function seedRoles(manager: EntityManager) {
-  const data = ['user', 'admin'].map((name) => ({ name }));
+  const data = ['user', 'admin', 'expert'].map((name) => ({ name }));
 
   await manager.getRepository(Role).upsert(data, ['name']);
 

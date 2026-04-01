@@ -6,6 +6,7 @@ import {
   IsNumber,
   IsOptional,
   IsString,
+  IsUrl,
   IsUUID,
   Min,
 } from 'class-validator';
@@ -26,6 +27,19 @@ export class CreateExpertDto {
   @IsString()
   bio?: string;
 
+  @ApiProperty({ example: 'VN-EXPERT-2026-0001', description: 'Professional license identifier' })
+  @IsNotEmpty()
+  @IsString()
+  license_id: string;
+
+  @ApiProperty({
+    example: 'https://example.com/licenses/VN-EXPERT-2026-0001.pdf',
+    description: 'Public URL to license proof',
+  })
+  @IsNotEmpty()
+  @IsUrl()
+  license_url: string;
+
   @ApiProperty({ example: 2.5, description: 'Charged tokens per minute', required: false })
   @IsOptional()
   @Transform(({ value }) => (value !== undefined ? Number(value) : value))
@@ -33,15 +47,19 @@ export class CreateExpertDto {
   @Min(0)
   token_per_minute?: number;
 
-  @ApiProperty({ example: false, required: false })
+  @ApiProperty({
+    example: 'uuid',
+    description: 'Premium package tier for booking fee discount',
+    required: false,
+  })
   @IsOptional()
-  @IsBoolean()
-  is_verified?: boolean;
+  @IsUUID('4')
+  booking_fee_tier_id?: string;
 
   @ApiProperty({ example: false, required: false })
   @IsOptional()
   @IsBoolean()
-  is_online?: boolean;
+  is_verified?: boolean;
 
   @ApiProperty({ example: 0, required: false })
   @IsOptional()

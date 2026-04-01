@@ -11,6 +11,7 @@ import {
 } from 'typeorm';
 import { User } from 'src/users/entities/user.entity';
 import { ExpertRole } from 'src/expert_roles/entities/expert_role.entity';
+import { PremiumPackage } from 'src/premium_packages/entities/premium_package.entity';
 import { ExpertRating } from 'src/expert_ratings/entities/expert_rating.entity';
 import { Booking } from 'src/bookings/entities/booking.entity';
 import { Consultation } from 'src/consultations/entities/consultation.entity';
@@ -26,11 +27,14 @@ export class Expert {
   @Column({ type: 'float', default: 0 })
   token_per_minute: number;
 
-  @Column({ type: 'boolean', default: false })
-  is_verified: boolean;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  license_id: string | null;
+
+  @Column({ type: 'text', nullable: true })
+  license_url: string | null;
 
   @Column({ type: 'boolean', default: false })
-  is_online: boolean;
+  is_verified: boolean;
 
   @Column({ type: 'float', default: 0 })
   rating_avg: number;
@@ -52,6 +56,10 @@ export class Expert {
   @ManyToOne(() => ExpertRole, (expertRole) => expertRole.experts, { onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'expert_role_id' })
   expert_role: ExpertRole;
+
+  @ManyToOne(() => PremiumPackage, { onDelete: 'SET NULL', nullable: true })
+  @JoinColumn({ name: 'booking_fee_tier_id' })
+  booking_fee_tier: PremiumPackage | null;
 
   @OneToMany(() => ExpertRating, (expertRating) => expertRating.expert)
   expert_ratings: ExpertRating[];
