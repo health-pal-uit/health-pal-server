@@ -12,6 +12,7 @@ import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { ExpertRatingsService } from './expert_ratings.service';
 import { CreateExpertRatingDto } from './dto/create-expert_rating.dto';
+import { RateMyConsultationDto } from './dto/rate-my-consultation.dto';
 import { UpdateExpertRatingDto } from './dto/update-expert_rating.dto';
 
 @ApiTags('expert-ratings')
@@ -27,6 +28,22 @@ export class ExpertRatingsController {
   @ApiResponse({ status: 201, description: 'Expert rating created' })
   async create(@Body() createExpertRatingDto: CreateExpertRatingDto, @CurrentUser() user: any) {
     return await this.expertRatingsService.create(createExpertRatingDto, user.id, user.role);
+  }
+
+  @Post('me')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({
+    summary: 'Rate expert for your consultation (client only)',
+    description:
+      'Rate the expert who conducted your consultation. Expert ID is auto-filled from consultation.',
+  })
+  @ApiBody({ type: RateMyConsultationDto })
+  @ApiResponse({ status: 201, description: 'Expert rating created' })
+  async rateMyConsultation(
+    @Body() rateMyConsultationDto: RateMyConsultationDto,
+    @CurrentUser() user: any,
+  ) {
+    return await this.expertRatingsService.createMe(rateMyConsultationDto, user.id);
   }
 
   @Get()

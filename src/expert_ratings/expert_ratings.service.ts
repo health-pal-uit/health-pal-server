@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateExpertRatingDto } from './dto/create-expert_rating.dto';
+import { RateMyConsultationDto } from './dto/rate-my-consultation.dto';
 import { UpdateExpertRatingDto } from './dto/update-expert_rating.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
@@ -101,6 +102,33 @@ export class ExpertRatingsService {
     const saved = await this.expertRatingRepository.save(rating);
     await this.recalculateExpertStats(expert.id);
     return await this.findOne(saved.id);
+  }
+
+  async createMe(
+    rateMyConsultationDto: RateMyConsultationDto,
+    currentUserId: string,
+  ): Promise<ExpertRating> {
+    // Fetch consultation with expert and client info
+    const consultation = await this.consultationRepository.findOne({
+      where: { id: rateMyConsultationDto.consultation_id, deleted_at: IsNull() },
+      relations: ['expert', 'booking', 'booking.client', 'expert_rating'],
+    });
+
+    if (!consultation) {
+      throw new NotFoundException('Consultation not found');
+    }
+
+    // Build the full DTO with auto-filled expert_id and client_id
+    const createExpertRatingDto: CreateExpertRatingDto = {
+      expert_id: consultation.expert.id,
+      client_id: currentUserId,
+      consultation_id: rateMyConsultationDto.consultation_id,
+      score: rateMyConsultationDto.score,
+      comment: rateMyConsultationDto.comment,
+    };
+
+    // Use the existing create method with client role
+    return await this.create(createExpertRatingDto, currentUserId, 'client');
   }
 
   async findAll(): Promise<ExpertRating[]> {

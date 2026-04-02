@@ -11,5 +11,6 @@ import { Consultation } from 'src/consultations/entities/consultation.entity';
   imports: [TypeOrmModule.forFeature([Booking, Expert, User, Consultation])],
   controllers: [BookingsController],
   providers: [BookingsService],
+  exports: [BookingsService],
 })
 export class BookingsModule {}

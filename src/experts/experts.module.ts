@@ -8,11 +8,13 @@ import { ExpertRole } from 'src/expert_roles/entities/expert_role.entity';
 import { Role } from 'src/roles/entities/role.entity';
 import { PremiumPackage } from 'src/premium_packages/entities/premium_package.entity';
 import { SupabaseStorageModule } from 'src/supabase-storage/supabase-storage.module';
+import { BookingsModule } from 'src/bookings/bookings.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Expert, User, ExpertRole, Role, PremiumPackage]),
     SupabaseStorageModule,
+    BookingsModule,
   ],
   controllers: [ExpertsController],
   providers: [ExpertsService],

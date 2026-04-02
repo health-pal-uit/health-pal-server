@@ -6,6 +6,7 @@ import { SupabaseGuard } from './guards/supabase/supabase.guard';
 import type { Response } from 'express';
 import { GoogleGuard } from './guards/google/google.guard';
 import { ReqUserType } from './types/req.type';
+import { RoleLevel } from './enums/role-level.enum';
 import { responseHelper } from 'src/helpers/responses/response.helper';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ResetPasswordDto } from './dto/reset-password.dto';
@@ -142,7 +143,12 @@ export class AuthController {
   ) {
     const user = req.user;
     const redirectUrl = req.cookies?.redirect_url || 'http://localhost:3001/auth/success';
-    const payload: ReqUserType = { email: user.email, role: 'user', id: user.id };
+    const payload: ReqUserType = {
+      email: user.email,
+      role: 'user',
+      id: user.id,
+      roleLevel: RoleLevel.USER,
+    };
     const token = await this.authService.signToken(payload);
     if (token === '') {
       return res.redirect(`http://localhost:3001/auth/failure`); // wrong credentials

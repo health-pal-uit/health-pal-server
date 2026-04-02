@@ -5,6 +5,7 @@ import { Request } from 'express';
 import { SupabaseAuthStrategy } from 'nestjs-supabase-auth';
 import { ExtractJwt } from 'passport-jwt';
 import { ReqUserType } from '../types/req.type';
+import { RoleLevel } from '../enums/role-level.enum';
 import { createClient, type User as SupabaseUser } from '@supabase/supabase-js';
 import { UsersService } from 'src/users/users.service';
 
@@ -66,6 +67,20 @@ export class SupabaseStrategy extends PassportStrategy(SupabaseAuthStrategy, 'su
       return this.fail('Expert profile not found', 401);
     }
 
-    this.success({ id: data.user.id, email: data.user.email, role: roleName }, null); // this is ReqUserType
+    const roleLevel = this.getRoleLevel(roleName);
+
+    this.success({ id: data.user.id, email: data.user.email, role: roleName, roleLevel }, null); // this is ReqUserType
+  }
+
+  private getRoleLevel(roleName: string): RoleLevel {
+    switch (roleName) {
+      case 'admin':
+        return RoleLevel.ADMIN;
+      case 'expert':
+        return RoleLevel.EXPERT;
+      case 'user':
+      default:
+        return RoleLevel.USER;
+    }
   }
 }

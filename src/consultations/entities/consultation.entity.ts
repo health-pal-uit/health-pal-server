@@ -40,6 +40,9 @@ export class Consultation {
   @Column({ type: 'float', nullable: true, default: 0 })
   tokens_charged: number;
 
+  @Column({ type: 'text', nullable: true })
+  result: string | null;
+
   @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP' })
   created_at: Date;
 

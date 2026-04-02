@@ -6,11 +6,17 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateConsultationDto } from './dto/create-consultation.dto';
+import { CreateMyConsultationDto } from './dto/create-my-consultation.dto';
 import { UpdateConsultationDto } from './dto/update-consultation.dto';
+import { EndConsultationDto } from './dto/end-consultation.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Repository } from 'typeorm';
-import { Consultation } from './entities/consultation.entity';
-import { Booking, BookingStatus } from 'src/bookings/entities/booking.entity';
+import { Consultation, ConsultationStatus } from './entities/consultation.entity';
+import {
+  Booking,
+  BookingStatus,
+  BookingConfirmationStatus,
+} from 'src/bookings/entities/booking.entity';
 import { Expert } from 'src/experts/entities/expert.entity';
 import { ChatSession } from 'src/chat_sessions/entities/chat_session.entity';
 
@@ -68,7 +74,7 @@ export class ConsultationsService {
         relations: ['expert', 'expert.user', 'client'],
       }),
       this.expertRepository.findOne({
-        where: { id: createConsultationDto.expert_id, deleted_at: IsNull() },
+        where: { id: createConsultationDto.expert_id ?? currentUserId, deleted_at: IsNull() },
         relations: ['user'],
       }),
     ]);
@@ -87,6 +93,11 @@ export class ConsultationsService {
     }
     if (booking.status !== BookingStatus.CONFIRMED) {
       throw new ConflictException('Consultation can only be created from a confirmed booking');
+    }
+    if (booking.confirmed_by !== BookingConfirmationStatus.BOTH) {
+      throw new ConflictException(
+        'Booking must be confirmed by both expert and client to start consultation',
+      );
     }
     if (booking.expert?.id !== expert.id) {
       throw new ConflictException('Expert does not match booking expert');
@@ -128,10 +139,43 @@ export class ConsultationsService {
       ended_at: endedAt,
       duration_minutes: createConsultationDto.duration_minutes,
       tokens_charged: createConsultationDto.tokens_charged,
+      result: createConsultationDto.result,
     });
 
     const saved = await this.consultationRepository.save(consultation);
     return await this.findOne(saved.id, currentUserId, currentUserRole);
+  }
+
+  async createMe(
+    createMyConsultationDto: CreateMyConsultationDto,
+    currentUserId: string,
+    currentUserRole?: string,
+  ): Promise<Consultation> {
+    // Get expert profile from current user
+    const expert = await this.expertRepository.findOne({
+      where: { user: { id: currentUserId }, deleted_at: IsNull() },
+      relations: ['user'],
+    });
+
+    if (!expert) {
+      throw new NotFoundException('Expert profile not found for current user');
+    }
+
+    // Build the full DTO with auto-filled expert_id
+    const createConsultationDto: CreateConsultationDto = {
+      booking_id: createMyConsultationDto.booking_id,
+      expert_id: expert.id,
+      chat_session_id: createMyConsultationDto.chat_session_id,
+      status: createMyConsultationDto.status,
+      started_at: createMyConsultationDto.started_at,
+      ended_at: createMyConsultationDto.ended_at,
+      duration_minutes: createMyConsultationDto.duration_minutes,
+      tokens_charged: createMyConsultationDto.tokens_charged,
+      result: createMyConsultationDto.result,
+    };
+
+    // Use the existing create method
+    return await this.create(createConsultationDto, currentUserId, currentUserRole);
   }
 
   async findAll(currentUserId: string, currentUserRole?: string): Promise<Consultation[]> {
@@ -254,6 +298,9 @@ export class ConsultationsService {
     if (updateConsultationDto.tokens_charged !== undefined) {
       consultation.tokens_charged = updateConsultationDto.tokens_charged;
     }
+    if (updateConsultationDto.result !== undefined) {
+      consultation.result = updateConsultationDto.result;
+    }
 
     if (updateConsultationDto.started_at !== undefined) {
       consultation.started_at = updateConsultationDto.started_at
@@ -266,6 +313,57 @@ export class ConsultationsService {
         : null;
     }
     this.validateDateRange(consultation.started_at, consultation.ended_at);
+
+    const saved = await this.consultationRepository.save(consultation);
+    return await this.findOne(saved.id, currentUserId, currentUserRole);
+  }
+
+  async endConsultation(
+    id: string,
+    endConsultationDto: EndConsultationDto,
+    currentUserId: string,
+    currentUserRole?: string,
+  ): Promise<Consultation> {
+    const consultation = await this.findOne(id, currentUserId, currentUserRole);
+
+    if (!consultation) {
+      throw new NotFoundException('Consultation not found');
+    }
+
+    // Only expert and admin can end consultation
+    if (currentUserRole !== 'admin' && currentUserRole !== 'expert') {
+      throw new ForbiddenException('Only expert or admin can end consultation');
+    }
+
+    if (currentUserRole === 'expert' && consultation.expert?.user?.id !== currentUserId) {
+      throw new ForbiddenException('Expert can only end their own consultations');
+    }
+
+    // Check if already completed
+    if (consultation.ended_at !== null) {
+      throw new ConflictException('Consultation has already been ended');
+    }
+
+    // Set ended_at to now
+    consultation.ended_at = new Date();
+
+    // If no status provided, default to COMPLETED
+    if (endConsultationDto.status !== undefined) {
+      consultation.status = endConsultationDto.status;
+    } else {
+      consultation.status = ConsultationStatus.COMPLETED;
+    }
+
+    // Update optional fields if provided
+    if (endConsultationDto.duration_minutes !== undefined) {
+      consultation.duration_minutes = endConsultationDto.duration_minutes;
+    }
+    if (endConsultationDto.tokens_charged !== undefined) {
+      consultation.tokens_charged = endConsultationDto.tokens_charged;
+    }
+    if (endConsultationDto.result !== undefined) {
+      consultation.result = endConsultationDto.result;
+    }
 
     const saved = await this.consultationRepository.save(consultation);
     return await this.findOne(saved.id, currentUserId, currentUserRole);

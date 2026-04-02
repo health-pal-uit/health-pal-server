@@ -25,6 +25,13 @@ export enum BookingStatus {
   COMPLETED = 'completed',
 }
 
+export enum BookingConfirmationStatus {
+  NONE = 'none',
+  EXPERT = 'expert',
+  CLIENT = 'client',
+  BOTH = 'both',
+}
+
 @Entity('bookings')
 export class Booking {
   @PrimaryGeneratedColumn('uuid')
@@ -35,6 +42,13 @@ export class Booking {
 
   @Column({ type: 'enum', enum: BookingStatus, default: BookingStatus.PENDING })
   status: BookingStatus;
+
+  @Column({
+    type: 'enum',
+    enum: BookingConfirmationStatus,
+    default: BookingConfirmationStatus.NONE,
+  })
+  confirmed_by: BookingConfirmationStatus;
 
   @Column({ type: 'timestamptz' })
   scheduled_at: Date;

@@ -6,10 +6,16 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CreateBookingDto } from './dto/create-booking.dto';
+import { CreateMyBookingDto } from './dto/create-my-booking.dto';
 import { UpdateBookingDto } from './dto/update-booking.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, IsNull, Not, Repository } from 'typeorm';
-import { Booking, BookingCallType, BookingStatus } from './entities/booking.entity';
+import {
+  Booking,
+  BookingCallType,
+  BookingStatus,
+  BookingConfirmationStatus,
+} from './entities/booking.entity';
 import { Expert } from 'src/experts/entities/expert.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Consultation } from 'src/consultations/entities/consultation.entity';
@@ -137,6 +143,52 @@ export class BookingsService {
     return await this.findOne(saved.id);
   }
 
+  async createMe(
+    createMyBookingDto: CreateMyBookingDto,
+    currentUserId: string,
+    currentUserRole?: string,
+  ): Promise<Booking> {
+    // Auto-fill expert_id or client_id based on user role
+    const createBookingDto: CreateBookingDto = {
+      expert_id: createMyBookingDto.expert_id || '',
+      client_id: createMyBookingDto.client_id || '',
+      call_type: createMyBookingDto.call_type,
+      status: createMyBookingDto.status,
+      scheduled_at: createMyBookingDto.scheduled_at,
+      client_note: createMyBookingDto.client_note,
+    };
+
+    if (currentUserRole === 'expert') {
+      if (!createBookingDto.client_id) {
+        throw new BadRequestException('client_id is required when booking as an expert');
+      }
+      const expert = await this.expertRepository.findOne({
+        where: { user: { id: currentUserId }, deleted_at: IsNull() },
+      });
+      if (!expert) {
+        throw new NotFoundException('Expert profile not found for current user');
+      }
+      createBookingDto.expert_id = expert.id;
+    } else if (currentUserRole === 'user' || !currentUserRole) {
+      if (!createBookingDto.expert_id) {
+        throw new BadRequestException('expert_id is required when booking as a user');
+      }
+      createBookingDto.client_id = currentUserId;
+    } else if (currentUserRole === 'admin') {
+      if (!createBookingDto.expert_id) {
+        throw new BadRequestException('expert_id is required');
+      }
+      if (!createBookingDto.client_id) {
+        throw new BadRequestException('client_id is required');
+      }
+    }
+
+    const booking = await this.create(createBookingDto, currentUserId, currentUserRole);
+
+    // Auto-confirm the creator's side
+    return await this.confirmBooking(booking.id, currentUserId, currentUserRole);
+  }
+
   async findAll(currentUserId: string, currentUserRole?: string): Promise<Booking[]> {
     const whereClause =
       currentUserRole === 'admin'
@@ -147,6 +199,61 @@ export class BookingsService {
 
     return await this.bookingRepository.find({
       where: whereClause,
+      relations: ['expert', 'expert.user', 'client', 'consultation'],
+      order: { created_at: 'DESC' },
+    });
+  }
+
+  async findPending(currentUserId: string, currentUserRole?: string): Promise<Booking[]> {
+    const baseWhere =
+      currentUserRole === 'admin'
+        ? { deleted_at: IsNull() }
+        : currentUserRole === 'expert'
+          ? { deleted_at: IsNull(), expert: { user: { id: currentUserId } } }
+          : { deleted_at: IsNull(), client: { id: currentUserId } };
+
+    return await this.bookingRepository.find({
+      where: {
+        ...baseWhere,
+        confirmed_by: Not(BookingConfirmationStatus.BOTH),
+      },
+      relations: ['expert', 'expert.user', 'client', 'consultation'],
+      order: { created_at: 'DESC' },
+    });
+  }
+
+  async findVerified(currentUserId: string, currentUserRole?: string): Promise<Booking[]> {
+    const baseWhere =
+      currentUserRole === 'admin'
+        ? { deleted_at: IsNull() }
+        : currentUserRole === 'expert'
+          ? { deleted_at: IsNull(), expert: { user: { id: currentUserId } } }
+          : { deleted_at: IsNull(), client: { id: currentUserId } };
+
+    return await this.bookingRepository.find({
+      where: {
+        ...baseWhere,
+        confirmed_by: BookingConfirmationStatus.BOTH,
+        status: BookingStatus.CONFIRMED,
+      },
+      relations: ['expert', 'expert.user', 'client', 'consultation'],
+      order: { created_at: 'DESC' },
+    });
+  }
+
+  async findDenied(currentUserId: string, currentUserRole?: string): Promise<Booking[]> {
+    const baseWhere =
+      currentUserRole === 'admin'
+        ? { deleted_at: IsNull() }
+        : currentUserRole === 'expert'
+          ? { deleted_at: IsNull(), expert: { user: { id: currentUserId } } }
+          : { deleted_at: IsNull(), client: { id: currentUserId } };
+
+    return await this.bookingRepository.find({
+      where: {
+        ...baseWhere,
+        status: BookingStatus.CANCELLED,
+      },
       relations: ['expert', 'expert.user', 'client', 'consultation'],
       order: { created_at: 'DESC' },
     });
@@ -227,6 +334,75 @@ export class BookingsService {
     await this.validateVideoCapability(booking.expert.id, booking.call_type);
     await this.ensureExpertTimeAvailable(booking.expert.id, booking.scheduled_at, booking.id);
 
+    const saved = await this.bookingRepository.save(booking);
+    return await this.findOne(saved.id, currentUserId, currentUserRole);
+  }
+
+  async confirmBooking(
+    id: string,
+    currentUserId: string,
+    currentUserRole?: string,
+  ): Promise<Booking> {
+    const booking = await this.findOne(id, currentUserId, currentUserRole);
+
+    // Update confirmation based on role
+    if (currentUserRole === 'expert') {
+      if (booking.expert?.user?.id !== currentUserId) {
+        throw new ForbiddenException('Only the assigned expert can confirm this booking');
+      }
+      // Expert confirms: update based on current state
+      if (booking.confirmed_by === BookingConfirmationStatus.CLIENT) {
+        booking.confirmed_by = BookingConfirmationStatus.BOTH;
+        booking.status = BookingStatus.CONFIRMED;
+      } else if (booking.confirmed_by === BookingConfirmationStatus.NONE) {
+        booking.confirmed_by = BookingConfirmationStatus.EXPERT;
+      }
+    } else if (currentUserRole === 'user' || !currentUserRole) {
+      if (booking.client?.id !== currentUserId) {
+        throw new ForbiddenException('Only the booking client can confirm this booking');
+      }
+      // Client confirms: update based on current state
+      if (booking.confirmed_by === BookingConfirmationStatus.EXPERT) {
+        booking.confirmed_by = BookingConfirmationStatus.BOTH;
+        booking.status = BookingStatus.CONFIRMED;
+      } else if (booking.confirmed_by === BookingConfirmationStatus.NONE) {
+        booking.confirmed_by = BookingConfirmationStatus.CLIENT;
+      }
+    } else if (currentUserRole === 'admin') {
+      // Admins can confirm fully
+      booking.confirmed_by = BookingConfirmationStatus.BOTH;
+      booking.status = BookingStatus.CONFIRMED;
+    } else {
+      throw new ForbiddenException('You cannot confirm bookings');
+    }
+
+    const saved = await this.bookingRepository.save(booking);
+    return await this.findOne(saved.id, currentUserId, currentUserRole);
+  }
+
+  async denyBooking(id: string, currentUserId: string, currentUserRole?: string): Promise<Booking> {
+    const booking = await this.findOne(id, currentUserId, currentUserRole);
+
+    // Only allow deny if booking is not yet fully confirmed
+    if (booking.status === BookingStatus.CONFIRMED) {
+      throw new ConflictException('Cannot deny a confirmed booking');
+    }
+
+    // Check permission and deny based on role
+    if (currentUserRole === 'expert') {
+      if (booking.expert?.user?.id !== currentUserId) {
+        throw new ForbiddenException('Only the assigned expert can deny this booking');
+      }
+    } else if (currentUserRole === 'user' || !currentUserRole) {
+      if (booking.client?.id !== currentUserId) {
+        throw new ForbiddenException('Only the booking client can deny this booking');
+      }
+    } else if (currentUserRole !== 'admin') {
+      throw new ForbiddenException('You cannot deny bookings');
+    }
+
+    // Set status to CANCELLED when denied
+    booking.status = BookingStatus.CANCELLED;
     const saved = await this.bookingRepository.save(booking);
     return await this.findOne(saved.id, currentUserId, currentUserRole);
   }

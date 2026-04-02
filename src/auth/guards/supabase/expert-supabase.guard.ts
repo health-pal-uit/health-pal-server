@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
+import { RoleLevel } from 'src/auth/enums/role-level.enum';
 
 @Injectable()
 export class ExpertSupabaseGuard extends AuthGuard('supabase') implements CanActivate {
@@ -19,7 +20,7 @@ export class ExpertSupabaseGuard extends AuthGuard('supabase') implements CanAct
       throw new UnauthorizedException('Authentication required');
     }
 
-    if (user.role !== 'expert') {
+    if ((user.roleLevel ?? 0) < RoleLevel.EXPERT) {
       throw new ForbiddenException('Expert access required');
     }
 
