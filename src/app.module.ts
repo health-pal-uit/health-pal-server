@@ -47,6 +47,7 @@ import { AdminReportsModule } from './admin-reports/admin-reports.module';
 import { ChatAiModule } from './chat-ai/chat-ai.module';
 import { RecommendationsModule } from './recommendations/recommendations.module';
 import { FoodVisionModule } from './food-vision/food-vision.module';
+import { FitnessSyncModule } from './fitness-sync/fitness-sync.module';
 import { ExpertRolesModule } from './expert_roles/expert_roles.module';
 import { ExpertsModule } from './experts/experts.module';
 import { ExpertRatingsModule } from './expert_ratings/expert_ratings.module';
@@ -153,6 +154,7 @@ import * as joi from 'joi';
     ChatAiModule,
     RecommendationsModule,
     FoodVisionModule,
+    FitnessSyncModule,
     ExpertRolesModule,
     ExpertsModule,
     ExpertRatingsModule,
