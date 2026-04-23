@@ -11,6 +11,7 @@ import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guar
 import { ExpertRolesService } from './expert_roles.service';
 import { CreateExpertRoleDto } from './dto/create-expert_role.dto';
 import { UpdateExpertRoleDto } from './dto/update-expert_role.dto';
+import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 
 @ApiTags('expert-roles')
 @ApiBearerAuth()
@@ -28,7 +29,7 @@ export class ExpertRolesController {
   }
 
   @Get()
-  @UseGuards(AdminSupabaseGuard)
+  @UseGuards(SupabaseGuard)
   @ApiOperation({ summary: 'Get all expert roles (admin only)' })
   @ApiResponse({ status: 200, description: 'List of expert roles' })
   async findAll() {
