@@ -23,12 +23,10 @@ async function bootstrap() {
     await seedService.seed();
   }
 
-  // cors
+  // cors - allow local network access
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:8081', 'http://localhost:5000'], // web and mobile
+    origin: true, // allow all origins for development
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    //preflightContinue: false,
-    //optionsSuccessStatus: 204,
     credentials: true,
   });
   const config = new DocumentBuilder()

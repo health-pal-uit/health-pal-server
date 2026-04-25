@@ -39,14 +39,25 @@ export class SupabaseWsGuard implements CanActivate {
   }
 
   private async validateToken(client: Socket): Promise<boolean> {
+    // check both header and auth object for token
     const { authorization } = client.handshake.headers;
-    Logger.log('WebSocket connection attempt with authorization header:', authorization);
+    const authToken = (client.handshake.auth as any)?.token;
 
-    if (!authorization) {
-      return false;
+    Logger.log('WebSocket connection attempt with authorization header:', authorization);
+    Logger.log('WebSocket connection attempt with auth.token:', authToken ? 'present' : 'missing');
+
+    // get token from either header (Bearer token) or auth object
+    let token: string | undefined;
+    if (authorization) {
+      token = authorization.split(' ')[1];
+    } else if (authToken) {
+      token = authToken;
     }
 
-    const token = authorization?.split(' ')[1];
+    if (!token) {
+      Logger.warn('No token found in headers or auth object');
+      return false;
+    }
 
     const { data, error } = await this.localSupabase.auth.getUser(token);
     if (error || !data?.user) {

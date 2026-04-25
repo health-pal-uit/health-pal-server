@@ -39,6 +39,7 @@ import { Role } from 'src/roles/entities/role.entity';
 import { TokenTransaction } from 'src/token_transactions/entities/token_transaction.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Wallet } from 'src/wallets/entities/wallet.entity';
+import { VideoCall } from 'src/video_calls/entities/video_call.entity';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
 const resolveDbConfigFromEnv = () => {
@@ -116,6 +117,7 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
       Role,
       ContributionMeal,
       ContributionIngre,
+      VideoCall,
     ], // change later
     autoLoadEntities: true,
     migrations: [__dirname + '/../migrations/**/*{.ts,.js}'], // change later

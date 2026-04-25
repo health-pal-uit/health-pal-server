@@ -11,5 +11,6 @@ import { ChatSession } from 'src/chat_sessions/entities/chat_session.entity';
   imports: [TypeOrmModule.forFeature([Consultation, Booking, Expert, ChatSession])],
   controllers: [ConsultationsController],
   providers: [ConsultationsService],
+  exports: [ConsultationsService],
 })
 export class ConsultationsModule {}

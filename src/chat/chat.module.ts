@@ -7,9 +7,16 @@ import { ChatParticipant } from 'src/chat_participants/entities/chat_participant
 import { ChatMessage } from 'src/chat_messages/entities/chat_message.entity';
 import { UsersModule } from 'src/users/users.module';
 import { SupabaseWsGuard } from './guards/supabase-ws.guard';
+import { VideoCallsModule } from 'src/video_calls/video_calls.module';
+import { ConsultationsModule } from 'src/consultations/consultations.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ChatSession, ChatParticipant, ChatMessage]), UsersModule],
+  imports: [
+    TypeOrmModule.forFeature([ChatSession, ChatParticipant, ChatMessage]),
+    UsersModule,
+    VideoCallsModule,
+    ConsultationsModule,
+  ],
   providers: [ChatGateway, ChatService, SupabaseWsGuard],
   exports: [ChatGateway, ChatService],
 })

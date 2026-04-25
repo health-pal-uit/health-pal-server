@@ -14,6 +14,9 @@ import { UseGuards } from '@nestjs/common';
 import { SupabaseWsGuard } from './guards/supabase-ws.guard';
 import { WsUser } from './decorators/ws-user.decorator';
 import { User } from 'src/users/entities/user.entity';
+import { VideoCallsService } from 'src/video_calls/video_calls.service';
+import { VideoCallStatus } from 'src/video_calls/entities/video_call.entity';
+import { ConsultationsService } from 'src/consultations/consultations.service';
 
 @WebSocketGateway({
   namespace: 'chat',
@@ -26,7 +29,11 @@ import { User } from 'src/users/entities/user.entity';
 export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer() server: Server<any, ServerToClientEvents>;
 
-  constructor(private chatService: ChatService) {}
+  constructor(
+    private chatService: ChatService,
+    private videoCallsService: VideoCallsService,
+    private consultationsService: ConsultationsService,
+  ) {}
 
   handleConnection(client: Socket) {
     console.log('Client connected:', client.id);
@@ -137,5 +144,314 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const savedMessage = await this.chatService.saveMessage(userId, sessionId, content);
 
     this.server.in(sessionId).emit('newMessage', savedMessage!);
+  }
+
+  // webrtc signaling events
+  @SubscribeMessage('join-video-call')
+  async handleJoinVideoCall(
+    @WsUser() user: User,
+    @ConnectedSocket() client: Socket,
+    @MessageBody() rawData: string | { consultationId: string },
+  ) {
+    // parse if it's a string
+    let data: { consultationId: string };
+    if (typeof rawData === 'string') {
+      try {
+        data = JSON.parse(rawData);
+      } catch (e) {
+        console.error('[join-video-call] Failed to parse data:', e);
+        client.emit('error', { message: 'Invalid data format' });
+        return;
+      }
+    } else {
+      data = rawData;
+    }
+
+    const userId = user.id;
+    const { consultationId } = data;
+
+    console.log('[join-video-call] User', userId, 'joining consultation', consultationId);
+
+    if (!consultationId) {
+      client.emit('error', { message: 'consultationId is required' });
+      return;
+    }
+
+    // check if video call already exists for this consultation
+    let videoCall = await this.videoCallsService.findByConsultation(consultationId);
+
+    if (!videoCall) {
+      // fetch consultation to get patient and expert IDs (try with admin role to bypass permission check)
+      let consultation;
+      try {
+        consultation = await this.consultationsService.findOne(consultationId, userId, 'admin');
+      } catch (error) {
+        console.error('[join-video-call] Failed to fetch consultation:', error.message);
+        client.emit('error', { message: `Consultation not found: ${error.message}` });
+        return;
+      }
+
+      if (!consultation) {
+        console.error('[join-video-call] Consultation not found:', consultationId);
+        client.emit('error', { message: 'Consultation not found' });
+        return;
+      }
+
+      // get patient_id and expert_id from booking
+      const patientId = consultation.booking?.client?.id;
+      const expertId = consultation.expert?.id;
+
+      console.log('[join-video-call] Extracted IDs:');
+      console.log('[join-video-call]   Current User ID:', userId);
+      console.log('[join-video-call]   Patient ID:', patientId);
+      console.log('[join-video-call]   Expert ID:', expertId);
+      console.log('[join-video-call]   Expert has user?:', !!consultation.expert?.user);
+      console.log('[join-video-call]   Expert.user.id:', consultation.expert?.user?.id);
+
+      if (!patientId || !expertId) {
+        console.error('[join-video-call] Missing patient or expert ID in consultation');
+        console.error('[join-video-call] Consultation structure:', {
+          hasBooking: !!consultation.booking,
+          hasClient: !!consultation.booking?.client,
+          hasExpert: !!consultation.expert,
+          patientId,
+          expertId,
+        });
+        client.emit('error', { message: 'Invalid consultation data - missing patient or expert' });
+        return;
+      }
+
+      // expert might be identified by expert.user.id instead of expert.id
+      const expertUserId = consultation.expert?.user?.id;
+
+      // verify user is either patient or expert
+      if (userId !== patientId && userId !== expertId && userId !== expertUserId) {
+        console.error('[join-video-call] User is not part of this consultation');
+        console.error('[join-video-call] Comparison failed:');
+        console.error('[join-video-call]   userId:', userId);
+        console.error('[join-video-call]   patientId:', patientId);
+        console.error('[join-video-call]   expertId:', expertId);
+        console.error('[join-video-call]   expertUserId:', expertUserId);
+        client.emit('error', { message: 'You are not part of this consultation' });
+        return;
+      }
+
+      // create new video call record
+      console.log('[join-video-call] Creating new video call for consultation', consultationId);
+      console.log('[join-video-call] Patient:', patientId, 'Expert:', expertId);
+      videoCall = await this.videoCallsService.create({
+        consultation_id: consultationId,
+        patient_id: patientId,
+        expert_id: expertId,
+      });
+    }
+
+    // join the video call room
+    const roomId = `video-call-${videoCall.id}`;
+    await client.join(roomId);
+
+    console.log('[join-video-call] User joined room:', roomId);
+
+    // send call info to user
+    client.emit('call-room-joined', { callId: videoCall.id, roomId });
+
+    // notify other peers in the room
+    client.to(roomId).emit('peer-joined', { peerId: userId });
+
+    // update status to connecting if waiting
+    if (videoCall.status === VideoCallStatus.WAITING) {
+      await this.videoCallsService.updateStatus(videoCall.id, VideoCallStatus.CONNECTING);
+    }
+  }
+
+  @SubscribeMessage('webrtc-offer')
+  async handleWebRTCOffer(
+    @WsUser() user: User,
+    @ConnectedSocket() client: Socket,
+    @MessageBody() rawData: string | { to: string; callId: string; offer: any },
+  ) {
+    // parse if it's a string
+    let data: { to: string; callId: string; offer: any };
+    if (typeof rawData === 'string') {
+      try {
+        data = JSON.parse(rawData);
+      } catch (e) {
+        console.error('[webrtc-offer] Failed to parse data:', e);
+        client.emit('error', { message: 'Invalid data format' });
+        return;
+      }
+    } else {
+      data = rawData;
+    }
+
+    const { to, callId, offer } = data;
+
+    console.log('[webrtc-offer] From:', user.id, 'To:', to, 'CallId:', callId);
+
+    if (!to || !callId || !offer) {
+      client.emit('error', { message: 'to, callId, and offer are required' });
+      return;
+    }
+
+    // verify user is part of the call
+    const isInCall = await this.videoCallsService.isUserInCall(user.id, callId);
+    if (!isInCall) {
+      console.log('[webrtc-offer] User', user.id, 'is not part of call', callId);
+      client.emit('error', { message: 'You are not part of this call' });
+      return;
+    }
+
+    // forward offer to the target peer in the room
+    const roomId = `video-call-${callId}`;
+    this.server.in(roomId).emit('webrtc-offer', {
+      from: user.id,
+      offer,
+    });
+
+    console.log('[webrtc-offer] Forwarded offer to room:', roomId);
+  }
+
+  @SubscribeMessage('webrtc-answer')
+  async handleWebRTCAnswer(
+    @WsUser() user: User,
+    @ConnectedSocket() client: Socket,
+    @MessageBody() rawData: string | { to: string; callId: string; answer: any },
+  ) {
+    // parse if it's a string
+    let data: { to: string; callId: string; answer: any };
+    if (typeof rawData === 'string') {
+      try {
+        data = JSON.parse(rawData);
+      } catch (e) {
+        console.error('[webrtc-answer] Failed to parse data:', e);
+        client.emit('error', { message: 'Invalid data format' });
+        return;
+      }
+    } else {
+      data = rawData;
+    }
+
+    const { to, callId, answer } = data;
+
+    console.log('[webrtc-answer] From:', user.id, 'To:', to, 'CallId:', callId);
+
+    if (!to || !callId || !answer) {
+      client.emit('error', { message: 'to, callId, and answer are required' });
+      return;
+    }
+
+    // verify user is part of the call
+    const isInCall = await this.videoCallsService.isUserInCall(user.id, callId);
+    if (!isInCall) {
+      console.log('[webrtc-answer] User', user.id, 'is not part of call', callId);
+      client.emit('error', { message: 'You are not part of this call' });
+      return;
+    }
+
+    // forward answer to the target peer in the room
+    const roomId = `video-call-${callId}`;
+    this.server.in(roomId).emit('webrtc-answer', {
+      from: user.id,
+      answer,
+    });
+
+    console.log('[webrtc-answer] Forwarded answer to room:', roomId);
+
+    // update status to active when answer is sent
+    await this.videoCallsService.updateStatus(callId, VideoCallStatus.ACTIVE);
+  }
+
+  @SubscribeMessage('ice-candidate')
+  async handleIceCandidate(
+    @WsUser() user: User,
+    @ConnectedSocket() client: Socket,
+    @MessageBody() rawData: string | { to: string; callId: string; candidate: any },
+  ) {
+    // parse if it's a string
+    let data: { to: string; callId: string; candidate: any };
+    if (typeof rawData === 'string') {
+      try {
+        data = JSON.parse(rawData);
+      } catch (e) {
+        console.error('[ice-candidate] Failed to parse data:', e);
+        client.emit('error', { message: 'Invalid data format' });
+        return;
+      }
+    } else {
+      data = rawData;
+    }
+
+    const { to, callId, candidate } = data;
+
+    console.log('[ice-candidate] From:', user.id, 'To:', to, 'CallId:', callId);
+
+    if (!to || !callId || !candidate) {
+      client.emit('error', { message: 'to, callId, and candidate are required' });
+      return;
+    }
+
+    // verify user is part of the call
+    const isInCall = await this.videoCallsService.isUserInCall(user.id, callId);
+    if (!isInCall) {
+      console.log('[ice-candidate] User', user.id, 'is not part of call', callId);
+      client.emit('error', { message: 'You are not part of this call' });
+      return;
+    }
+
+    // forward ice candidate to the target peer in the room
+    const roomId = `video-call-${callId}`;
+    this.server.in(roomId).emit('ice-candidate', {
+      from: user.id,
+      candidate,
+    });
+
+    console.log('[ice-candidate] Forwarded ICE candidate to room:', roomId);
+  }
+
+  @SubscribeMessage('end-video-call')
+  async handleEndVideoCall(
+    @WsUser() user: User,
+    @ConnectedSocket() client: Socket,
+    @MessageBody() rawData: string | { callId: string },
+  ) {
+    // parse if it's a string
+    let data: { callId: string };
+    if (typeof rawData === 'string') {
+      try {
+        data = JSON.parse(rawData);
+      } catch (e) {
+        console.error('[end-video-call] Failed to parse data:', e);
+        client.emit('error', { message: 'Invalid data format' });
+        return;
+      }
+    } else {
+      data = rawData;
+    }
+
+    const { callId } = data;
+
+    console.log('[end-video-call] User', user.id, 'ending call', callId);
+
+    if (!callId) {
+      client.emit('error', { message: 'callId is required' });
+      return;
+    }
+
+    // verify user is part of the call
+    const isInCall = await this.videoCallsService.isUserInCall(user.id, callId);
+    if (!isInCall) {
+      console.log('[end-video-call] User', user.id, 'is not part of call', callId);
+      client.emit('error', { message: 'You are not part of this call' });
+      return;
+    }
+
+    // update call status to ended
+    await this.videoCallsService.updateStatus(callId, VideoCallStatus.ENDED);
+
+    // notify all peers in the room
+    const roomId = `video-call-${callId}`;
+    this.server.in(roomId).emit('call-ended', { callId });
+
+    console.log('[end-video-call] Call ended:', callId);
   }
 }
