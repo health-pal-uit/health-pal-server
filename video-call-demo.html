@@ -297,12 +297,24 @@
       let isMuted = false;
       let isVideoOff = false;
 
-      // STUN servers
+      // STUN and TURN servers for NAT traversal
       const configuration = {
         iceServers: [
           { urls: 'stun:stun.l.google.com:19302' },
           { urls: 'stun:stun1.l.google.com:19302' },
+          // free public TURN server for testing (replace with your own in production)
+          {
+            urls: 'turn:openrelay.metered.ca:80',
+            username: 'openrelayproject',
+            credential: 'openrelayproject',
+          },
+          {
+            urls: 'turn:openrelay.metered.ca:443',
+            username: 'openrelayproject',
+            credential: 'openrelayproject',
+          },
         ],
+        iceCandidatePoolSize: 10,
       };
 
       function log(message, type = 'info') {
@@ -380,55 +392,111 @@
           });
 
           socket.on('peer-joined', async (data) => {
-            log(`👤 Peer joined: ${data.peerId}`, 'success');
-            remotePeerId = data.peerId;
-            document.getElementById('peerCount').textContent = '1';
-            updateStatus('Peer joined! Establishing connection...', 'info');
+            try {
+              log(`👤 Peer joined: ${data.peerId}`, 'success');
+              remotePeerId = data.peerId;
+              document.getElementById('peerCount').textContent = '1';
+              updateStatus('Peer joined! Establishing connection...', 'info');
 
-            // create peer connection and send offer
-            await createPeerConnection();
-            const offer = await pc.createOffer();
-            await pc.setLocalDescription(offer);
+              // only create offer if we don't already have a peer connection
+              if (pc) {
+                log('⚠️ Peer connection already exists, skipping offer creation', 'info');
+                return;
+              }
 
-            log('📤 Sending WebRTC offer...', 'info');
-            socket.emit('webrtc-offer', {
-              to: remotePeerId,
-              callId: currentCallId,
-              offer: offer,
-            });
+              // create peer connection and send offer
+              log('🎬 Creating peer connection as initiator (I will send offer)...', 'info');
+              await createPeerConnection();
+
+              log('📝 Creating SDP offer...', 'info');
+              const offer = await pc.createOffer();
+              await pc.setLocalDescription(offer);
+              log('✅ Local description set (offer)', 'success');
+
+              log(`📤 Sending WebRTC offer to ${remotePeerId}...`, 'info');
+              socket.emit('webrtc-offer', {
+                to: remotePeerId,
+                callId: currentCallId,
+                offer: offer,
+              });
+            } catch (error) {
+              log(`❌ Error in peer-joined: ${error.message}`, 'error');
+              console.error('peer-joined error:', error);
+            }
           });
 
           socket.on('webrtc-offer', async (data) => {
-            log(`📥 Received WebRTC offer from ${data.from}`, 'info');
-            remotePeerId = data.from;
-            document.getElementById('peerCount').textContent = '1';
+            try {
+              log(`📥 Received WebRTC offer from ${data.from}`, 'success');
+              remotePeerId = data.from;
+              document.getElementById('peerCount').textContent = '1';
+              updateStatus('Received offer, sending answer...', 'info');
 
-            await createPeerConnection();
-            await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+              if (!pc) {
+                log('🎬 Creating peer connection as responder (I will send answer)...', 'info');
+                await createPeerConnection();
+              }
 
-            const answer = await pc.createAnswer();
-            await pc.setLocalDescription(answer);
+              log('📝 Setting remote description from offer...', 'info');
+              await pc.setRemoteDescription(new RTCSessionDescription(data.offer));
+              log('✅ Remote description set', 'success');
 
-            log('📤 Sending WebRTC answer...', 'info');
-            socket.emit('webrtc-answer', {
-              to: remotePeerId,
-              callId: currentCallId,
-              answer: answer,
-            });
+              log('📝 Creating SDP answer...', 'info');
+              const answer = await pc.createAnswer();
+              await pc.setLocalDescription(answer);
+              log('✅ Local description set (answer)', 'success');
+
+              log(`📤 Sending WebRTC answer to ${remotePeerId}...`, 'info');
+              socket.emit('webrtc-answer', {
+                to: remotePeerId,
+                callId: currentCallId,
+                answer: answer,
+              });
+            } catch (error) {
+              log(`❌ Error in webrtc-offer: ${error.message}`, 'error');
+              console.error('webrtc-offer error:', error);
+            }
           });
 
           socket.on('webrtc-answer', async (data) => {
-            log(`📥 Received WebRTC answer from ${data.from}`, 'success');
-            await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
-            updateStatus('🎉 Connected! Enjoying your video call...', 'success');
+            try {
+              log(`📥 Received WebRTC answer from ${data.from}`, 'success');
+              log('📝 Setting remote description from answer...', 'info');
+              await pc.setRemoteDescription(new RTCSessionDescription(data.answer));
+              log('✅ Remote description set from answer', 'success');
+              updateStatus('🎉 Signaling complete! Waiting for ICE...', 'success');
+            } catch (error) {
+              log(`❌ Error in webrtc-answer: ${error.message}`, 'error');
+              console.error('webrtc-answer error:', error);
+            }
           });
 
           socket.on('ice-candidate', async (data) => {
-            log(`📥 Received ICE candidate from ${data.from}`, 'info');
             try {
-              await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
-            } catch (e) {
-              console.error('Error adding ICE candidate:', e);
+              const cand = data.candidate;
+              console.log('Received ICE candidate data:', cand);
+
+              // parse the candidate string to get type and address
+              let candType = 'unknown',
+                candAddr = 'unknown';
+              if (cand.candidate) {
+                const parts = cand.candidate.split(' ');
+                candType = parts[7] || 'unknown'; // typ host/srflx/relay
+                candAddr = parts[4] || 'unknown'; // IP address
+              }
+
+              log(`📥 Received ICE candidate: ${candType} | ${candAddr}`, 'info');
+
+              if (pc && pc.remoteDescription) {
+                await pc.addIceCandidate(new RTCIceCandidate(cand));
+                log('✅ ICE candidate added', 'success');
+              } else {
+                log('⚠️ Cannot add ICE candidate - no remote description yet', 'error');
+              }
+            } catch (error) {
+              log(`❌ Error adding ICE candidate: ${error.message}`, 'error');
+              console.error('ice-candidate error:', error);
+              console.error('Problematic candidate:', data.candidate);
             }
           });
 
@@ -455,57 +523,109 @@
       }
 
       async function createPeerConnection() {
+        if (pc) {
+          log('⚠️ Peer connection already exists!', 'info');
+          return;
+        }
+
         pc = new RTCPeerConnection(configuration);
-        log('Creating peer connection...', 'info');
+        log('✅ Created new RTCPeerConnection', 'success');
 
         // add local stream tracks
         localStream.getTracks().forEach((track) => {
           pc.addTrack(track, localStream);
-          log(`Added ${track.kind} track to peer connection`, 'info');
+          log(`➕ Added ${track.kind} track to peer connection`, 'info');
         });
 
         // handle incoming tracks
         pc.ontrack = (event) => {
-          log(`📥 Received ${event.track.kind} track`, 'success');
+          log(`📥 Received remote ${event.track.kind} track!`, 'success');
           if (!remoteStream) {
             remoteStream = new MediaStream();
             document.getElementById('remoteVideo').srcObject = remoteStream;
+            log('📺 Set remote video stream', 'success');
           }
           remoteStream.addTrack(event.track);
+          log(
+            `✅ Added ${event.track.kind} to remote stream (total tracks: ${remoteStream.getTracks().length})`,
+            'success',
+          );
           updateStatus('🎉 Video call connected!', 'success');
         };
 
         // handle ICE candidates
         pc.onicecandidate = (event) => {
           if (event.candidate) {
-            log('📤 Sending ICE candidate', 'info');
+            const cand = event.candidate;
+            log(
+              `📤 Sending ICE candidate: ${cand.type} | ${cand.protocol} | ${cand.address || 'no-addr'}`,
+              'info',
+            );
+            console.log('Full ICE candidate:', cand);
+
+            // convert to plain object for proper serialization
+            const candidateObj = {
+              candidate: cand.candidate,
+              sdpMLineIndex: cand.sdpMLineIndex,
+              sdpMid: cand.sdpMid,
+              usernameFragment: cand.usernameFragment,
+            };
+
             socket.emit('ice-candidate', {
               to: remotePeerId,
               callId: currentCallId,
-              candidate: event.candidate,
+              candidate: candidateObj,
             });
+          } else {
+            log('✅ All ICE candidates sent', 'info');
           }
         };
 
         // handle connection state changes
         pc.onconnectionstatechange = () => {
-          log(`Connection state: ${pc.connectionState}`, 'info');
+          log(`🔄 Connection state changed: ${pc.connectionState}`, 'info');
           updateStats();
 
           if (pc.connectionState === 'connected') {
             updateStatus('🎉 Video call connected!', 'success');
-          } else if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+            log('✅✅✅ PEER CONNECTION ESTABLISHED! ✅✅✅', 'success');
+          } else if (pc.connectionState === 'failed') {
+            updateStatus('Connection failed', 'error');
+            log('❌ Connection failed!', 'error');
+          } else if (pc.connectionState === 'disconnected') {
             updateStatus('Connection lost', 'error');
+            log('⚠️ Connection disconnected', 'error');
           }
         };
 
         pc.oniceconnectionstatechange = () => {
-          log(`ICE state: ${pc.iceConnectionState}`, 'info');
+          log(`🧊 ICE connection state: ${pc.iceConnectionState}`, 'info');
           updateStats();
+
+          if (pc.iceConnectionState === 'failed') {
+            log('❌ ICE connection failed! Checking candidates...', 'error');
+            pc.getStats().then((stats) => {
+              stats.forEach((report) => {
+                if (report.type === 'candidate-pair' && report.state === 'failed') {
+                  console.error('Failed candidate pair:', report);
+                }
+              });
+            });
+          } else if (pc.iceConnectionState === 'connected') {
+            log('✅✅✅ ICE CONNECTION SUCCESSFUL! ✅✅✅', 'success');
+          }
         };
 
         pc.onsignalingstatechange = () => {
+          log(`📡 Signaling state: ${pc.signalingState}`, 'info');
           updateStats();
+        };
+
+        pc.onicegatheringstatechange = () => {
+          log(`🔍 ICE gathering state: ${pc.iceGatheringState}`, 'info');
+          if (pc.iceGatheringState === 'complete') {
+            log('✅ ICE gathering complete', 'success');
+          }
         };
 
         updateStats();
