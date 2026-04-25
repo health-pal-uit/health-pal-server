@@ -179,8 +179,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     // check if video call already exists for this consultation
     let videoCall = await this.videoCallsService.findByConsultation(consultationId);
+    console.log('[join-video-call] Existing video call found?:', !!videoCall);
+    if (videoCall) {
+      console.log('[join-video-call] Found existing video call:', videoCall.id);
+    }
 
     if (!videoCall) {
+      console.log('[join-video-call] No existing video call, creating new one...');
+
       // fetch consultation to get patient and expert IDs (try with admin role to bypass permission check)
       let consultation;
       try {
@@ -236,18 +242,36 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
         return;
       }
 
-      // create new video call record
+      // create new video call record with explicit consultation object
       console.log('[join-video-call] Creating new video call for consultation', consultationId);
       console.log('[join-video-call] Patient:', patientId, 'Expert:', expertId);
+
+      // create video call with consultation object to ensure proper relation
       videoCall = await this.videoCallsService.create({
         consultation_id: consultationId,
         patient_id: patientId,
         expert_id: expertId,
       });
+      console.log('[join-video-call] Created video call with ID:', videoCall.id);
+
+      // verify it was saved with consultation link
+      const verifyCall = await this.videoCallsService.findOne(videoCall.id);
+      console.log(
+        '[join-video-call] Verification - has consultation?:',
+        !!verifyCall?.consultation,
+      );
+      if (verifyCall?.consultation) {
+        console.log('[join-video-call] Consultation ID in saved call:', verifyCall.consultation.id);
+      }
     }
 
     // join the video call room
     const roomId = `video-call-${videoCall.id}`;
+
+    // get existing peers in room before joining
+    const existingPeers = await this.server.in(roomId).fetchSockets();
+    console.log('[join-video-call] Existing peers in room:', existingPeers.length);
+
     await client.join(roomId);
 
     console.log('[join-video-call] User joined room:', roomId);
@@ -255,8 +279,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
     // send call info to user
     client.emit('call-room-joined', { callId: videoCall.id, roomId });
 
-    // notify other peers in the room
-    client.to(roomId).emit('peer-joined', { peerId: userId });
+    // only notify existing peers about new user (they will initiate the offer)
+    // the new user just waits to receive an offer
+    if (existingPeers.length > 0) {
+      console.log('[join-video-call] Notifying existing peers about new user:', userId);
+      client.to(roomId).emit('peer-joined', { peerId: userId });
+    } else {
+      console.log('[join-video-call] No existing peers, user is first in room');
+    }
 
     // update status to connecting if waiting
     if (videoCall.status === VideoCallStatus.WAITING) {
@@ -301,14 +331,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
-    // forward offer to the target peer in the room
+    // forward offer to other peers in the room (exclude sender)
     const roomId = `video-call-${callId}`;
-    this.server.in(roomId).emit('webrtc-offer', {
+    client.to(roomId).emit('webrtc-offer', {
       from: user.id,
       offer,
     });
 
-    console.log('[webrtc-offer] Forwarded offer to room:', roomId);
+    console.log('[webrtc-offer] Forwarded offer to other peers in room:', roomId);
   }
 
   @SubscribeMessage('webrtc-answer')
@@ -348,14 +378,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
-    // forward answer to the target peer in the room
+    // forward answer to other peers in the room (exclude sender)
     const roomId = `video-call-${callId}`;
-    this.server.in(roomId).emit('webrtc-answer', {
+    client.to(roomId).emit('webrtc-answer', {
       from: user.id,
       answer,
     });
 
-    console.log('[webrtc-answer] Forwarded answer to room:', roomId);
+    console.log('[webrtc-answer] Forwarded answer to other peers in room:', roomId);
 
     // update status to active when answer is sent
     await this.videoCallsService.updateStatus(callId, VideoCallStatus.ACTIVE);
@@ -398,14 +428,14 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
       return;
     }
 
-    // forward ice candidate to the target peer in the room
+    // forward ice candidate to other peers in the room (exclude sender)
     const roomId = `video-call-${callId}`;
-    this.server.in(roomId).emit('ice-candidate', {
+    client.to(roomId).emit('ice-candidate', {
       from: user.id,
       candidate,
     });
 
-    console.log('[ice-candidate] Forwarded ICE candidate to room:', roomId);
+    console.log('[ice-candidate] Forwarded ICE candidate to other peers in room:', roomId);
   }
 
   @SubscribeMessage('end-video-call')

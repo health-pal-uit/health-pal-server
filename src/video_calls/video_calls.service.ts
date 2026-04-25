@@ -18,7 +18,16 @@ export class VideoCallsService {
   ) {}
 
   async create(createVideoCallDto: CreateVideoCallDto): Promise<VideoCall> {
-    const videoCall = this.videoCallRepository.create(createVideoCallDto);
+    const videoCall = this.videoCallRepository.create({
+      status: createVideoCallDto.status || VideoCallStatus.WAITING,
+      started_at: createVideoCallDto.started_at || null,
+      ended_at: createVideoCallDto.ended_at || null,
+      patient: { id: createVideoCallDto.patient_id } as User,
+      expert: { id: createVideoCallDto.expert_id } as Expert,
+      consultation: createVideoCallDto.consultation_id
+        ? ({ id: createVideoCallDto.consultation_id } as Consultation)
+        : null,
+    });
     return this.videoCallRepository.save(videoCall);
   }
 
@@ -85,8 +94,9 @@ export class VideoCallsService {
       .createQueryBuilder('video_call')
       .leftJoinAndSelect('video_call.patient', 'patient')
       .leftJoinAndSelect('video_call.expert', 'expert')
+      .leftJoinAndSelect('expert.user', 'expert_user')
       .where('video_call.id = :call_id', { call_id })
-      .andWhere('(patient.id = :user_id OR expert.id = :user_id)', { user_id })
+      .andWhere('(patient.id = :user_id OR expert_user.id = :user_id)', { user_id })
       .getOne();
 
     return !!call;
