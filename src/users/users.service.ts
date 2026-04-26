@@ -27,13 +27,11 @@ export class UsersService {
     createUserDto: CreateUserDto,
   ) {
     let role: Role | null;
-    if (!createUserDto.role_id) {
+    if (createUserDto.role_id) {
+      role = await this.rolesService.findOne(createUserDto.role_id);
+    } else {
       role = await this.rolesService.findByName('user');
-      if (!role) {
-        throw new Error('Default role not found');
-      }
     }
-    role = await this.rolesService.findOne(createUserDto.role_id!);
     if (!role) {
       throw new Error('Role not found');
     }

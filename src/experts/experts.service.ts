@@ -74,6 +74,17 @@ export class ExpertsService {
       throw new ConflictException('This user is already registered as an expert');
     }
 
+    // Assign pending-expert role to user
+    const pendingExpertRole = await this.roleRepository.findOne({
+      where: { name: 'pending-expert' },
+    });
+    if (!pendingExpertRole) {
+      throw new NotFoundException('Role pending-expert not found');
+    }
+
+    user.role = pendingExpertRole;
+    await this.userRepository.save(user);
+
     const expert = this.expertRepository.create({
       bio: createExpertDto.bio ?? null,
       token_per_minute: createExpertDto.token_per_minute ?? 0,
@@ -260,15 +271,24 @@ export class ExpertsService {
     await this.expertRepository.save(expert);
 
     if (isVerified) {
+      // Approve: Change role to 'expert'
       const expertRole = await this.roleRepository.findOne({ where: { name: 'expert' } });
       if (!expertRole) {
         throw new NotFoundException('Role expert not found');
       }
 
       expert.user.role = expertRole;
-      await this.userRepository.save(expert.user);
+    } else {
+      // Reject: Revert role to 'user'
+      const userRole = await this.roleRepository.findOne({ where: { name: 'user' } });
+      if (!userRole) {
+        throw new NotFoundException('Role user not found');
+      }
+
+      expert.user.role = userRole;
     }
 
+    await this.userRepository.save(expert.user);
     return await this.findOne(id);
   }
 
