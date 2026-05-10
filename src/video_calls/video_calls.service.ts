@@ -7,6 +7,10 @@ import { Repository, UpdateResult, DeleteResult } from 'typeorm';
 import { Consultation } from 'src/consultations/entities/consultation.entity';
 import { User } from 'src/users/entities/user.entity';
 import { Expert } from 'src/experts/entities/expert.entity';
+import { BlockchainService } from 'src/blockchain/blockchain.service';
+import { WalletsService } from 'src/wallets/wallets.service';
+import { TokenTransactionsService } from 'src/token_transactions/token_transactions.service';
+import { TokenTransactionType } from 'src/token_transactions/entities/token_transaction.entity';
 
 @Injectable()
 export class VideoCallsService {
@@ -15,6 +19,9 @@ export class VideoCallsService {
     @InjectRepository(Consultation) private consultationRepository: Repository<Consultation>,
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(Expert) private expertRepository: Repository<Expert>,
+    private blockchainService: BlockchainService,
+    private walletsService: WalletsService,
+    private tokenTransactionsService: TokenTransactionsService,
   ) {}
 
   async create(createVideoCallDto: CreateVideoCallDto): Promise<VideoCall> {
@@ -73,11 +80,14 @@ export class VideoCallsService {
     if (status === VideoCallStatus.ENDED || status === VideoCallStatus.FAILED) {
       updateData.ended_at = new Date();
 
-      // calculate duration if we have started_at
       const call = await this.findOne(id);
       if (call?.started_at) {
         const duration = (updateData.ended_at.getTime() - call.started_at.getTime()) / 1000;
         updateData.duration_seconds = duration;
+
+        if (status === VideoCallStatus.ENDED) {
+          await this.processPayPerMinute(call, duration);
+        }
       }
     }
 
@@ -86,6 +96,47 @@ export class VideoCallsService {
 
   async remove(id: string): Promise<DeleteResult> {
     return await this.videoCallRepository.delete(id);
+  }
+
+  private async processPayPerMinute(call: VideoCall, durationSeconds: number): Promise<void> {
+    const expert = await this.expertRepository.findOne({
+      where: { id: call.expert.id },
+      relations: ['user'],
+    });
+    if (!expert || expert.token_per_minute <= 0) return;
+
+    const minutes = Math.ceil(durationSeconds / 60);
+    const totalTokens = minutes * expert.token_per_minute;
+
+    const patientWallet = await this.walletsService.findByUserId(call.patient.id);
+    const expertWallet = await this.walletsService.findByUserId(expert.user.id);
+
+    if (patientWallet?.address) {
+      const deductHash = await this.blockchainService.deductFromUser(
+        patientWallet.address,
+        totalTokens,
+      );
+      await this.tokenTransactionsService.record(
+        patientWallet,
+        TokenTransactionType.DEBIT,
+        totalTokens,
+        deductHash,
+        call.id,
+        `Video call payment — ${minutes} min × ${expert.token_per_minute} HPT`,
+      );
+    }
+
+    if (expertWallet?.address) {
+      const rewardHash = await this.blockchainService.rewardUser(expertWallet.address, totalTokens);
+      await this.tokenTransactionsService.record(
+        expertWallet,
+        TokenTransactionType.CREDIT,
+        totalTokens,
+        rewardHash,
+        call.id,
+        `Consultation earnings — ${minutes} min × ${expert.token_per_minute} HPT`,
+      );
+    }
   }
 
   // helper to check if user is part of the call

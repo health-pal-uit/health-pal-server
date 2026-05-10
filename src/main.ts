@@ -5,6 +5,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { ResponseInterceptor } from './helpers/interceptors/response.interceptor';
 import { SeedService } from './seed/seed.service';
+import { WalletMigrationService } from './seed/wallet-migration.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -22,6 +23,10 @@ async function bootstrap() {
     const seedService = app.get(SeedService);
     await seedService.seed();
   }
+
+  // create wallets for any existing users that don't have one
+  const walletMigration = app.get(WalletMigrationService);
+  await walletMigration.run();
 
   // cors - allow local network access
   app.enableCors({
