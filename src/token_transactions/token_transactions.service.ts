@@ -34,4 +34,19 @@ export class TokenTransactionsService {
     });
     return this.repo.save(tx);
   }
+
+  async findByUserId(
+    userId: string,
+    page: number = 1,
+    limit: number = 20,
+  ): Promise<{ data: TokenTransaction[]; total: number; page: number; limit: number }> {
+    const skip = (page - 1) * limit;
+    const [data, total] = await this.repo.findAndCount({
+      where: { wallet: { user: { id: userId } } },
+      order: { created_at: 'DESC' },
+      skip,
+      take: limit,
+    });
+    return { data, total, page, limit };
+  }
 }
