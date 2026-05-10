@@ -10,6 +10,7 @@ import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.se
 import { ConfigService } from '@nestjs/config';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_ADMIN } from 'src/supabase/supabase-admin.provider';
+import { WalletsService } from 'src/wallets/wallets.service';
 
 @Injectable()
 export class UsersService {
@@ -20,6 +21,7 @@ export class UsersService {
     private readonly supabaseStorageService: SupabaseStorageService,
     private readonly configService: ConfigService,
     @Inject(SUPABASE_ADMIN) private readonly supabase: SupabaseClient,
+    private readonly walletsService: WalletsService,
   ) {}
 
   async createFromSupabase(
@@ -51,7 +53,9 @@ export class UsersService {
         premium_package_id: createUserDto.premium_package_id,
       }),
     });
-    return await this.userRepository.save(user);
+    const saved = await this.userRepository.save(user);
+    await this.walletsService.createForUser(saved);
+    return saved;
   }
 
   async markVerified(supabaseId: string) {
