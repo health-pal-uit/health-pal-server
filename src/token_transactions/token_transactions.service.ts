@@ -1,26 +1,37 @@
 import { Injectable } from '@nestjs/common';
-import { CreateTokenTransactionDto } from './dto/create-token_transaction.dto';
-import { UpdateTokenTransactionDto } from './dto/update-token_transaction.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import {
+  TokenTransaction,
+  TokenTransactionStatus,
+  TokenTransactionType,
+} from './entities/token_transaction.entity';
+import { Wallet } from 'src/wallets/entities/wallet.entity';
 
 @Injectable()
 export class TokenTransactionsService {
-  create(createTokenTransactionDto: CreateTokenTransactionDto) {
-    return 'This action adds a new tokenTransaction';
-  }
+  constructor(
+    @InjectRepository(TokenTransaction)
+    private repo: Repository<TokenTransaction>,
+  ) {}
 
-  findAll() {
-    return `This action returns all tokenTransactions`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} tokenTransaction`;
-  }
-
-  update(id: number, updateTokenTransactionDto: UpdateTokenTransactionDto) {
-    return `This action updates a #${id} tokenTransaction`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} tokenTransaction`;
+  async record(
+    wallet: Wallet,
+    type: TokenTransactionType,
+    amount: number,
+    txHash: string | null,
+    referenceId?: string,
+    note?: string,
+  ): Promise<TokenTransaction> {
+    const tx = this.repo.create({
+      wallet,
+      type,
+      amount,
+      tx_hash: txHash,
+      status: txHash ? TokenTransactionStatus.SUCCESS : TokenTransactionStatus.FAILED,
+      reference_id: referenceId ?? null,
+      note: note ?? null,
+    });
+    return this.repo.save(tx);
   }
 }
