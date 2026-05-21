@@ -11,6 +11,9 @@ import { ConfigService } from '@nestjs/config';
 import { SupabaseClient } from '@supabase/supabase-js';
 import { SUPABASE_ADMIN } from 'src/supabase/supabase-admin.provider';
 import { WalletsService } from 'src/wallets/wallets.service';
+import { RedisService } from 'src/cache/redis.service';
+
+const USER_PROFILE_TTL = 300; // 5 min
 
 @Injectable()
 export class UsersService {
@@ -22,6 +25,7 @@ export class UsersService {
     private readonly configService: ConfigService,
     @Inject(SUPABASE_ADMIN) private readonly supabase: SupabaseClient,
     private readonly walletsService: WalletsService,
+    private readonly redisService: RedisService,
   ) {}
 
   async createFromSupabase(
@@ -91,7 +95,13 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    return await this.userRepository.findOne({ where: { id }, relations: ['role'] });
+    const cacheKey = `user:profile:${id}`;
+    const cached = await this.redisService.get<User>(cacheKey);
+    if (cached) return cached;
+
+    const user = await this.userRepository.findOne({ where: { id }, relations: ['role'] });
+    if (user) await this.redisService.set(cacheKey, user, USER_PROFILE_TTL);
+    return user;
   }
 
   async update(id: string, updateUserDto: UpdateUserDto, imageBuffer?: Buffer, imageName?: string) {
@@ -113,7 +123,9 @@ export class UsersService {
         console.error('Error uploading image to Supabase:', error);
       }
     }
-    return await this.userRepository.save(user);
+    const saved = await this.userRepository.save(user);
+    await this.redisService.del(`user:profile:${id}`);
+    return saved;
   }
 
   async remove(id: string) {
@@ -129,6 +141,7 @@ export class UsersService {
     user.deactivated_at = new Date();
 
     await this.userRepository.save(user);
+    await this.redisService.del(`user:profile:${id}`);
 
     // also delete from supabase auth
     await this.supabase.auth.admin.deleteUser(id);

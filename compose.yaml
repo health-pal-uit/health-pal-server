@@ -15,6 +15,18 @@ services:
       timeout: 5s
       retries: 5
 
+  health-pal-redis:
+    image: redis:7-alpine
+    ports:
+      - '6379:6379'
+    volumes:
+      - health-pal-redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   health-pal-server:
     build:
       context: .
@@ -25,6 +37,8 @@ services:
       DB_USERNAME: ${DB_USERNAME}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_DATABASE: ${DB_DATABASE}
+      REDIS_HOST: health-pal-redis
+      REDIS_PORT: 6379
       SUPABASE_URL: ${SUPABASE_URL}
       SUPABASE_KEY: ${SUPABASE_KEY}
       SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
@@ -48,9 +62,12 @@ services:
     depends_on:
       health-pal-db:
         condition: service_healthy
+      health-pal-redis:
+        condition: service_healthy
 
 volumes:
   health-pal-db-data:
+  health-pal-redis-data:
 # Comments are provided throughout this file to help you get started.
 # If you need more help, visit the Docker Compose reference guide at
 # https://docs.docker.com/go/compose-spec-reference/

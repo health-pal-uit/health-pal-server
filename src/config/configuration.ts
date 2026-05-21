@@ -27,6 +27,8 @@ export default () => {
     DB_PORT: selectedDb.port,
     DB_PASSWORD: selectedDb.password,
     DB_HOST: selectedDb.host,
+    REDIS_HOST: process.env.REDIS_HOST || '',
+    REDIS_PORT: parseInt(process.env.REDIS_PORT || '6379', 10),
   };
 };
 

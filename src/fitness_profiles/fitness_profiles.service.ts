@@ -6,6 +6,9 @@ import {
   UnauthorizedException,
   forwardRef,
 } from '@nestjs/common';
+import { RedisService } from 'src/cache/redis.service';
+
+const FITNESS_PROFILE_TTL = 300; // 5 min
 import { CreateFitnessProfileDto } from './dto/create-fitness_profile.dto';
 import { UpdateFitnessProfileDto } from './dto/update-fitness_profile.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -30,9 +33,14 @@ export class FitnessProfilesService {
     @InjectRepository(DietType) private dietTypeRepository: Repository<DietType>,
     @Inject(forwardRef(() => FitnessGoalsService))
     private fitnessGoalsService: FitnessGoalsService,
+    private readonly redisService: RedisService,
   ) {}
 
   async findOneByUserId(userId: string): Promise<FitnessProfile | null> {
+    const cacheKey = `fitness-profile:${userId}`;
+    const cached = await this.redisService.get<FitnessProfile>(cacheKey);
+    if (cached) return cached;
+
     const user = await this.userRepository.findOneBy({ id: userId });
     if (!user) {
       throw new Error('User not found');
@@ -44,6 +52,7 @@ export class FitnessProfilesService {
     if (!fitnessProfile) {
       throw new UnauthorizedException('You do not have access to this fitness profile');
     }
+    await this.redisService.set(cacheKey, fitnessProfile, FITNESS_PROFILE_TTL);
     return fitnessProfile;
   }
 
@@ -200,6 +209,7 @@ export class FitnessProfilesService {
 
     // save the entity (this properly handles relations)
     await this.fitnessProfileRepository.save(fitnessProfile);
+    await this.redisService.del(`fitness-profile:${userId}`);
 
     // if diet type changed, update all user's fitness goals to recalculate macros
     if (dietTypeChanged) {

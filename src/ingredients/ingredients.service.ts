@@ -8,6 +8,9 @@ import { DeleteResult } from 'typeorm';
 import { UpdateResult } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
+import { RedisService } from 'src/cache/redis.service';
+
+const INGREDIENT_SEARCH_TTL = 600; // 10 min
 
 @Injectable()
 export class IngredientsService {
@@ -16,12 +19,23 @@ export class IngredientsService {
     //private contributionIngresService: ContributionIngresService,
     private supabaseStorageService: SupabaseStorageService,
     private configService: ConfigService,
+    private readonly redisService: RedisService,
   ) {}
+
   async searchByName(
     name: string,
     page = 1,
     limit = 10,
   ): Promise<{ data: Ingredient[]; total: number; page: number; limit: number }> {
+    const cacheKey = `ingredients:search:${encodeURIComponent(name)}:${page}:${limit}`;
+    const cached = await this.redisService.get<{
+      data: Ingredient[];
+      total: number;
+      page: number;
+      limit: number;
+    }>(cacheKey);
+    if (cached) return cached;
+
     const [data, total] = await this.ingredientRepository.findAndCount({
       where: {
         name: ILike(`%${name}%`),
@@ -32,7 +46,9 @@ export class IngredientsService {
       take: limit,
       order: { created_at: 'DESC' },
     });
-    return { data, total, page, limit };
+    const result = { data, total, page, limit };
+    await this.redisService.set(cacheKey, result, INGREDIENT_SEARCH_TTL);
+    return result;
   }
 
   // admin create

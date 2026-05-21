@@ -11,6 +11,9 @@ import { calculateMacros } from 'src/helpers/functions/macro-calculator';
 import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
 import { ConfigService } from '@nestjs/config';
 import { isUUID } from 'class-validator';
+import { RedisService } from 'src/cache/redis.service';
+
+const MEAL_SEARCH_TTL = 600; // 10 min
 
 @Injectable()
 export class MealsService {
@@ -20,6 +23,7 @@ export class MealsService {
     @InjectRepository(Ingredient) private ingredientsRepository: Repository<Ingredient>,
     private readonly supabaseStorageService: SupabaseStorageService,
     private readonly configService: ConfigService,
+    private readonly redisService: RedisService,
   ) {}
 
   async searchByName(
@@ -27,6 +31,15 @@ export class MealsService {
     page = 1,
     limit = 10,
   ): Promise<{ data: Meal[]; total: number; page: number; limit: number }> {
+    const cacheKey = `meals:search:${encodeURIComponent(name)}:${page}:${limit}`;
+    const cached = await this.redisService.get<{
+      data: Meal[];
+      total: number;
+      page: number;
+      limit: number;
+    }>(cacheKey);
+    if (cached) return cached;
+
     const [data, total] = await this.mealsRepository.findAndCount({
       where: {
         name: ILike(`%${name}%`),
@@ -38,7 +51,9 @@ export class MealsService {
       take: limit,
       order: { created_at: 'DESC' },
     });
-    return { data, total, page, limit };
+    const result = { data, total, page, limit };
+    await this.redisService.set(cacheKey, result, MEAL_SEARCH_TTL);
+    return result;
   }
 
   async updateFromIngredients(
