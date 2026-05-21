@@ -60,6 +60,7 @@ import { TokenTransactionsModule } from './token_transactions/token_transactions
 import { VideoCallsModule } from './video_calls/video_calls.module';
 import { BlockchainModule } from './blockchain/blockchain.module';
 import { RedisModule } from './cache/redis.module';
+import { MetricsModule } from './metrics/metrics.module';
 import configuration from './config/configuration';
 import * as joi from 'joi';
 
@@ -173,6 +174,7 @@ import * as joi from 'joi';
     VideoCallsModule,
     BlockchainModule,
     RedisModule,
+    MetricsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
