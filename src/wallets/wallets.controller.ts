@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { WalletsService } from './wallets.service';
 import { BlockchainService } from 'src/blockchain/blockchain.service';
@@ -6,6 +6,7 @@ import { TokenTransactionsService } from 'src/token_transactions/token_transacti
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import type { ReqUserType } from 'src/auth/types/req.type';
+import { TopupDto } from './dto/topup.dto';
 
 @ApiTags('wallets')
 @ApiBearerAuth()
@@ -34,6 +35,22 @@ export class WalletsController {
     }
 
     return { address: wallet.address, balance: onChainBalance, balance_cache: parsed };
+  }
+
+  @Post('topup')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({
+    summary: 'Top-up HPT tokens (simulated)',
+    description:
+      'Simulated top-up: mints the requested HPT amount to the user wallet on Sepolia. ' +
+      'Falls back to off-chain balance update when blockchain is not configured.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Top-up successful — returns new balance and transaction details',
+  })
+  async topup(@CurrentUser() user: ReqUserType, @Body() dto: TopupDto) {
+    return this.walletsService.topup(user.id, dto.token_amount);
   }
 
   @Get('transactions')

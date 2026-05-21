@@ -10,7 +10,10 @@ import { NotificationsService } from 'src/notifications/notifications.service';
 import { BlockchainService } from 'src/blockchain/blockchain.service';
 import { WalletsService } from 'src/wallets/wallets.service';
 import { TokenTransactionsService } from 'src/token_transactions/token_transactions.service';
-import { TokenTransactionType } from 'src/token_transactions/entities/token_transaction.entity';
+import {
+  TokenTransactionStatus,
+  TokenTransactionType,
+} from 'src/token_transactions/entities/token_transaction.entity';
 
 const CHALLENGE_REWARD_TOKENS = 10;
 
@@ -205,11 +208,18 @@ export class ChallengesUsersService {
       txHash,
       challengeUserId,
       'Challenge completion reward',
+      TokenTransactionStatus.SUCCESS,
     );
 
+    // refresh balance from chain when available, otherwise increment cache
     if (txHash) {
       const newBalance = parseFloat(await this.blockchainService.getBalance(wallet.address));
       await this.walletsService.updateBalanceCache(wallet.id, newBalance);
+    } else {
+      await this.walletsService.updateBalanceCache(
+        wallet.id,
+        wallet.token_balance_cache + CHALLENGE_REWARD_TOKENS,
+      );
     }
   }
 }

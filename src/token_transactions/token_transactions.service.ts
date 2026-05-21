@@ -22,13 +22,16 @@ export class TokenTransactionsService {
     txHash: string | null,
     referenceId?: string,
     note?: string,
+    statusOverride?: TokenTransactionStatus,
   ): Promise<TokenTransaction> {
+    const status =
+      statusOverride ?? (txHash ? TokenTransactionStatus.SUCCESS : TokenTransactionStatus.FAILED);
     const tx = this.repo.create({
       wallet,
       type,
       amount,
       tx_hash: txHash,
-      status: txHash ? TokenTransactionStatus.SUCCESS : TokenTransactionStatus.FAILED,
+      status,
       reference_id: referenceId ?? null,
       note: note ?? null,
     });
