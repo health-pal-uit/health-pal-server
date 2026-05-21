@@ -4,13 +4,14 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import { ResponseInterceptor } from './helpers/interceptors/response.interceptor';
+import { HttpMetricsInterceptor } from './metrics/http-metrics.interceptor';
 import { SeedService } from './seed/seed.service';
 import { WalletMigrationService } from './seed/wallet-migration.service';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
-  app.useGlobalInterceptors(new ResponseInterceptor());
+  app.useGlobalInterceptors(new HttpMetricsInterceptor(), new ResponseInterceptor());
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
