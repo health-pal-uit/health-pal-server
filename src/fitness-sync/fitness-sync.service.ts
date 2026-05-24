@@ -108,6 +108,15 @@ export class FitnessSyncService {
     }
 
     const eventDate = this.pickEventDate(dto);
+
+    if (dto.record_type === FitnessSyncRecordType.HEART_RATE) {
+      return this.syncHeartRate(user, dto, eventDate);
+    }
+
+    if (dto.record_type === FitnessSyncRecordType.SLEEP) {
+      return this.syncSleep(user, dto, eventDate);
+    }
+
     const dailyLog = await this.dailyLogsService.getOrCreateDailyLog(userId, eventDate);
     if (!dailyLog) {
       throw new NotFoundException('Could not create daily log');
@@ -159,6 +168,77 @@ export class FitnessSyncService {
       external_record_id: dto.external_record_id,
       activity_record_id: savedRecord.id,
     };
+  }
+
+  private async syncHeartRate(
+    user: User,
+    dto: SyncFitnessRecordDto,
+    eventDate: Date,
+  ): Promise<SyncResult> {
+    const dailyLog = await this.dailyLogsService.getOrCreateDailyLog(user.id, eventDate);
+    if (!dailyLog) throw new NotFoundException('Could not create daily log');
+
+    if (dto.avg_heart_rate_bpm != null) {
+      dailyLog.avg_heart_rate_bpm = Math.round(dto.avg_heart_rate_bpm);
+    }
+    if (dto.min_heart_rate_bpm != null) {
+      dailyLog.resting_heart_rate_bpm = Math.round(dto.min_heart_rate_bpm);
+    }
+    await this.dailyLogsService.save(dailyLog);
+
+    await this.saveSyncEventAndUpdateTimestamp(user, dto);
+
+    return {
+      status: 'created',
+      source: dto.source,
+      record_type: dto.record_type,
+      external_record_id: dto.external_record_id,
+      activity_record_id: null,
+    };
+  }
+
+  private async syncSleep(
+    user: User,
+    dto: SyncFitnessRecordDto,
+    eventDate: Date,
+  ): Promise<SyncResult> {
+    const dailyLog = await this.dailyLogsService.getOrCreateDailyLog(user.id, eventDate);
+    if (!dailyLog) throw new NotFoundException('Could not create daily log');
+
+    if (dto.sleep_duration_hours != null) {
+      dailyLog.sleep_duration_hours = dto.sleep_duration_hours;
+    }
+    if (dto.sleep_quality != null) {
+      dailyLog.sleep_quality = dto.sleep_quality;
+    }
+    await this.dailyLogsService.save(dailyLog);
+
+    await this.saveSyncEventAndUpdateTimestamp(user, dto);
+
+    return {
+      status: 'created',
+      source: dto.source,
+      record_type: dto.record_type,
+      external_record_id: dto.external_record_id,
+      activity_record_id: null,
+    };
+  }
+
+  private async saveSyncEventAndUpdateTimestamp(user: User, dto: SyncFitnessRecordDto) {
+    const syncEvent = this.syncEventRepository.create({
+      user,
+      source: dto.source,
+      record_type: dto.record_type,
+      external_record_id: dto.external_record_id,
+      payload: dto as unknown as Record<string, unknown>,
+      activity_record: null,
+    });
+    await this.syncEventRepository.save(syncEvent);
+
+    if (dto.source === FitnessSyncSource.HEALTH_CONNECT) {
+      user.health_connect_last_synced_at = new Date();
+      await this.userRepository.save(user);
+    }
   }
 
   async syncBatch(userId: string, dto: SyncFitnessRecordsBatchDto) {

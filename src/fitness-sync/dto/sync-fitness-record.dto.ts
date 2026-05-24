@@ -23,6 +23,7 @@ export enum FitnessSyncRecordType {
   DISTANCE = 'distance',
   ACTIVE_CALORIES = 'active_calories',
   HEART_RATE = 'heart_rate',
+  SLEEP = 'sleep',
   EXERCISE_SESSION = 'exercise_session',
 }
 
@@ -91,6 +92,34 @@ export class SyncFitnessRecordDto {
   @IsNumber()
   @Min(0)
   avg_heart_rate_bpm?: number;
+
+  @ApiPropertyOptional({ example: 55, description: 'Minimum (resting) heart rate for the period' })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  min_heart_rate_bpm?: number;
+
+  @ApiPropertyOptional({ example: 178, description: 'Maximum (peak) heart rate for the period' })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  max_heart_rate_bpm?: number;
+
+  @ApiPropertyOptional({
+    example: 7.5,
+    description: 'Total sleep duration in hours (for SLEEP records)',
+  })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  sleep_duration_hours?: number;
+
+  @ApiPropertyOptional({ example: 4, description: 'Sleep quality score 1–5 (for SLEEP records)' })
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  @Max(5)
+  sleep_quality?: number;
 
   @ApiPropertyOptional({ example: 3 })
   @IsOptional()

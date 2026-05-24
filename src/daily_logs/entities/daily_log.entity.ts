@@ -60,6 +60,12 @@ export class DailyLog {
   @Column({ type: 'int', nullable: true })
   sleep_quality?: number | null;
 
+  @Column({ type: 'int', nullable: true })
+  avg_heart_rate_bpm?: number | null;
+
+  @Column({ type: 'int', nullable: true })
+  resting_heart_rate_bpm?: number | null;
+
   @UpdateDateColumn({ type: 'timestamptz' })
   updated_at: Date;
 

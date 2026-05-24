@@ -1,18 +1,25 @@
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ILike, Repository } from 'typeorm';
+import { ILike, MoreThanOrEqual, Repository } from 'typeorm';
 import { GoogleGenAI } from '@google/genai';
 import { CreateFitnessGoalDto } from 'src/fitness_goals/dto/create-fitness_goal.dto';
 import { FitnessGoalsService } from 'src/fitness_goals/fitness_goals.service';
 import { FitnessProfilesService } from 'src/fitness_profiles/fitness_profiles.service';
 import { FitnessGoalType } from 'src/helpers/enums/fitness-goal-type.enum';
 import { Meal } from 'src/meals/entities/meal.entity';
+import { DailyLog } from 'src/daily_logs/entities/daily_log.entity';
+import { Expert } from 'src/experts/entities/expert.entity';
 import { MealRecommendationRequestDto } from './dto/meal-recommendation-request.dto';
 import {
   MealRecommendationResponseDto,
   RecommendedMealDto,
 } from './dto/meal-recommendation-response.dto';
+import {
+  HealthAlertDto,
+  HealthAlertResponseDto,
+  SuggestedExpertDto,
+} from './dto/health-alert-response.dto';
 
 type RecommendedGoal = {
   goal_type: FitnessGoalType;
@@ -32,6 +39,8 @@ export class RecommendationsService {
     private fitnessGoalsService: FitnessGoalsService,
     private fitnessProfilesService: FitnessProfilesService,
     @InjectRepository(Meal) private readonly mealsRepository: Repository<Meal>,
+    @InjectRepository(DailyLog) private readonly dailyLogRepository: Repository<DailyLog>,
+    @InjectRepository(Expert) private readonly expertRepository: Repository<Expert>,
     private readonly configService: ConfigService,
   ) {
     this.ai = new GoogleGenAI({});
@@ -143,6 +152,124 @@ export class RecommendationsService {
       carbs: Math.round(carbsGr),
       fiber: Math.round(fiberGr),
     };
+  }
+
+  async analyzeHealthAndAlert(userId: string): Promise<HealthAlertResponseDto> {
+    const since = new Date();
+    since.setDate(since.getDate() - 7);
+
+    const logs = await this.dailyLogRepository.find({
+      where: { user: { id: userId }, date: MoreThanOrEqual(since) as any },
+      order: { date: 'DESC' },
+    });
+
+    const alerts: HealthAlertDto[] = [];
+
+    // detect elevated heart rate (avg > 90 bpm for 3+ days)
+    const hrLogs = logs.filter((l) => l.avg_heart_rate_bpm != null);
+    const elevatedHrLogs = hrLogs.filter((l) => (l.avg_heart_rate_bpm ?? 0) > 90);
+    if (elevatedHrLogs.length >= 3) {
+      const avgHr =
+        elevatedHrLogs.reduce((sum, l) => sum + (l.avg_heart_rate_bpm ?? 0), 0) /
+        elevatedHrLogs.length;
+      alerts.push({
+        type: 'high_heart_rate',
+        message: `Your average heart rate has been above 90 bpm for ${elevatedHrLogs.length} of the last 7 days.`,
+        days_affected: elevatedHrLogs.length,
+        avg_value: Math.round(avgHr),
+      });
+    }
+
+    // detect short sleep (< 6 hours for 3+ days)
+    const sleepLogs = logs.filter((l) => l.sleep_duration_hours != null);
+    const shortSleepLogs = sleepLogs.filter((l) => (l.sleep_duration_hours ?? 8) < 6);
+    if (shortSleepLogs.length >= 3) {
+      const avgSleep =
+        shortSleepLogs.reduce((sum, l) => sum + (l.sleep_duration_hours ?? 0), 0) /
+        shortSleepLogs.length;
+      alerts.push({
+        type: 'short_sleep',
+        message: `You've been sleeping less than 6 hours for ${shortSleepLogs.length} of the last 7 days.`,
+        days_affected: shortSleepLogs.length,
+        avg_value: Math.round(avgSleep * 10) / 10,
+      });
+    }
+
+    // detect poor sleep quality (score <= 2 for 3+ days)
+    const qualityLogs = logs.filter((l) => l.sleep_quality != null);
+    const poorQualityLogs = qualityLogs.filter((l) => (l.sleep_quality ?? 5) <= 2);
+    if (poorQualityLogs.length >= 3) {
+      alerts.push({
+        type: 'poor_sleep_quality',
+        message: `Your sleep quality has been poor (score ≤ 2/5) for ${poorQualityLogs.length} of the last 7 days.`,
+        days_affected: poorQualityLogs.length,
+      });
+    }
+
+    if (alerts.length === 0) {
+      return {
+        has_alerts: false,
+        alerts: [],
+        ai_message:
+          'Your health metrics look good! Keep up the healthy habits and stay consistent.',
+        suggested_experts: [],
+      };
+    }
+
+    const experts = await this.expertRepository.find({
+      where: { is_verified: true },
+      relations: ['expert_role'],
+      take: 3,
+      order: { rating_avg: 'DESC' },
+    });
+
+    const suggestedExperts: SuggestedExpertDto[] = experts.map((e) => ({
+      id: e.id,
+      bio: e.bio,
+      rating_avg: e.rating_avg,
+      token_per_minute: e.token_per_minute,
+      expert_role: e.expert_role ? { name: e.expert_role.name } : null,
+    }));
+
+    const aiMessage = await this.buildHealthAlertMessage(alerts);
+
+    return {
+      has_alerts: true,
+      alerts,
+      ai_message: aiMessage,
+      suggested_experts: suggestedExperts,
+    };
+  }
+
+  private async buildHealthAlertMessage(alerts: HealthAlertDto[]): Promise<string> {
+    const alertSummary = alerts.map((a) => `- ${a.message}`).join('\n');
+
+    const prompt = `You are a caring health assistant. A user's health data shows these concerns over the last 7 days:
+${alertSummary}
+
+Write a short (3–4 sentences), warm, non-alarmist message that:
+1. Acknowledges the concern without causing panic
+2. Explains why this pattern may need attention
+3. Gently suggests consulting a health professional
+Do not use markdown formatting. Keep the tone supportive.`;
+
+    try {
+      const result = await this.ai.models.generateContent({
+        model: 'gemini-2.0-flash-exp',
+        contents: prompt,
+      });
+      return result.text?.trim() || this.fallbackAlertMessage(alerts);
+    } catch {
+      return this.fallbackAlertMessage(alerts);
+    }
+  }
+
+  private fallbackAlertMessage(alerts: HealthAlertDto[]): string {
+    const types = alerts.map((a) => a.type);
+    if (types.includes('high_heart_rate')) {
+      return 'We noticed your heart rate has been elevated over the past week. This can be caused by stress, dehydration, or other factors. It might be worth speaking with a health professional to rule out any underlying issues. Consider booking a consultation with one of our verified experts.';
+    }
+    return 'We noticed some unusual patterns in your health data this week. Consistent sleep issues can impact your energy, mood, and long-term health. We recommend speaking with a health professional for personalized advice. Our experts are here to help.';
   }
 
   async getMealRecommendations(

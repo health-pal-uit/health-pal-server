@@ -6,6 +6,7 @@ import { ApiBearerAuth, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swa
 import { responseHelper } from 'src/helpers/responses/response.helper';
 import { MealRecommendationRequestDto } from './dto/meal-recommendation-request.dto';
 import { MealRecommendationResponseDto } from './dto/meal-recommendation-response.dto';
+import { HealthAlertResponseDto } from './dto/health-alert-response.dto';
 import type { ReqUserType } from 'src/auth/types/req.type';
 
 @Controller('recommendations')
@@ -46,6 +47,25 @@ export class RecommendationsController {
     return responseHelper({
       data,
       message: 'Personalized fitness goal created successfully.',
+      statusCode: 200,
+    });
+  }
+
+  @Get('health-alert')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({
+    summary: 'AI health anomaly detection and expert upsell',
+    description:
+      'Analyses the last 7 days of synced health data (heart rate, sleep) for the authenticated user. Returns detected anomalies, a Gemini-generated health advisory, and a list of verified experts to consult.',
+  })
+  @ApiOkResponse({ type: HealthAlertResponseDto })
+  async getHealthAlert(@CurrentUser() user: ReqUserType) {
+    const data = await this.recommendationsService.analyzeHealthAndAlert(user.id);
+    return responseHelper({
+      data,
+      message: data.has_alerts
+        ? 'Health anomalies detected. Consider consulting an expert.'
+        : 'No health anomalies detected.',
       statusCode: 200,
     });
   }
