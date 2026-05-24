@@ -87,6 +87,15 @@ export class ExpertsController {
     return this.expertsService.findAll();
   }
 
+  @Get(':id/ratings')
+  @UseGuards(SupabaseGuard)
+  @ApiOperation({ summary: 'Get all ratings for an expert' })
+  @ApiParam({ name: 'id', description: 'Expert id (UUID)' })
+  @ApiResponse({ status: 200, description: 'List of expert ratings' })
+  findRatings(@Param('id') id: string) {
+    return this.expertsService.findRatings(id);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.expertsService.findOne(id);

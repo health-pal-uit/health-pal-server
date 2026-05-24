@@ -7,6 +7,15 @@ import { Repository } from 'typeorm';
 import { Challenge } from 'src/challenges/entities/challenge.entity';
 import { ChallengesUser } from './entities/challenges_user.entity';
 import { NotificationsService } from 'src/notifications/notifications.service';
+import { BlockchainService } from 'src/blockchain/blockchain.service';
+import { WalletsService } from 'src/wallets/wallets.service';
+import { TokenTransactionsService } from 'src/token_transactions/token_transactions.service';
+import {
+  TokenTransactionStatus,
+  TokenTransactionType,
+} from 'src/token_transactions/entities/token_transaction.entity';
+
+const CHALLENGE_REWARD_TOKENS = 10;
 
 @Injectable()
 export class ChallengesUsersService {
@@ -15,6 +24,9 @@ export class ChallengesUsersService {
     @InjectRepository(Challenge) private challengesRepository: Repository<Challenge>,
     @InjectRepository(ChallengesUser) private challengesUsersRepository: Repository<ChallengesUser>,
     private notificationsService: NotificationsService,
+    private blockchainService: BlockchainService,
+    private walletsService: WalletsService,
+    private tokenTransactionsService: TokenTransactionsService,
   ) {}
 
   async create(createChallengesUserDto: CreateChallengesUserDto): Promise<ChallengesUser> {
@@ -85,6 +97,9 @@ export class ChallengesUsersService {
 
     // send notification to user
     await this.notificationsService.notifyChallengeCompleted(userId, challenge.name);
+
+    // reward user with tokens on-chain
+    await this.rewardChallengeCompletion(userId, saved.id);
 
     return saved;
   }
@@ -178,5 +193,33 @@ export class ChallengesUsersService {
 
   async save(challengeUser: ChallengesUser): Promise<ChallengesUser> {
     return await this.challengesUsersRepository.save(challengeUser);
+  }
+
+  private async rewardChallengeCompletion(userId: string, challengeUserId: string): Promise<void> {
+    const wallet = await this.walletsService.findByUserId(userId);
+    if (!wallet?.address) return;
+
+    const txHash = await this.blockchainService.rewardUser(wallet.address, CHALLENGE_REWARD_TOKENS);
+
+    await this.tokenTransactionsService.record(
+      wallet,
+      TokenTransactionType.CREDIT,
+      CHALLENGE_REWARD_TOKENS,
+      txHash,
+      challengeUserId,
+      'Challenge completion reward',
+      TokenTransactionStatus.SUCCESS,
+    );
+
+    // refresh balance from chain when available, otherwise increment cache
+    if (txHash) {
+      const newBalance = parseFloat(await this.blockchainService.getBalance(wallet.address));
+      await this.walletsService.updateBalanceCache(wallet.id, newBalance);
+    } else {
+      await this.walletsService.updateBalanceCache(
+        wallet.id,
+        wallet.token_balance_cache + CHALLENGE_REWARD_TOKENS,
+      );
+    }
   }
 }

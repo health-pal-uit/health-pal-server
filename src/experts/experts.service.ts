@@ -12,6 +12,7 @@ import { Expert } from './entities/expert.entity';
 import { User } from 'src/users/entities/user.entity';
 import { ExpertRole } from 'src/expert_roles/entities/expert_role.entity';
 import { PremiumPackage } from 'src/premium_packages/entities/premium_package.entity';
+import { ExpertRating } from 'src/expert_ratings/entities/expert_rating.entity';
 import { CreateCurrentExpertDto } from './dto/create-current-expert.dto';
 import { Role } from 'src/roles/entities/role.entity';
 import { SupabaseStorageService } from 'src/supabase-storage/supabase-storage.service';
@@ -30,6 +31,8 @@ export class ExpertsService {
     private readonly roleRepository: Repository<Role>,
     @InjectRepository(PremiumPackage)
     private readonly premiumPackageRepository: Repository<PremiumPackage>,
+    @InjectRepository(ExpertRating)
+    private readonly expertRatingRepository: Repository<ExpertRating>,
     private readonly supabaseStorageService: SupabaseStorageService,
     private readonly configService: ConfigService,
   ) {}
@@ -172,6 +175,22 @@ export class ExpertsService {
     }
 
     return expert;
+  }
+
+  async findRatings(expertId: string): Promise<ExpertRating[]> {
+    const expert = await this.expertRepository.findOne({
+      where: { id: expertId, deleted_at: IsNull() },
+    });
+
+    if (!expert) {
+      throw new NotFoundException('Expert not found');
+    }
+
+    return await this.expertRatingRepository.find({
+      where: { expert: { id: expertId } },
+      relations: ['client', 'consultation'],
+      order: { created_at: 'DESC' },
+    });
   }
 
   async update(id: string, updateExpertDto: UpdateExpertDto): Promise<Expert> {
