@@ -216,6 +216,7 @@ export class BookingsService {
       where: {
         ...baseWhere,
         confirmed_by: Not(BookingConfirmationStatus.BOTH),
+        status: Not(BookingStatus.CANCELLED),
       },
       relations: ['expert', 'expert.user', 'client', 'consultation'],
       order: { created_at: 'DESC' },
