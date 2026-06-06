@@ -51,6 +51,14 @@ export class DatabaseHelper {
       await this.dataSource.query(
         `DELETE FROM activities WHERE id NOT IN (SELECT id FROM activities LIMIT 0);`,
       );
+      await this.dataSource.query(`DELETE FROM fitness_sync_events;`);
+      await this.dataSource.query(`DELETE FROM token_transactions;`);
+      await this.dataSource.query(`DELETE FROM video_calls;`);
+      await this.dataSource.query(`DELETE FROM bookings;`);
+      await this.dataSource.query(`DELETE FROM consultations;`);
+      await this.dataSource.query(`DELETE FROM wallets;`);
+      await this.dataSource.query(`DELETE FROM experts;`);
+      await this.dataSource.query(`DELETE FROM expert_roles;`);
 
       console.log('Database cleaned successfully (preserved users and roles)');
     } catch (error) {
@@ -141,6 +149,33 @@ export class DatabaseHelper {
     return {
       dietTypeId: dietTypeResult[0].id,
     };
+  }
+
+  /**
+   * Seed a verified expert tied to the admin user.
+   * Returns the expert's UUID so tests can reference it.
+   */
+  async seedTestExpert(): Promise<{ expertId: string; expertRoleId: string }> {
+    const roleResult = await this.dataSource.query(`
+      INSERT INTO expert_roles (id, name, created_at)
+      VALUES (gen_random_uuid(), 'General Health', NOW())
+      ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name
+      RETURNING id
+    `);
+    const expertRoleId: string = roleResult[0].id;
+
+    const adminUserId = 'e55c00cd-2b9c-4627-96c4-7988791e0cf2';
+    const expertResult = await this.dataSource.query(
+      `
+      INSERT INTO experts (id, bio, token_per_minute, is_verified, rating_avg, rating_count, expert_role_id, user_id, created_at)
+      VALUES (gen_random_uuid(), 'Test expert bio', 5, true, 4.5, 10, $1, $2, NOW())
+      ON CONFLICT (user_id) DO UPDATE SET is_verified = true
+      RETURNING id
+    `,
+      [expertRoleId, adminUserId],
+    );
+
+    return { expertId: expertResult[0].id, expertRoleId };
   }
 
   /**
