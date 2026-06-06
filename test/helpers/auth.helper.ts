@@ -25,6 +25,15 @@ const HARDCODED_ADMIN_TOKEN =
 const HARDCODED_ADMIN_ID = 'e55c00cd-2b9c-4627-96c4-7988791e0cf2';
 const HARDCODED_ADMIN_EMAIL = 'khonghuynhngochan@gmail.com';
 
+function isTokenExpired(token: string): boolean {
+  try {
+    const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+    return Date.now() / 1000 > payload.exp - 30;
+  } catch {
+    return true;
+  }
+}
+
 export class AuthHelper {
   private app: INestApplication;
 
@@ -33,12 +42,12 @@ export class AuthHelper {
   }
 
   /**
-   * Create a test user with authentication
-   * If USE_HARDCODED_TOKEN is true, returns the hardcoded token instead of creating a new user
+   * Create a test user with authentication.
+   * Uses fresh token from env if set; falls back to hardcoded token if still valid;
+   * otherwise auto-logins using TEST_USER_PASSWORD / TEST_ADMIN_PASSWORD from env.
    */
   async createTestUser(email: string, role: 'user' | 'admin' = 'user'): Promise<TestUser> {
-    // Use hardcoded tokens based on role
-    if (role === 'admin' && HARDCODED_ADMIN_TOKEN) {
+    if (role === 'admin' && HARDCODED_ADMIN_TOKEN && !isTokenExpired(HARDCODED_ADMIN_TOKEN)) {
       return {
         id: HARDCODED_ADMIN_ID,
         email: HARDCODED_ADMIN_EMAIL,
@@ -47,7 +56,7 @@ export class AuthHelper {
       };
     }
 
-    if (HARDCODED_USER_TOKEN) {
+    if (role !== 'admin' && HARDCODED_USER_TOKEN && !isTokenExpired(HARDCODED_USER_TOKEN)) {
       return {
         id: HARDCODED_USER_ID,
         email: HARDCODED_USER_EMAIL,
@@ -55,54 +64,40 @@ export class AuthHelper {
         token: HARDCODED_USER_TOKEN,
       };
     }
-    // First, signup the user
-    const signupResponse = await request(this.app.getHttpServer())
-      .post('/auth/signup')
-      .send({
-        email,
-        password: 'Test123!@#',
-        username: `Test${role}`,
-        birth_date: '1990-01-01',
-        gender: true,
-      });
 
-    if (signupResponse.status !== 201) {
-      throw new Error(`Signup failed: ${JSON.stringify(signupResponse.body)}`);
+    // Hardcoded token is expired — try auto-login via password
+    const loginEmail =
+      role === 'admin'
+        ? process.env.TEST_ADMIN_EMAIL || HARDCODED_ADMIN_EMAIL
+        : process.env.TEST_USER_EMAIL || HARDCODED_USER_EMAIL;
+    const loginPassword =
+      role === 'admin' ? process.env.TEST_ADMIN_PASSWORD : process.env.TEST_USER_PASSWORD;
+
+    if (!loginPassword) {
+      throw new Error(
+        `Hardcoded JWT for role '${role}' is expired. ` +
+          `Set TEST_${role.toUpperCase()}_PASSWORD in .env.test to auto-login, ` +
+          `or set TEST_${role.toUpperCase()}_TOKEN to a fresh Supabase token.`,
+      );
     }
 
-    // Wait a bit for signup to complete
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Try to login (may fail if email not verified)
-    const loginResponse = await request(this.app.getHttpServer()).post('/auth/login').send({
-      email,
-      password: 'Test123!@#',
-    });
+    const loginResponse = await request(this.app.getHttpServer())
+      .post('/auth/login')
+      .send({ email: loginEmail, password: loginPassword });
 
     if (loginResponse.status !== 200) {
       throw new Error(
-        `Login failed after signup: ${loginResponse.status} - ${JSON.stringify(loginResponse.body)}. Email verification might be required.`,
+        `Auto-login failed for ${role} (${loginEmail}): ` +
+          `${loginResponse.status} - ${JSON.stringify(loginResponse.body)}`,
       );
     }
 
-    // Get the user ID from signup response (wrapped in responseHelper)
-    const userId = signupResponse.body.data?.user?.id;
     const token = loginResponse.body.data?.token;
-
-    if (!userId || !token) {
-      throw new Error(
-        `Missing user ID or token. Signup response: ${JSON.stringify(signupResponse.body)}, Login response: ${JSON.stringify(loginResponse.body)}`,
-      );
-    }
-
-    if (role === 'admin') {
-      // Promote to admin (would need admin endpoint or direct DB manipulation)
-      // For now, return mock admin token
-    }
+    if (!token) throw new Error(`No token in auto-login response for ${role}`);
 
     return {
-      id: userId,
-      email,
+      id: role === 'admin' ? HARDCODED_ADMIN_ID : HARDCODED_USER_ID,
+      email: loginEmail,
       role,
       token,
     };

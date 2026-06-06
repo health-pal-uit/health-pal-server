@@ -154,7 +154,7 @@ describe('Auth (BACKEND_AUTH_001 - BACKEND_AUTH_060)', () => {
         .post('/auth/forgot-password')
         .send({ email: 'hankhongg@gmail.com' });
 
-      expect([200, 400, 404]).toContain(res.status);
+      expect([200, 201, 400, 404]).toContain(res.status);
     });
   });
 

@@ -94,29 +94,29 @@ export class DatabaseHelper {
     }
 
     try {
-      // Insert test user - silently ignore if already exists
+      // Insert test user — look up role by name to avoid hardcoded ID mismatch
       await this.dataSource.query(`
-        INSERT INTO users (id, username, email, fullname, gender, birth_date, role_id, "isVerified", created_at) 
+        INSERT INTO users (id, username, email, fullname, gender, birth_date, role_id, "isVerified", created_at)
         VALUES (
-          '4d46d27a-c9e3-465d-8e4e-a5171905da39', 
-          'hankhongg', 
-          'hankhongg@gmail.com', 
-          'Khong Han', 
-          false, 
-          '2005-06-10', 
-          '8f7924ae-eb80-4663-aced-05323c046f61', 
-          true, 
+          '4d46d27a-c9e3-465d-8e4e-a5171905da39',
+          'hankhongg',
+          'hankhongg@gmail.com',
+          'Khong Han',
+          false,
+          '2005-06-10',
+          (SELECT id FROM roles WHERE name = 'user' LIMIT 1),
+          true,
           NOW()
-        );
+        ) ON CONFLICT (id) DO NOTHING;
       `);
     } catch (error) {
-      // Ignore all errors - user already exists (duplicate key on id, email, or username)
+      // Ignore all errors - user already exists
     }
 
     try {
-      // Insert admin user - silently ignore if already exists
+      // Insert admin user — look up role by name to avoid hardcoded ID mismatch
       await this.dataSource.query(`
-        INSERT INTO users (id, username, email, fullname, gender, birth_date, role_id, "isVerified", created_at) 
+        INSERT INTO users (id, username, email, fullname, gender, birth_date, role_id, "isVerified", created_at)
         VALUES (
           'e55c00cd-2b9c-4627-96c4-7988791e0cf2',
           'admin',
@@ -124,13 +124,13 @@ export class DatabaseHelper {
           'HealthPal Admin',
           true,
           '1990-01-01',
-          '4b9a9b5d-8d86-4f4b-9f36-5c9b4a4db123',
+          (SELECT id FROM roles WHERE name = 'admin' LIMIT 1),
           true,
           NOW()
-        );
+        ) ON CONFLICT (id) DO NOTHING;
       `);
     } catch (error) {
-      // Ignore all errors - user already exists (duplicate key on id, email, or username)
+      // Ignore all errors - user already exists
     }
   }
 
