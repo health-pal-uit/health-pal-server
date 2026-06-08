@@ -26,7 +26,7 @@ import { AdminSupabaseGuard } from 'src/auth/guards/supabase/admin-supabase.guar
 import { ExpertSupabaseGuard } from 'src/auth/guards/supabase/expert-supabase.guard';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
-import { ReqUserType } from 'src/auth/types/req.type';
+import type { ReqUserType } from 'src/auth/types/req.type';
 import { ExpertsService } from './experts.service';
 import { CreateExpertDto } from './dto/create-expert.dto';
 import { CreateCurrentExpertDto } from './dto/create-current-expert.dto';
@@ -85,6 +85,14 @@ export class ExpertsController {
   @UseGuards(SupabaseGuard)
   findAll() {
     return this.expertsService.findAll();
+  }
+
+  @Get('me')
+  @UseGuards(ExpertSupabaseGuard)
+  @ApiOperation({ summary: 'Get current expert profile' })
+  @ApiResponse({ status: 200, description: 'Current expert profile' })
+  findCurrentExpert(@CurrentUser() user: ReqUserType) {
+    return this.expertsService.findByUserId(user.id);
   }
 
   @Get(':id/ratings')

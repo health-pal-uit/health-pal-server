@@ -177,6 +177,19 @@ export class ExpertsService {
     return expert;
   }
 
+  async findByUserId(userId: string): Promise<Expert> {
+    const expert = await this.expertRepository.findOne({
+      where: { user: { id: userId }, deleted_at: IsNull() },
+      relations: ['user', 'expert_role', 'booking_fee_tier'],
+    });
+
+    if (!expert) {
+      throw new NotFoundException('Expert profile not found for current user');
+    }
+
+    return expert;
+  }
+
   async findRatings(expertId: string): Promise<ExpertRating[]> {
     const expert = await this.expertRepository.findOne({
       where: { id: expertId, deleted_at: IsNull() },
