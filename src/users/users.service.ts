@@ -99,6 +99,14 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
+
+    // Assign updated fields
+    if (updateUserDto.fullname !== undefined) user.fullname = updateUserDto.fullname;
+    if (updateUserDto.phone !== undefined) user.phone = updateUserDto.phone;
+    if (updateUserDto.gender !== undefined) user.gender = updateUserDto.gender;
+    if (updateUserDto.birth_date !== undefined) user.birth_date = updateUserDto.birth_date;
+    if (updateUserDto.username !== undefined) user.username = updateUserDto.username;
+
     if (imageBuffer && imageName) {
       const avatarBucketName =
         this.configService.get<string>('SUPABASE_AVATAR_BUCKET_NAME') || 'avatars';
