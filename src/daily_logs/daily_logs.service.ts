@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { CreateDailyLogDto } from './dto/create-daily_log.dto';
 import { UpdateDailyLogDto } from './dto/update-daily_log.dto';
+import { UpdateHealthMetricsDto } from './dto/update-health-metrics.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DailyLog } from './entities/daily_log.entity';
 import { Equal, Repository } from 'typeorm';
@@ -115,6 +116,16 @@ export class DailyLogsService {
     }
     dailyLog.total_kcal = dailyLog.total_kcal_eaten - (dailyLog.total_kcal_burned || 0);
     await this.dailyLogRepository.save(dailyLog);
+  }
+
+  async updateHealthMetrics(
+    userId: string,
+    dateISO: string,
+    dto: UpdateHealthMetricsDto,
+  ): Promise<DailyLog> {
+    const log = await this.getOrCreateDailyLog(userId, dateISO);
+    await this.dailyLogRepository.update(log!.id, dto);
+    return (await this.dailyLogRepository.findOne({ where: { id: log!.id } }))!;
   }
 
   async save(dailyLog: DailyLog): Promise<DailyLog> {
