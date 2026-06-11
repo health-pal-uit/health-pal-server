@@ -83,7 +83,10 @@ export class ChallengesUsersService {
       // update existing record to finished
       existingChallengeUser.progress_percent = 100;
       existingChallengeUser.completed_at = new Date();
-      return await this.challengesUsersRepository.save(existingChallengeUser);
+      const saved = await this.challengesUsersRepository.save(existingChallengeUser);
+      await this.notificationsService.notifyChallengeCompleted(userId, challenge.name);
+      await this.rewardChallengeCompletion(userId, saved.id);
+      return saved;
     }
 
     // create new finished challenge record
