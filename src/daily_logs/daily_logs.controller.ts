@@ -14,6 +14,7 @@ import { DailyLogPaginationDto } from './dto/daily-log-pagination.dto';
 import { DailyLogsService } from './daily_logs.service';
 import { CreateDailyLogDto } from './dto/create-daily_log.dto';
 import { UpdateDailyLogDto } from './dto/update-daily_log.dto';
+import { UpdateHealthMetricsDto } from './dto/update-health-metrics.dto';
 import { SupabaseGuard } from 'src/auth/guards/supabase/supabase.guard';
 import { CurrentUser } from 'src/helpers/decorators/current-user.decorator';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
@@ -98,6 +99,34 @@ export class DailyLogsController {
       return dailyLog;
     }
     return await this.dailyLogsService.findOne(id);
+  }
+
+  @Patch('date/:date/health-metrics')
+  @ApiOperation({
+    summary: 'Log health metrics (heart rate, sleep) for a specific date',
+    description:
+      'Creates the daily log for the date if it does not exist, then patches heart rate and sleep fields. These values are used by GET /recommendations/health-alert for anomaly detection.',
+  })
+  @ApiParam({
+    name: 'date',
+    type: String,
+    description: 'Date in dd-MM-yyyy format (e.g., 29-12-2025)',
+    example: '29-12-2025',
+  })
+  @ApiBody({ type: UpdateHealthMetricsDto })
+  @ApiResponse({ status: 200, description: 'Health metrics updated' })
+  async updateHealthMetrics(
+    @Param('date') date: string,
+    @Body() dto: UpdateHealthMetricsDto,
+    @CurrentUser() user: ReqUserType,
+  ) {
+    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+    if (!dateRegex.test(date)) {
+      throw new ForbiddenException('Invalid date format. Use dd-MM-yyyy (e.g., 29-12-2025)');
+    }
+    const [day, month, year] = date.split('-');
+    const isoDate = `${year}-${month}-${day}`;
+    return await this.dailyLogsService.updateHealthMetrics(user.id, isoDate, dto);
   }
 
   @Patch(':id')
