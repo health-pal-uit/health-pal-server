@@ -1,0 +1,195 @@
+{
+  "version": "healthpal-recognition-performance-repo-v1",
+  "release": {
+    "model_version": "healthpal-selected-92-v1",
+    "model_sha256": "c282c0654c589feb5fec8c6247e99a0ef92f0eefeabf08c5ce825ff7cfd08579",
+    "policy_version": "healthpal-main10-20261110-v1",
+    "catalogue_version": "main10-v1",
+    "candidate_floor": 0.05,
+    "confidence_threshold": 0.36970099806785583,
+    "target_class_ids": [80, 81, 82, 83, 84, 85, 86, 87, 88, 89]
+  },
+  "images": [
+    {
+      "id": "FT001",
+      "relative_path": "fixtures/FT001_bright_banh_mi.jpg",
+      "filename": "FT001_bright_banh_mi.jpg",
+      "mime": "image/jpeg",
+      "sha256": "b4ab9b338d3a061dc3f4fced33899f0ee9b1e03276ce084a155be5373085355a",
+      "bytes": 372641,
+      "historical_reference": {
+        "P0": {
+          "accepted": "True",
+          "predicted_food": "Banh_mi",
+          "confidence": "0.9308570027351379",
+          "reason": "accepted",
+          "correct_and_accepted": "True"
+        },
+        "P1": {
+          "accepted": "True",
+          "predicted_food": "Banh_mi",
+          "confidence": "0.9308570027351379",
+          "reason": "accepted",
+          "correct_and_accepted": "True"
+        },
+        "P2": {
+          "accepted": "True",
+          "predicted_food": "Banh_mi",
+          "confidence": "0.9308570027351379",
+          "reason": "accepted",
+          "correct_and_accepted": "True"
+        }
+      }
+    },
+    {
+      "id": "FT002",
+      "relative_path": "fixtures/FT002_uncertain_banh_mi.jpg",
+      "filename": "FT002_uncertain_banh_mi.jpg",
+      "mime": "image/jpeg",
+      "sha256": "d7c3e64dbcc70c058e3169c0ce52b0c8f5c639c7b036af81ccab5b10eadbf4f8",
+      "bytes": 410548,
+      "historical_reference": {
+        "P0": {
+          "accepted": "True",
+          "predicted_food": "Pho",
+          "confidence": "0.14411109685897827",
+          "reason": "accepted",
+          "correct_and_accepted": "False"
+        },
+        "P1": {
+          "accepted": "False",
+          "predicted_food": "Pho",
+          "confidence": "0.14411109685897827",
+          "reason": "below_threshold",
+          "correct_and_accepted": "False"
+        },
+        "P2": {
+          "accepted": "False",
+          "predicted_food": "Pho",
+          "confidence": "0.14411109685897827",
+          "reason": "below_threshold",
+          "correct_and_accepted": "False"
+        }
+      }
+    },
+    {
+      "id": "FT041",
+      "relative_path": "fixtures/FT041_p2_label_disagreement.jpg",
+      "filename": "FT041_p2_label_disagreement.jpg",
+      "mime": "image/jpeg",
+      "sha256": "2e0fdcb1d9acbbf8ef9524e74c4b3beb908c4da7b6d859596dc1b21298b4b4b8",
+      "bytes": 398154,
+      "historical_reference": {
+        "P0": {
+          "accepted": "True",
+          "predicted_food": "Bun_dau",
+          "confidence": "0.3742265999317169",
+          "reason": "accepted",
+          "correct_and_accepted": "True"
+        },
+        "P1": {
+          "accepted": "True",
+          "predicted_food": "Bun_dau",
+          "confidence": "0.3742265999317169",
+          "reason": "accepted",
+          "correct_and_accepted": "True"
+        },
+        "P2": {
+          "accepted": "False",
+          "predicted_food": "Bun_dau",
+          "confidence": "0.3742265999317169",
+          "reason": "view_label_disagreement",
+          "correct_and_accepted": "False"
+        }
+      }
+    },
+    {
+      "id": "FT065",
+      "relative_path": "fixtures/FT065_no_detection_goi_cuon.jpg",
+      "filename": "FT065_no_detection_goi_cuon.jpg",
+      "mime": "image/jpeg",
+      "sha256": "621ebfac78dc26f1b939be79166cdb1896129678a84d9566fa5aba6682e16a0a",
+      "bytes": 64637,
+      "historical_reference": {
+        "P0": {
+          "accepted": "False",
+          "predicted_food": "",
+          "confidence": "",
+          "reason": "no_candidate",
+          "correct_and_accepted": "False"
+        },
+        "P1": {
+          "accepted": "False",
+          "predicted_food": "",
+          "confidence": "",
+          "reason": "no_candidate",
+          "correct_and_accepted": "False"
+        },
+        "P2": {
+          "accepted": "False",
+          "predicted_food": "",
+          "confidence": "",
+          "reason": "no_candidate",
+          "correct_and_accepted": "False"
+        }
+      }
+    },
+    {
+      "id": "FT101",
+      "relative_path": "fixtures/FT101_outside_catalogue_sushi.jpg",
+      "filename": "FT101_outside_catalogue_sushi.jpg",
+      "mime": "image/jpeg",
+      "sha256": "9246150ca35e3a3fbe7d5ea667ac8dbda565e97698df4a771b005e09ffdaa6ec",
+      "bytes": 168448,
+      "historical_reference": {
+        "P0": {
+          "accepted": "False",
+          "predicted_food": "Sushi",
+          "confidence": "0.3303498923778534",
+          "reason": "outside_catalogue",
+          "correct_and_accepted": "False"
+        },
+        "P1": {
+          "accepted": "False",
+          "predicted_food": "Sushi",
+          "confidence": "0.3303498923778534",
+          "reason": "outside_catalogue",
+          "correct_and_accepted": "False"
+        },
+        "P2": {
+          "accepted": "False",
+          "predicted_food": "Sushi",
+          "confidence": "0.3303498923778534",
+          "reason": "outside_catalogue",
+          "correct_and_accepted": "False"
+        }
+      }
+    }
+  ],
+  "matrix": [
+    {
+      "policy": "P0",
+      "vus": 1,
+      "iterations": 60
+    },
+    {
+      "policy": "P1",
+      "vus": 1,
+      "iterations": 60
+    },
+    {
+      "policy": "P2",
+      "vus": 1,
+      "iterations": 60
+    },
+    {
+      "policy": "P1",
+      "vus": 2,
+      "iterations": 60
+    }
+  ],
+  "think_seconds": 0.25,
+  "warmup_requests_per_run": 5,
+  "purpose": "Fixed, equally weighted repeated images; serving latency/errors, not a new accuracy or capacity test.",
+  "origin": "Repository packaging of the 2026-11-22 benchmark: same release, photo bytes, profiles and checks; portable paths and optional sample logging."
+}

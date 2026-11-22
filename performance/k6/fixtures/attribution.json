@@ -1,0 +1,75 @@
+{
+  "scope": "Academic functional/performance fixtures. Previously inspected final-test photos; not training or new accuracy data. Keep source and licence notices with copies.",
+  "files": [
+    {
+      "input_id": "FT001",
+      "source_page": "https://www.kaggle.com/datasets/quandang/vietnamese-foods/versions/11",
+      "source_file": "Images/Test/Banh mi/756.jpg",
+      "source_dataset": "30VNFoods-v11",
+      "author": "Original photographer not identified",
+      "license": "CC BY-NC-SA4.0 (publisher declaration; original per-image rights not independently established)",
+      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "reuse_scope": "Functional regression/demo only. Previously inspected final-test image; never new accuracy evidence or new training data.",
+      "file": "fixtures/FT001_bright_banh_mi.jpg",
+      "sha256": "b4ab9b338d3a061dc3f4fced33899f0ee9b1e03276ce084a155be5373085355a",
+      "bytes": 372641,
+      "modified": false
+    },
+    {
+      "input_id": "FT002",
+      "source_page": "https://www.kaggle.com/datasets/quandang/vietnamese-foods/versions/11",
+      "source_file": "Images/Test/Banh mi/985.jpg",
+      "source_dataset": "30VNFoods-v11",
+      "author": "Original photographer not identified",
+      "license": "CC BY-NC-SA4.0 (publisher declaration; original per-image rights not independently established)",
+      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "reuse_scope": "Functional regression/demo only. Previously inspected final-test image; never new accuracy evidence or new training data.",
+      "file": "fixtures/FT002_uncertain_banh_mi.jpg",
+      "sha256": "d7c3e64dbcc70c058e3169c0ce52b0c8f5c639c7b036af81ccab5b10eadbf4f8",
+      "bytes": 410548,
+      "modified": false
+    },
+    {
+      "input_id": "FT041",
+      "source_page": "https://www.kaggle.com/datasets/quandang/vietnamese-foods/versions/11",
+      "source_file": "Images/Test/Bun dau mam tom/711.jpg",
+      "source_dataset": "30VNFoods-v11",
+      "author": "Original photographer not identified",
+      "license": "CC BY-NC-SA4.0 (publisher declaration; original per-image rights not independently established)",
+      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "reuse_scope": "Functional regression/demo only. Previously inspected final-test image; never new accuracy evidence or new training data.",
+      "file": "fixtures/FT041_p2_label_disagreement.jpg",
+      "sha256": "2e0fdcb1d9acbbf8ef9524e74c4b3beb908c4da7b6d859596dc1b21298b4b4b8",
+      "bytes": 398154,
+      "modified": false
+    },
+    {
+      "input_id": "FT065",
+      "source_page": "https://www.kaggle.com/datasets/quandang/vietnamese-foods/versions/11",
+      "source_file": "Images/Test/Goi cuon/806.jpg",
+      "source_dataset": "30VNFoods-v11",
+      "author": "Original photographer not identified",
+      "license": "CC BY-NC-SA4.0 (publisher declaration; original per-image rights not independently established)",
+      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "reuse_scope": "Functional regression/demo only. Previously inspected final-test image; never new accuracy evidence or new training data.",
+      "file": "fixtures/FT065_no_detection_goi_cuon.jpg",
+      "sha256": "621ebfac78dc26f1b939be79166cdb1896129678a84d9566fa5aba6682e16a0a",
+      "bytes": 64637,
+      "modified": false
+    },
+    {
+      "input_id": "FT101",
+      "source_page": "https://www.kaggle.com/datasets/quandang/vietnamese-foods/versions/11",
+      "source_file": "Images/Test/Banh khot/119.jpg",
+      "source_dataset": "30VNFoods-v11",
+      "author": "Original photographer not identified",
+      "license": "CC BY-NC-SA4.0 (publisher declaration; original per-image rights not independently established)",
+      "license_url": "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+      "reuse_scope": "Functional regression/demo only. Previously inspected final-test image; never new accuracy evidence or new training data.",
+      "file": "fixtures/FT101_outside_catalogue_sushi.jpg",
+      "sha256": "9246150ca35e3a3fbe7d5ea667ac8dbda565e97698df4a771b005e09ffdaa6ec",
+      "bytes": 168448,
+      "modified": false
+    }
+  ]
+}

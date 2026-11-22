@@ -1,0 +1,6 @@
+# Local credentials and generated measurements.
+auth.local.env
+results/
+*.html
+*.ndjson
+*.log
