@@ -1,0 +1,11 @@
+apiVersion: 1
+providers:
+  - name: HealthPal
+    orgId: 1
+    folder: HealthPal
+    type: file
+    disableDeletion: false
+    allowUiUpdates: false
+    updateIntervalSeconds: 10
+    options:
+      path: /etc/grafana/dashboards

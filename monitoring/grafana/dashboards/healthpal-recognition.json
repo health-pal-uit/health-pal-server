@@ -1,0 +1,424 @@
+{
+  "id": null,
+  "uid": "healthpal-recognition",
+  "title": "HealthPal Recognition",
+  "tags": ["healthpal", "recognition", "local-verification"],
+  "schemaVersion": 39,
+  "version": 1,
+  "editable": false,
+  "refresh": "10s",
+  "timezone": "browser",
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "description": "Local backend-to-AI forwarding monitoring only. Recognition accuracy, Mobile latency, CPU/RAM, full API error rate and distributed traces are outside this dashboard.",
+  "templating": {
+    "list": [
+      {
+        "name": "request_id",
+        "label": "Request ID / run prefix (blank = all)",
+        "type": "textbox",
+        "query": "",
+        "current": {
+          "text": "",
+          "value": ""
+        },
+        "options": [
+          {
+            "text": "",
+            "value": "",
+            "selected": true
+          }
+        ]
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Forwarded AI requests",
+      "type": "stat",
+      "description": "Only requests forwarded by the backend; excludes auth/upload rejections before AI.",
+      "datasource": {
+        "type": "loki",
+        "uid": "healthpal-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 8,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({job=\"healthpal-recognition\"} |= \"$request_id\" [$__range])) or vector(0)",
+          "datasource": {
+            "type": "loki",
+            "uid": "healthpal-loki"
+          },
+          "queryType": "instant",
+          "legendFormat": "{{event}}"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showLegend": true,
+        "showTime": true
+      }
+    },
+    {
+      "id": 2,
+      "title": "AI HTTP 2xx responses",
+      "type": "stat",
+      "description": "Upstream HTTP success, not recognition accuracy or user acceptance.",
+      "datasource": {
+        "type": "loki",
+        "uid": "healthpal-loki"
+      },
+      "gridPos": {
+        "x": 8,
+        "y": 0,
+        "w": 8,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({job=\"healthpal-recognition\",event=\"food_recognition\"} |= \"$request_id\" [$__range])) or vector(0)",
+          "datasource": {
+            "type": "loki",
+            "uid": "healthpal-loki"
+          },
+          "queryType": "instant",
+          "legendFormat": "{{event}}"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showLegend": true,
+        "showTime": true
+      }
+    },
+    {
+      "id": 3,
+      "title": "AI forwarding failures",
+      "type": "stat",
+      "description": "Includes upstream 4xx input errors, upstream 5xx and transport failures; not every backend API error.",
+      "datasource": {
+        "type": "loki",
+        "uid": "healthpal-loki"
+      },
+      "gridPos": {
+        "x": 16,
+        "y": 0,
+        "w": 8,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(count_over_time({job=\"healthpal-recognition\",event=\"food_recognition_failed\"} |= \"$request_id\" [$__range])) or vector(0)",
+          "datasource": {
+            "type": "loki",
+            "uid": "healthpal-loki"
+          },
+          "queryType": "instant",
+          "legendFormat": "{{event}}"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showLegend": true,
+        "showTime": true
+      }
+    },
+    {
+      "id": 4,
+      "title": "Backend to AI p95 (5-minute window)",
+      "type": "timeseries",
+      "description": "Actual axios elapsed_ms from backend logs. Excludes authentication, client transfer and Mobile.",
+      "datasource": {
+        "type": "loki",
+        "uid": "healthpal-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "quantile_over_time(0.95, {job=\"healthpal-recognition\"} |= \"$request_id\" | json | unwrap elapsed_ms | __error__=\"\" [5m]) by (endpoint)",
+          "datasource": {
+            "type": "loki",
+            "uid": "healthpal-loki"
+          },
+          "queryType": "range",
+          "legendFormat": "{{endpoint}}"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showLegend": true,
+        "showTime": true
+      }
+    },
+    {
+      "id": 5,
+      "title": "Forwarding events per second (1-minute window)",
+      "type": "timeseries",
+      "description": "",
+      "datasource": {
+        "type": "loki",
+        "uid": "healthpal-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (event) (rate({job=\"healthpal-recognition\"} |= \"$request_id\" [1m]))",
+          "datasource": {
+            "type": "loki",
+            "uid": "healthpal-loki"
+          },
+          "queryType": "range",
+          "legendFormat": "{{event}}"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showLegend": true,
+        "showTime": true
+      }
+    },
+    {
+      "id": 6,
+      "title": "Backend to AI p50 (5-minute window)",
+      "type": "timeseries",
+      "description": "",
+      "datasource": {
+        "type": "loki",
+        "uid": "healthpal-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "quantile_over_time(0.50, {job=\"healthpal-recognition\"} |= \"$request_id\" | json | unwrap elapsed_ms | __error__=\"\" [5m]) by (endpoint)",
+          "datasource": {
+            "type": "loki",
+            "uid": "healthpal-loki"
+          },
+          "queryType": "range",
+          "legendFormat": "{{endpoint}}"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showLegend": true,
+        "showTime": true
+      }
+    },
+    {
+      "id": 7,
+      "title": "Forwarded requests by upstream HTTP status",
+      "type": "barchart",
+      "description": "Empty status means no upstream HTTP response (for example connection refused).",
+      "datasource": {
+        "type": "loki",
+        "uid": "healthpal-loki"
+      },
+      "gridPos": {
+        "x": 12,
+        "y": 12,
+        "w": 12,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum by (upstream_status) (count_over_time({job=\"healthpal-recognition\"} |= \"$request_id\" [$__range]))",
+          "datasource": {
+            "type": "loki",
+            "uid": "healthpal-loki"
+          },
+          "queryType": "instant",
+          "legendFormat": "{{event}}"
+        }
+      ],
+      "options": {
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        },
+        "showLegend": true,
+        "showTime": true
+      }
+    },
+    {
+      "id": 8,
+      "title": "Recognition logs - filter by request ID or run prefix above",
+      "type": "logs",
+      "description": "Only allowlisted forwarding metadata. A request ID links this line to its API response; this is log correlation, not distributed tracing.",
+      "datasource": {
+        "type": "loki",
+        "uid": "healthpal-loki"
+      },
+      "gridPos": {
+        "x": 0,
+        "y": 20,
+        "w": 24,
+        "h": 11
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{job=\"healthpal-recognition\"} |~ \"$request_id\" | json",
+          "datasource": {
+            "type": "loki",
+            "uid": "healthpal-loki"
+          },
+          "queryType": "range",
+          "legendFormat": "{{event}}"
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "showCommonLabels": false,
+        "wrapLogMessage": true,
+        "prettifyLogMessage": true,
+        "enableLogDetails": true,
+        "sortOrder": "Descending",
+        "dedupStrategy": "none"
+      }
+    }
+  ],
+  "annotations": {
+    "list": []
+  }
+}
