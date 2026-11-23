@@ -1,3 +1,11 @@
+# Start the configured backend, AI and monitoring with: docker compose up -d
+# DB_TARGET/CLOUD_DB_* are read from the existing private .env at runtime.
+x-service-logging: &service-logging
+  driver: json-file
+  options:
+    max-size: '10m'
+    max-file: '3'
+
 services:
   health-pal-db:
     image: postgres:17
@@ -6,144 +14,176 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_DATABASE}
     ports:
-      - '5433:5432'
+      - '127.0.0.1:5433:5432'
     volumes:
       - health-pal-db-data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U ${DB_USERNAME}']
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 10
+    logging: *service-logging
+    restart: unless-stopped
+
+  healthpal-ai:
+    build:
+      context: ${HEALTHPAL_AI_SOURCE:-../healthpal-ai-service}
+      dockerfile: ${HEALTHPAL_AI_DOCKERFILE:-../health-pal-server/docker/ai.Dockerfile}
+    environment:
+      HEALTHPAL_DEVICE: cpu
+      HEALTHPAL_MODEL_PATH: /app/models/healthpal-selected-92.pt
+      YOLO_CONFIG_DIR: /tmp/ultralytics
+      MPLCONFIGDIR: /tmp/matplotlib
+    volumes:
+      - type: bind
+        source: ${HEALTHPAL_MODEL_FILE:-../healthpal-ai-service/models/healthpal-selected-92.pt}
+        target: /app/models/healthpal-selected-92.pt
+        read_only: true
+        bind:
+          create_host_path: false
+    ports:
+      - '127.0.0.1:8001:8001'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'python',
+          '-c',
+          'import urllib.request; urllib.request.urlopen("http://127.0.0.1:8001/health/ready", timeout=4).close()',
+        ]
+      interval: 10s
+      timeout: 5s
+      start_period: 45s
+      retries: 12
+    logging: *service-logging
+    restart: unless-stopped
 
   health-pal-server:
     build:
       context: .
+    env_file:
+      - .env
     environment:
       NODE_ENV: production
+      PORT: 3001
+      DB_TARGET: ${DB_TARGET:-local}
       DB_HOST: health-pal-db
-      DB_PORT: ${DB_PORT}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_DATABASE: ${DB_DATABASE}
-      SUPABASE_URL: ${SUPABASE_URL}
-      SUPABASE_KEY: ${SUPABASE_KEY}
-      SUPABASE_JWT_SECRET: ${SUPABASE_JWT_SECRET}
-      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
-      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
-      GOOGLE_CALLBACK_URL: ${GOOGLE_CALLBACK_URL}
-      AVATAR_BUCKET_NAME: ${AVATAR_BUCKET_NAME}
-      POST_IMG_BUCKET_NAME: ${POST_IMG_BUCKET_NAME}
-      POST_VIDEO_BUCKET_NAME: ${POST_VIDEO_BUCKET_NAME}
-      CHAT_IMG_BUCKET_NAME: ${CHAT_IMG_BUCKET_NAME}
-      CHALLENGE_IMG_BUCKET_NAME: ${CHALLENGE_IMG_BUCKET_NAME}
-      MEDAL_IMG_BUCKET_NAME: ${MEDAL_IMG_BUCKET_NAME}
-      MEAL_IMG_BUCKET_NAME: ${MEAL_IMG_BUCKET_NAME}
-      INGREDIENT_IMG_BUCKET_NAME: ${INGREDIENT_IMG_BUCKET_NAME}
-      PROJECT_ID: ${PROJECT_ID}
-      PRIVATE_KEY: ${PRIVATE_KEY}
-      CLIENT_EMAIL: ${CLIENT_EMAIL}
-      GOOGLE_FIT_CALLBACK_URL: ${GOOGLE_FIT_CALLBACK_URL}
-      ALCHEMY_RPC_URL: ${ALCHEMY_RPC_URL}
-      BACKEND_PRIVATE_KEY: ${BACKEND_PRIVATE_KEY}
-      CONTRACT_ADDRESS: ${CONTRACT_ADDRESS}
-      GEMINI_API_KEY: ${GEMINI_API_KEY}
-      FOOD_VISION_URL: ${FOOD_VISION_URL}
-      LICENSES_BUCKET_NAME: ${LICENSES_BUCKET_NAME}
-      FRONTEND_URL: ${FRONTEND_URL}
+      DB_PORT: 5432
+      HEALTHPAL_AI_BASE_URL: http://healthpal-ai:8001
+      HEALTHPAL_AI_TIMEOUT_MS: ${HEALTHPAL_AI_TIMEOUT_MS:-10000}
+      # Optional legacy /analyze service continues to run separately on the host.
+      FOOD_VISION_URL: ${FOOD_VISION_CONTAINER_URL:-http://host.docker.internal:5000/analyze}
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    labels:
+      healthpal.logs: recognition
     ports:
       - '3001:3001'
     depends_on:
       health-pal-db:
         condition: service_healthy
+      healthpal-ai:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          'fetch("http://127.0.0.1:3001/api-json").then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))',
+        ]
+      interval: 15s
+      timeout: 5s
+      start_period: 60s
+      retries: 12
+    logging: *service-logging
+    restart: unless-stopped
 
   loki:
     image: grafana/loki:3.0.0
+    command: ['-config.file=/etc/loki/local-config.yaml']
     ports:
-      - '3100:3100'
+      - '127.0.0.1:3100:3100'
     volumes:
-      - ./monitoring/loki-config.yml:/etc/loki/local-config.yaml
-      - loki-data:/loki
-    command: -config.file=/etc/loki/local-config.yaml
+      - ./monitoring/loki-config.yml:/etc/loki/local-config.yaml:ro
+      - recognition-loki-data:/loki
     healthcheck:
-      test: ['CMD-SHELL', 'wget -q --tries=1 -O- http://localhost:3100/ready || exit 1']
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:3100/ready || exit 1']
       interval: 10s
       timeout: 5s
-      retries: 5
+      start_period: 30s
+      retries: 12
+    logging: *service-logging
+    restart: unless-stopped
 
-  promtail:
-    image: grafana/promtail:3.0.0
+  alloy:
+    image: grafana/alloy:v1.22.0
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config
+    environment:
+      HEALTHPAL_COMPOSE_PROJECT: ${COMPOSE_PROJECT_NAME:-health-pal-server}
+    ports:
+      - '127.0.0.1:12345:12345'
     volumes:
-      - ./monitoring/promtail-config.yml:/etc/promtail/config.yml
-      - /var/run/docker.sock:/var/run/docker.sock
-    command: -config.file=/etc/promtail/config.yml
+      - ./monitoring/config.docker.alloy:/etc/alloy/config/source.alloy:ro
+      - ./monitoring/recognition-pipeline.alloy:/etc/alloy/config/pipeline.alloy:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - recognition-alloy-data:/var/lib/alloy/data
     depends_on:
       loki:
         condition: service_healthy
+    logging: *service-logging
+    restart: unless-stopped
+
+  grafana-init:
+    image: busybox:1.37.0
+    entrypoint: ['/bin/sh', '/opt/healthpal/init-grafana-secret.sh']
+    volumes:
+      - ./docker/init-grafana-secret.sh:/opt/healthpal/init-grafana-secret.sh:ro
+      - ./monitoring:/existing-monitoring:ro
+      - recognition-secrets:/run/healthpal-secrets
+    read_only: true
+    logging: *service-logging
+    restart: 'no'
 
   grafana:
     image: grafana/grafana:11.0.0
     ports:
-      - '3000:3000'
+      - '127.0.0.1:3000:3000'
     environment:
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      GF_AUTH_ANONYMOUS_ENABLED: 'true'
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_SECURITY_ADMIN_USER: healthpaladmin
+      GF_SECURITY_ADMIN_PASSWORD__FILE: /run/healthpal-secrets/grafana-admin-password
+      GF_USERS_ALLOW_SIGN_UP: 'false'
+      GF_ANALYTICS_REPORTING_ENABLED: 'false'
+      GF_ANALYTICS_CHECK_FOR_UPDATES: 'false'
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: 'false'
     volumes:
-      - grafana-data:/var/lib/grafana
+      - recognition-grafana-data:/var/lib/grafana
+      - recognition-secrets:/run/healthpal-secrets:ro
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/etc/grafana/dashboards:ro
     depends_on:
+      grafana-init:
+        condition: service_completed_successfully
       loki:
         condition: service_healthy
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -q -O /dev/null http://127.0.0.1:3000/api/health || exit 1']
+      interval: 10s
+      timeout: 5s
+      start_period: 30s
+      retries: 12
+    logging: *service-logging
+    restart: unless-stopped
 
 volumes:
   health-pal-db-data:
-  loki-data:
-  grafana-data:
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Docker Compose reference guide at
-# https://docs.docker.com/go/compose-spec-reference/
-
-# Here the instructions define your application as a service called "server".
-# This service is built from the Dockerfile in the current directory.
-# You can add other services your application may depend on here, such as a
-# database or a cache. For examples, see the Awesome Compose repository:
-# https://github.com/docker/awesome-compose
-# services:
-#   server:
-#     build:
-#       context: .
-#     environment:
-#       NODE_ENV: production
-#     ports:
-#       - 3000:3000
-
-# The commented out section below is an example of how to define a PostgreSQL
-# database that your application can use. `depends_on` tells Docker Compose to
-# start the database before your application. The `db-data` volume persists the
-# database data between container restarts. The `db-password` secret is used
-# to set the database password. You must create `db/password.txt` and add
-# a password of your choosing to it before running `docker-compose up`.
-#     depends_on:
-#       db:
-#         condition: service_healthy
-#   db:
-#     image: postgres
-#     restart: always
-#     user: postgres
-#     secrets:
-#       - db-password
-#     volumes:
-#       - db-data:/var/lib/postgresql/data
-#     environment:
-#       - POSTGRES_DB=example
-#       - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
-#     expose:
-#       - 5432
-#     healthcheck:
-#       test: [ "CMD", "pg_isready" ]
-#       interval: 10s
-#       timeout: 5s
-#       retries: 5
-# volumes:
-#   db-data:
-# secrets:
-#   db-password:
-#     file: db/password.txt
+  recognition-loki-data:
+  recognition-alloy-data:
+  recognition-grafana-data:
+  recognition-secrets:

@@ -1,0 +1,15 @@
+# AI build context is the sibling source checkout. Keep weights and Git out.
+**
+!requirements.txt
+!healthpal_ai/
+!healthpal_ai/**
+!config/
+!config/**
+!models/
+!models/model-manifest.json
+!models/model-card.json
+!third_party/
+!third_party/**
+!LICENSE
+**/__pycache__
+**/*.pyc

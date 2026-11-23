@@ -17,11 +17,12 @@ services:
       - run
       - --server.http.listen-addr=0.0.0.0:12345
       - --storage.path=/var/lib/alloy/data
-      - /etc/alloy/config.alloy
+      - /etc/alloy/config
     ports:
       - '127.0.0.1:12345:12345'
     volumes:
-      - ./config.alloy:/etc/alloy/config.alloy:ro
+      - ./config.alloy:/etc/alloy/config/source.alloy:ro
+      - ./recognition-pipeline.alloy:/etc/alloy/config/pipeline.alloy:ro
       - ${HP_BACKEND_LOG_DIR:-../../.cache/recognition-performance-20261122}/backend.stdout.log:/var/log/healthpal/backend.stdout.log:ro
       - ${HP_BACKEND_LOG_DIR:-../../.cache/recognition-performance-20261122}/backend.stderr.log:/var/log/healthpal/backend.stderr.log:ro
       - local-alloy-data:/var/lib/alloy/data

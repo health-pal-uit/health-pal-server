@@ -1,8 +1,20 @@
 # Local recognition monitoring
 
-**Backend log files → Alloy → Loki → Grafana.** This configuration monitors the Windows-hosted backend's actual AI forwarding calls. It starts three monitoring containers and leaves the application/database containers in the original Compose file alone.
+**Backend → Alloy → Loki → Grafana.** The main Compose stack collects the containerized backend's actual AI forwarding calls. The host-run alternative below collects Windows log files instead.
 
-## Open / start
+## Default: start the full Compose stack
+
+From the backend repository:
+
+```powershell
+docker compose up -d
+```
+
+This includes backend, AI, database and monitoring. Grafana's secret is initialized automatically in a private volume. See the [Compose guide](../docker/COMPOSE.md) for the sibling AI source/model prerequisites. Use `--compose` when running `verify-monitoring.py` against this stack.
+
+`config.docker.alloy` discovers the labelled backend in the current Compose project. `recognition-pipeline.alloy` sanitizes its logs before shipping them. No Windows log-file mounts are needed in this mode.
+
+## Alternative: keep the backend on Windows
 
 The backend and AI must already be running. In the current research workspace, from `health-pal-server`:
 
@@ -63,7 +75,7 @@ An existing private token file can be supplied with `--token-file PATH`; never p
 ## Files / limits
 
 - `compose.local.yaml`: standalone local stack; pinned Grafana 11.0.0 and Loki 3.0.0 reuse the available baseline images, with Alloy 1.22.0.
-- `config.alloy`: reads only two read-only log mounts, drops unrelated lines and exports six allowlisted fields. No tokens, images, SQL or account records are shipped. Request IDs stay in JSON content, not stream labels.
+- `config.alloy`: host-mode file input. Both modes use `recognition-pipeline.alloy`, which drops unrelated lines and exports six allowlisted fields. No tokens, images, SQL or account records are shipped. Request IDs stay in JSON content, not stream labels.
 - `grafana/`: provisioned Loki datasource and dashboard; files are the source of truth.
 - `.grafana-admin-password.local`: generated private admin password, ignored by Git. Local anonymous access is **Viewer**, not Admin.
 

@@ -276,8 +276,10 @@ npm run start:prod
 #### Using Docker Compose
 
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
+
+Starts the backend, selected CPU AI service, PostgreSQL and the provisioned Grafana/Loki/Alloy stack. Keep the existing `.env`; `DB_TARGET=cloud` preserves the cloud database connection. The sibling `../healthpal-ai-service` checkout and its separate verified model artifact are required. See the [short Compose guide](docker/COMPOSE.md) for setup, addresses and verification.
 
 ### API Documentation
 

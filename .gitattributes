@@ -1,0 +1,2 @@
+# Entrypoints mounted into Linux containers must keep Unix line endings.
+docker/*.sh text eol=lf

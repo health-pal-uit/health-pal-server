@@ -10,6 +10,7 @@ import json
 import os
 import re
 import struct
+import subprocess
 import time
 import urllib.error
 import urllib.parse
@@ -58,6 +59,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--token-file', type=Path, default=REPO / 'performance/k6/auth.local.env')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--compose', action='store_true', help='Read the main Compose stack\'s private Grafana credential from its container.')
     args = parser.parse_args()
     token = os.environ.get('HP_TOKEN', '').strip()
     if not token and args.token_file.is_file():
@@ -157,7 +159,11 @@ def main():
     save('recognition-probes.json', probes)
 
     # Check Grafana's own data-source path, not just direct Loki connectivity.
-    secret = (MONITORING / '.grafana-admin-password.local').read_text(encoding='utf-8').strip()
+    if args.compose:
+        secret = subprocess.check_output(['docker', 'compose', 'exec', '-T', 'grafana', 'cat',
+                                         '/run/healthpal-secrets/grafana-admin-password'], cwd=REPO, text=True).strip()
+    else:
+        secret = (MONITORING / '.grafana-admin-password.local').read_text(encoding='utf-8').strip()
     grafana_auth = {'Authorization': 'Basic ' + base64.b64encode(('healthpaladmin:' + secret).encode()).decode()}
     status, datasource = http('http://127.0.0.1:3000/api/datasources/uid/healthpal-loki/health', headers=grafana_auth)
     assert status == 200 and datasource.get('status') == 'OK', f'Grafana datasource health failed: {status}.'
@@ -186,6 +192,7 @@ def main():
     summary = {'status': 'passed', 'started_at_utc': datetime.fromtimestamp(started, timezone.utc).isoformat(),
                'finished_at_utc': datetime.now(timezone.utc).isoformat(), 'request_id_prefix': prefix,
                'scope': 'Live authenticated local monitoring verification, not a new load/accuracy test.',
+               'runtime': 'compose' if args.compose else 'hosted-backend',
                'api_probes': len(probes), 'http_200': sum(r['http_status'] == 200 for r in probes),
                'expected_pixel_limit_413': 1, 'expected_missing_token_401': 1,
                'forwarding_logs_expected': len(expected_ids), 'forwarding_logs_matched': len(events),

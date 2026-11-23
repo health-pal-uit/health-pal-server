@@ -32,3 +32,15 @@
 **/dist
 LICENSE
 README.md
+
+# Runtime credentials, machine instructions and test outputs never enter builds.
+**/.env*
+**/*.local.env
+**/.grafana-admin-password.local
+**/.codex
+**/.agents
+**/AGENTS.md
+performance
+monitoring
+**/__pycache__
+**/*.pyc
