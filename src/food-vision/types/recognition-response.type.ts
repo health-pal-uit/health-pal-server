@@ -70,7 +70,7 @@ function candidate(value: unknown): value is RecognitionCandidate {
   return (
     Number.isInteger(value.class_id) &&
     (value.class_id as number) >= 0 &&
-    (value.class_id as number) <= 91 &&
+    (value.class_id as number) <= 94 &&
     text(value.label) &&
     finite(value.confidence) &&
     value.confidence >= 0 &&

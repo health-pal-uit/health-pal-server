@@ -122,10 +122,47 @@ describe('FoodVisionService recognition adapter', () => {
     );
   });
   it.each([
+    [92, 'Macarons'],
+    [93, 'Edamame'],
+    [94, 'Churros'],
+  ])('preserves the approved preview class %i (%s)', async (classId, label) => {
+    const suggestion = { ...top, class_id: classId, label };
+    const result = {
+      ...recognized(),
+      model_version: 'healthpal-protected-95-preview-v1',
+      policy_version: 'healthpal-main13-preview-20261127-v1',
+      catalogue_version: 'main13-preview-v1',
+      release_profile: 'protected95-preview',
+      policy_validation_status: 'uncalibrated_preview',
+      candidate: suggestion,
+      suggestion,
+    };
+    post.mockResolvedValue(response(result));
+    await expect(
+      service.recognizeFoodImage(image, FoodRecognitionPolicy.P1, requestId),
+    ).resolves.toBe(result);
+    const comparison = {
+      ...result,
+      results: Object.values(FoodRecognitionPolicy).map((policy) => ({
+        policy,
+        status: 'accepted',
+        reason: 'accepted',
+        suggestion,
+      })),
+    };
+    post.mockResolvedValue(response(comparison));
+    await expect(service.compareFoodImage(image, requestId)).resolves.toBe(comparison);
+  });
+  it.each([
     { labels: ['Pho'] },
     { ...recognized(), request_id: 'different-request' },
     { ...recognized(), policy: FoodRecognitionPolicy.P0 },
     { ...recognized(), candidate: { ...top, bbox_xyxy: [0, 0] } },
+    {
+      ...recognized(),
+      candidate: { ...top, class_id: 95 },
+      suggestion: { ...top, class_id: 95 },
+    },
     { ...recognized(), user_confirmation_required: false },
     { ...recognized(), suggestion: null },
     { ...recognized(), statusCode: 200, message: 'bypass envelope' },
